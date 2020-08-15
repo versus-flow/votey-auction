@@ -118,6 +118,8 @@ pub contract VoteyAuction {
             // borrow a reference to the owner's NFT receiver
             if let vaultRef = capability.borrow() {
                 let bidVaultRef = &self.bidVault as &FungibleToken.Vault
+                log("Paid out money")
+                log(bidVaultRef.balance)
                 vaultRef.deposit(from: <-bidVaultRef.withdraw(amount: bidVaultRef.balance))
             } else {
                 log("sendBidTokens(): couldn't get vault ref")
