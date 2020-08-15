@@ -27,6 +27,8 @@ pub contract VoteyAuction {
     pub event NewBid(tokenID: UInt64, bidPrice: UFix64)
     pub event AuctionSettled(tokenID: UInt64, price: UFix64)
 
+    pub event MarketplaceEarned(amount:UFix64)
+
     // AuctionItem contains the Resources and metadata for a single auction
     pub resource AuctionItem {
         
@@ -158,7 +160,11 @@ pub contract VoteyAuction {
             }            
 
             //Withdraw cutPercentage to marketplace and put it in their vault
-            let beneficiaryCut <- self.bidVault.withdraw(amount: self.currentPrice*cutPercentage)
+            let amount=self.currentPrice*cutPercentage
+            let beneficiaryCut <- self.bidVault.withdraw(amount:amount )
+            log("Marketplace cut was")
+            log(amount)
+            emit MarketplaceEarned(amount: amount)
             cutVault.borrow()!.deposit(from: <- beneficiaryCut)
 
             self.exchangeTokens()
