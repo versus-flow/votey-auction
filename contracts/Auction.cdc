@@ -132,7 +132,7 @@ pub contract VoteyAuction {
             }
         }
 
-        pub fun settleAuction()  {
+        pub fun settleAuction(cutPercentage: UFix64, cutVault:Capability<&{FungibleToken.Receiver}> )  {
 
             if self.auctionCompleted {
                 log("this auction is already settled")
@@ -156,6 +156,10 @@ pub contract VoteyAuction {
                 log("No bids. Nothing to settle")
                 return
             }            
+
+            //Withdraw cutPercentage to marketplace and put it in their vault
+            let beneficiaryCut <- self.bidVault.withdraw(amount: self.currentPrice*cutPercentage)
+            cutVault.borrow()!.deposit(from: <- beneficiaryCut)
 
             self.exchangeTokens()
 
@@ -271,8 +275,15 @@ pub contract VoteyAuction {
 
         // Auction Items
         pub var auctionItems: @{UInt64: AuctionItem}
-        
-        init() {
+        pub var cutPercentage:UFix64 
+        pub let marketplaceVault: Capability<&{FungibleToken.Receiver}>
+
+        init(
+            marketplaceVault: Capability<&{FungibleToken.Receiver}>, 
+            cutPercentage: UFix64
+        ) {
+            self.cutPercentage= cutPercentage
+            self.marketplaceVault = marketplaceVault
             self.auctionItems <- {}
         }
 
@@ -324,9 +335,8 @@ pub contract VoteyAuction {
         pub fun settleAuction(_ id: UInt64) {
             let itemRef = &self.auctionItems[id] as &AuctionItem
 
-            itemRef.settleAuction()
+            itemRef.settleAuction(cutPercentage: self.cutPercentage, cutVault: self.marketplaceVault)
 
-            //TODO: Marketplace cut
         }
 
         // placeBid sends the bidder's tokens to the bid vault and updates the
@@ -353,8 +363,11 @@ pub contract VoteyAuction {
     }
 
     // createAuctionCollection returns a new AuctionCollection resource to the caller
-    pub fun createAuctionCollection(): @AuctionCollection {
-        let auctionCollection <- create AuctionCollection()
+    pub fun createAuctionCollection(marketplaceVault: Capability<&{FungibleToken.Receiver}>,cutPercentage: UFix64): @AuctionCollection {
+        let auctionCollection <- create AuctionCollection(
+            marketplaceVault: marketplaceVault, 
+            cutPercentage: cutPercentage
+        )
         return <- auctionCollection
     }
 

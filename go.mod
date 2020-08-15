@@ -1,8 +1,8 @@
-module github.com/0xAlchemist/votey-auction
+module github.com/versus-flow/auction-flow-contract
 
 go 1.14
 
 require (
-	github.com/0xAlchemist/go-flow-tooling v0.9.0
 	github.com/onflow/cadence v0.8.0
+	github.com/versus-flow/go-flow-tooling v0.10.1
 )

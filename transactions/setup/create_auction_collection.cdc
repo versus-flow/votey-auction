@@ -16,7 +16,13 @@ transaction {
     prepare(account: AuthAccount) {
         // create a new sale object     
         // initializing it with the reference to the owner's Vault
-        let auction <- VoteyAuction.createAuctionCollection()
+
+        let marketplaceReceiver=account.getCapability<&{FungibleToken.Receiver}>(/public/DemoTokenReceiver)!
+
+        let auction <- VoteyAuction.createAuctionCollection(
+            marketplaceVault: marketplaceReceiver,
+            cutPercentage: UFix64(0.15)
+        )
 
         // store the sale resource in the account for storage
         account.save(<-auction, to: /storage/NFTAuction)

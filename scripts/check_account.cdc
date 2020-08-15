@@ -27,7 +27,7 @@ pub struct AddressStatus {
   }
 }
 
-pub fun main(address:Address):AddressStatus {
+pub fun main(address:Address) {
     // get the accounts' public address objects
     let account = getAccount(address)
     let status= AddressStatus(address)
@@ -64,6 +64,6 @@ pub fun main(address:Address):AddressStatus {
         log("No items for sale 2")
     } 
     log("=====================")
-    return status
+    //return status
 
 }
