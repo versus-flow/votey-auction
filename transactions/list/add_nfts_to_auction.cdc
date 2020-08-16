@@ -43,6 +43,7 @@ transaction {
             // and move it into the transaction's context
             let NFT <- accountCollectionRef.withdraw(withdrawID: id)
 
+// TODO: This has to be public for now
             // list the token for sale by moving it into the sale resource
             auctionCollectionRef.addTokenToAuctionItems(
                 token: <-NFT,

@@ -268,6 +268,9 @@ pub contract VoteyAuction {
     // AuctionPublic is a resource interface that restricts users to
     // retreiving the auction price list and placing bids
     pub resource interface AuctionPublic {
+        // TODO; add addTOken method
+
+        //TODO extend this to be auctionInfo with time remaining aso
         pub fun getAuctionPrices(): {UInt64: UFix64}
         pub fun placeBid(
             id: UInt64, 
