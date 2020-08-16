@@ -17,12 +17,12 @@ pub struct AddressStatus {
 
   pub(set) var address:Address
   pub(set) var balance: UFix64
-  pub(set) var rocks: [UInt64]
-  pub(set) var auctions: {UInt64: UFix64}
+  pub(set) var rocks: {UInt64: {String : String}}
+  pub(set) var auctions: {UInt64: VoteyAuction.AuctionStatus}
   init (_ address:Address) {
     self.address=address
     self.balance= UFix64(0)
-    self.rocks= []
+    self.rocks= {}
     self.auctions ={}
   }
 }
@@ -46,8 +46,11 @@ pub fun main(address:Address):AddressStatus {
     if let rocksCap = account.getCapability(/public/RockCollection) {
        if let rocks= rocksCap.borrow<&{NonFungibleToken.CollectionPublic}>()  {
            log("Rocks in collection") 
-           log(rocks.getIDs())
-           status.rocks=rocks.getIDs()
+           for id in rocks.getIDs() {
+             var metadata=rocks.borrowNFT(id: id).metadata
+             log(metadata)
+             status.rocks[id]=metadata
+           }
        }
     }
    
@@ -55,8 +58,11 @@ pub fun main(address:Address):AddressStatus {
     if let auctionCap = account.getCapability(/public/NFTAuction) {
         if let auctions = auctionCap.borrow<&{VoteyAuction.AuctionPublic}>() {
           log("Items up for auction")
-          log(auctions.getAuctionPrices())
-          status.auctions=auctions.getAuctionPrices()
+          let auctionStatus=auctions.getAuctionStatuses()
+          for s in auctionStatus.keys {
+              log(auctionStatus[s])
+          }
+          status.auctions=auctionStatus
         } else {
           log("No items for sale 1")
         }

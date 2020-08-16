@@ -17,6 +17,45 @@ import NonFungibleToken from 0x01cf0e2f2f715450
 
 pub contract VoteyAuction {
 
+    pub struct AuctionStatus{
+
+        pub let price : UFix64
+        pub let bidIncrement : UFix64
+        pub let bids : UInt64
+        pub let active: Bool
+        pub let blocksRemaining : Int64
+        pub let endBlock : UInt64
+        pub let startBlock : UInt64
+        pub let metadata : {String: String}
+        pub let owner: Address
+        pub let leader: Address?
+    
+        //TODO: Add metadata about the item beeing auctioned Off
+
+        init(currentPrice: UFix64, 
+            bids:UInt64, 
+            active: Bool, 
+            blocksRemaining:Int64, 
+            nftMetadata: {String: String}, 
+            leader:Address?, 
+            bidIncrement: UFix64,
+            owner: Address, 
+            startBlock: UInt64,
+            endBlock: UInt64
+        ) {
+            self.price= currentPrice
+            self.bids=bids
+            self.active=active
+            self.blocksRemaining=blocksRemaining
+            self.metadata=nftMetadata
+            self.leader= leader
+            self.bidIncrement=bidIncrement
+            self.owner=owner
+            self.startBlock=startBlock
+            self.endBlock=endBlock
+        }
+    }
+
     // The total amount of AuctionItems that have been created
     pub var totalAuctions: UInt64
 
@@ -30,6 +69,7 @@ pub contract VoteyAuction {
     // AuctionItem contains the Resources and metadata for a single auction
     pub resource AuctionItem {
         
+        pub var numberOfBids: UInt64
         //The Item that is sold at this auction
         pub(set) var NFT: @NonFungibleToken.NFT?
 
@@ -56,7 +96,7 @@ pub contract VoteyAuction {
         pub(set) var currentPrice: UFix64
 
         //the capability that points to the resource wher  you want the NFT transfered to if you win this bid. 
-        pub(set) var recipientCollectionCap: Capability<&{NonFungibleToken.CollectionPublic}>
+        pub(set) var recipientCollectionCap: Capability<&{NonFungibleToken.CollectionPublic}>?
 
         //the capablity to send the escrow bidVault to if you are outbid
         pub(set) var recipientVaultCap: Capability<&{FungibleToken.Receiver}>?
@@ -88,13 +128,12 @@ pub contract VoteyAuction {
             self.currentPrice = startPrice
             self.auctionStartBlock = auctionStartBlock
             self.auctionCompleted = false
-            self.recipientCollectionCap = ownerCollectionCap
-            self.recipientVaultCap = ownerVaultCap
+            self.recipientCollectionCap = nil
+            self.recipientVaultCap = nil
             self.ownerCollectionCap = ownerCollectionCap
             self.ownerVaultCap = ownerVaultCap
+            self.numberOfBids=0
         }
-
-        
         
         // sendNFT sends the NFT to the Collection belonging to the provided Capability
         access(contract) fun sendNFT(_ capability: Capability<&{NonFungibleToken.CollectionPublic}>) {
@@ -174,6 +213,16 @@ pub contract VoteyAuction {
             self.sendNFT(self.ownerCollectionCap)
          }
 
+        //this can be negative
+        pub fun blocksRemaining() : Int64 {
+            let auctionLength = self.auctionLengthInBlocks
+
+            let startBlock = self.auctionStartBlock 
+
+            let currentBlock = getCurrentBlock().height
+            return Int64(startBlock+auctionLength) - Int64(currentBlock) 
+        }
+
            // isAuctionExpired returns true if the auction has exceeded it's length in blocks,
         // otherwise it returns false
         pub fun isAuctionExpired(): Bool {
@@ -198,7 +247,7 @@ pub contract VoteyAuction {
             }
             
 
-            self.sendNFT(self.recipientCollectionCap)
+            self.sendNFT(self.recipientCollectionCap!)
             self.sendBidTokens(self.ownerVaultCap)
         }
 
@@ -209,8 +258,8 @@ pub contract VoteyAuction {
                 panic("auction has already completed")
             }
 
-            if bidTokens.balance < self.minimumBidIncrement {
-                panic("bid amount be larger than minimum bid increment")
+            if bidTokens.balance <= self.minimumBidIncrement+self.currentPrice {
+                panic("bid amount be larger than current price + minimum bid increment")
             }
             
             if self.bidVault.balance != UFix64(0) {
@@ -231,9 +280,33 @@ pub contract VoteyAuction {
 
             // Add the bidder's Vault and NFT receiver references
             self.recipientCollectionCap = collectionCap
+            self.numberOfBids=self.numberOfBids+UInt64(1)
 
             //TODO make better bid event
             emit NewBid(tokenID: self.auctionID, bidPrice: self.currentPrice)
+        }
+
+        pub fun getAuctionStatus() :AuctionStatus {
+
+            var leader:Address?= nil
+            if let recipient = self.recipientVaultCap {
+                leader=recipient.borrow()!.owner!.address
+            }
+
+            //log(self.recipientVaultCap!.borrow()!.owner?.address ?? nil)
+
+            return AuctionStatus(
+                currentPrice: self.currentPrice, 
+                bids: self.numberOfBids,
+                active: !self.auctionCompleted  && self.isAuctionExpired(),
+                blocksRemaining: self.blocksRemaining(),
+                nftMetadata: self.NFT?.metadata ?? {},
+                leader: leader,
+                bidIncrement: self.minimumBidIncrement,
+                owner: self.ownerVaultCap.borrow()!.owner!.address,
+                startBlock: self.auctionStartBlock, 
+                endBlock: self.auctionStartBlock+self.auctionLengthInBlocks
+                )
         }
 
         destroy() {
@@ -256,7 +329,8 @@ pub contract VoteyAuction {
     // AuctionPublic is a resource interface that restricts users to
     // retreiving the auction price list and placing bids
     pub resource interface AuctionPublic {
-        pub fun getAuctionPrices(): {UInt64: UFix64}
+        pub fun getAuctionStatuses(): {UInt64: AuctionStatus}
+        pub fun getAuctionStatus(_ id:UInt64): AuctionStatus
         pub fun placeBid(
             id: UInt64, 
             bidTokens: @FungibleToken.Vault, 
@@ -302,21 +376,31 @@ pub contract VoteyAuction {
         }
 
         // getAuctionPrices returns a dictionary of available NFT IDs with their current price
-        pub fun getAuctionPrices(): {UInt64: UFix64} {
+        pub fun getAuctionStatuses(): {UInt64: AuctionStatus} {
             pre {
                 self.auctionItems.keys.length > 0: "There are no auction items"
             }
 
-            let priceList: {UInt64: UFix64} = {}
+            let priceList: {UInt64: AuctionStatus} = {}
 
             for id in self.auctionItems.keys {
                 let itemRef = &self.auctionItems[id] as? &AuctionItem
-                if itemRef.auctionCompleted == false {
-                    priceList[id] = itemRef.currentPrice
-                }
+                priceList[id] = itemRef.getAuctionStatus()
             }
             
             return priceList
+        }
+
+        pub fun getAuctionStatus(_ id:UInt64): AuctionStatus {
+            pre {
+                self.auctionItems[id] != nil:
+                    "NFT doesn't exist"
+            }
+
+            // Get the auction item resources
+            let itemRef = &self.auctionItems[id] as &AuctionItem
+            return itemRef.getAuctionStatus()
+
         }
 
         // settleAuction sends the auction item to the highest bidder
