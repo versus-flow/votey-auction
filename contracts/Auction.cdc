@@ -26,6 +26,7 @@ pub contract VoteyAuction {
     pub event TokenStartPriceUpdated(tokenID: UInt64, newPrice: UFix64)
     pub event NewBid(tokenID: UInt64, bidPrice: UFix64)
     pub event AuctionSettled(tokenID: UInt64, price: UFix64)
+    pub event AuctionCanceled(tokenID: UInt64)
 
     // AuctionItem contains the Resources and metadata for a single auction
     pub resource AuctionItem {
@@ -327,6 +328,13 @@ pub contract VoteyAuction {
             itemRef.settleAuction()
 
             //TODO: Marketplace cut
+        }
+
+        pub fun cancelAuction(_ id: UInt64) {
+
+            let itemRef = &self.auctionItems[id] as &AuctionItem
+            itemRef.returnAuctionItemToOwner()
+            emit AuctionCanceled(tokenID: id)
         }
 
         // placeBid sends the bidder's tokens to the bid vault and updates the
