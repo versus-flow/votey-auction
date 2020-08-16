@@ -257,6 +257,15 @@ pub contract VoteyAuction {
     // retreiving the auction price list and placing bids
     pub resource interface AuctionPublic {
         pub fun getAuctionPrices(): {UInt64: UFix64}
+         pub fun createAuction(
+             token: @NonFungibleToken.NFT, 
+             minimumBidIncrement: UFix64, 
+             auctionLengthInBlocks: UInt64, 
+             startPrice: UFix64, 
+             bidVault: @FungibleToken.Vault, 
+             collectionCap: Capability<&{NonFungibleToken.CollectionPublic}>, 
+             vaultCap: Capability<&{FungibleToken.Receiver}>) 
+
         pub fun placeBid(
             id: UInt64, 
             bidTokens: @FungibleToken.Vault, 
