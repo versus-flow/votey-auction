@@ -50,12 +50,12 @@ func main() {
 	flow.SendTransaction("setup/create_demotoken_vault", artist)
 	flow.SendTransaction("setup/create_nft_collection", artist)
 
-	//Mint 1 new NFTs and add the for sale with a start price of 20.0
+	//Mint 1 new NFTs and add the for sale with a start price of 10.0
 	flow.SendTransactionWithArguments("setup/mint_nfts", rocks, flow.FindAddress(artist), cadence.NewInt(1))
-	flow.SendTransactionWithArguments("list/add_nft_to_auction", marketplace,
-		flow.FindAddress(artist),
-		cadence.NewUInt64(0), //TODO: check index here
-		ufix("20.0"))
+	flow.SendTransactionWithArguments("list/add_nft_to_auction", artist,
+		flow.FindAddress(marketplace),
+		cadence.NewUInt64(0),
+		ufix("10.0"))
 
 	//Buyer1 bid on NFTS and hope to grow his NFT collection, Starts out with 100 tokens and no NFTS
 	flow.CreateAccount(buyer1)
@@ -80,15 +80,15 @@ func main() {
 		ufix("20.0"))
 
 	//We try to settle the account but the acution has not ended yet
-	flow.SendTransaction("buy/settle", marketplace)
+	flow.SendTransactionWithArguments("buy/settle", marketplace, cadence.UInt64(1))
 
 	//now the auction has ended and we can settle
-	flow.SendTransaction("buy/settle", marketplace)
+	flow.SendTransactionWithArguments("buy/settle", marketplace, cadence.UInt64(1))
 
 	//check the status of all the accounts involved in this scenario
-	flow.RunScript("check_account", flow.FindAddress(marketplace))
-	flow.RunScript("check_account", flow.FindAddress(artist))
-	flow.RunScript("check_account", flow.FindAddress(buyer1))
-	flow.RunScript("check_account", flow.FindAddress(buyer2))
+	flow.RunScript("check_account", flow.FindAddress(marketplace), cadence.NewString("marketplace"))
+	flow.RunScript("check_account", flow.FindAddress(artist), cadence.NewString("artist"))
+	flow.RunScript("check_account", flow.FindAddress(buyer1), cadence.NewString("buyer1"))
+	flow.RunScript("check_account", flow.FindAddress(buyer2), cadence.NewString("buyer2"))
 
 }

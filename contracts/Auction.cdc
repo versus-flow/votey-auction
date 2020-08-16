@@ -138,7 +138,6 @@ pub contract VoteyAuction {
                 log("this auction is already settled")
                 return 
             }
-
             if self.NFT == nil {
                 log("auction doesn't exist")
                 return 
@@ -287,7 +286,14 @@ pub contract VoteyAuction {
 
         // addTokenToauctionItems adds an NFT to the auction items and sets the meta data
         // for the auction item
-        pub fun addTokenToAuctionItems(token: @NonFungibleToken.NFT, minimumBidIncrement: UFix64, auctionLengthInBlocks: UInt64, startPrice: UFix64, bidVault: @FungibleToken.Vault, collectionCap: Capability<&{NonFungibleToken.CollectionPublic}>, vaultCap: Capability<&{FungibleToken.Receiver}>) {
+        pub fun createAuction(
+            token: @NonFungibleToken.NFT, 
+            minimumBidIncrement: UFix64, 
+            auctionLengthInBlocks: UInt64, 
+            startPrice: UFix64, 
+            bidVault: @FungibleToken.Vault, 
+            collectionCap: Capability<&{NonFungibleToken.CollectionPublic}>, 
+            vaultCap: Capability<&{FungibleToken.Receiver}>) {
             
             // create a new auction items resource container
             let item <- create AuctionItem(
@@ -332,6 +338,7 @@ pub contract VoteyAuction {
         // and deposits the FungibleTokens into the auction owner's account
         pub fun settleAuction(_ id: UInt64) {
             let itemRef = &self.auctionItems[id] as &AuctionItem
+            log(itemRef)
 
             itemRef.settleAuction()
 

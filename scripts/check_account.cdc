@@ -27,13 +27,12 @@ pub struct AddressStatus {
   }
 }
 
-pub fun main(address:Address):AddressStatus {
+pub fun main(address:Address, name: String):AddressStatus {
     // get the accounts' public address objects
     let account = getAccount(address)
     let status= AddressStatus(address)
+    log(name)
     log("=====================")
-    log("Check account")
-    log(account)
     
     if let demoTokenCapability =account.getCapability(/public/DemoTokenBalance) {
         if let demoTokens= demoTokenCapability.borrow<&{FungibleToken.Balance}>() {
