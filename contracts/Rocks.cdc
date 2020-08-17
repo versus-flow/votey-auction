@@ -39,7 +39,7 @@ pub contract Rocks: NonFungibleToken {
         pub let id: UInt64
 
         // a dictionary for storing the Rock's meta data
-        pub var metaData: {String: String}
+        pub var metadata: {String: String}
 
         init(initID: UInt64, rockType: String) {
             
@@ -47,14 +47,14 @@ pub contract Rocks: NonFungibleToken {
             self.id = initID
 
             // Set the rock type to the provided value
-            self.metaData = {
+            self.metadata = {
                 "type": rockType
             }
         }
 
         // getRockType returns the rock type as a string
         pub fun getRockType(): String {
-            return self.metaData["type"]
+            return self.metadata["type"]
                 ?? panic("Rock has no rock type!")
         }
     }

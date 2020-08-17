@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/0xAlchemist/go-flow-tooling/tooling"
 	"github.com/onflow/cadence"
+	"github.com/versus-flow/go-flow-tooling/tooling"
 )
 
 const nonFungibleToken = "NonFungibleToken"
@@ -27,9 +27,6 @@ func ufix(input string) cadence.UFix64 {
 //fmt.Scanln() // wai
 func main() {
 	flow := tooling.NewFlowConfigLocalhost()
-
-	// Since we cannot deploy more the one contract to an account we have to create one account for each and add them here
-	flow.DeployContract(nonFungibleToken)
 
 	// TODO: Could this minter be in init of demoToken? Do we have any scenario where somebody else should mint art?
 	flow.DeployContract(demoToken)
@@ -90,5 +87,6 @@ func main() {
 	flow.RunScript("check_account", flow.FindAddress(artist), cadence.NewString("artist"))
 	flow.RunScript("check_account", flow.FindAddress(buyer1), cadence.NewString("buyer1"))
 	flow.RunScript("check_account", flow.FindAddress(buyer2), cadence.NewString("buyer2"))
+
 
 }
