@@ -14,7 +14,7 @@ import VoteyAuction from 0xe03daebed8ca0615
 // Acct 4 - 0xe03daebed8ca0615 - auction.cdc
 
 //TODO add arguments here
-transaction {
+transaction(marketplace: Address, auctionId: UInt64, bidAmount: UFix64) {
     // reference to the buyer's NFT collection where they
     // will store the bought NFT
 
@@ -37,21 +37,19 @@ transaction {
             ?? panic("Could not borrow owner's Vault reference")
 
         // withdraw tokens from the buyer's Vault
-        self.temporaryVault <- vaultRef.withdraw(amount: UFix64(20))
+        self.temporaryVault <- vaultRef.withdraw(amount: bidAmount)
     }
 
     execute {
         // get the read-only account storage of the seller
-        let seller = getAccount(0x179b6b1cb6755e31)
+        let seller = getAccount(marketplace)
 
         // get the reference to the seller's sale
         let auctionRef = seller.getCapability(/public/NFTAuction)!
                          .borrow<&AnyResource{VoteyAuction.AuctionPublic}>()
                          ?? panic("Could not borrow seller's sale reference")
 
-        auctionRef.placeBid(id: UInt64(1), bidTokens: <- self.temporaryVault, vaultCap: self.vaultCap, collectionCap: self.collectionCap)
-
-        log("Token ID 1 has been bid on")
+        auctionRef.placeBid(id: auctionId, bidTokens: <- self.temporaryVault, vaultCap: self.vaultCap, collectionCap: self.collectionCap)
     }
 }
  

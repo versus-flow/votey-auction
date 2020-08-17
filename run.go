@@ -1,85 +1,92 @@
 package main
 
 import (
-	"log"
-
-	"github.com/0xAlchemist/go-flow-tooling/tooling"
 	"github.com/onflow/cadence"
+	"github.com/versus-flow/go-flow-tooling/tooling"
 )
 
 const nonFungibleToken = "NonFungibleToken"
 const demoToken = "DemoToken"
 const rocks = "Rocks"
 const auction = "Auction"
+const marketplace = "Marketplace"
+const artist = "Artist"
+const buyer1 = "Buyer1"
+const buyer2 = "Buyer2"
 
-func main() {
-	flow := tooling.NewFlowConfigLocalhost()
-
-	flow.DeployContract(nonFungibleToken)
-	flow.DeployContract(demoToken)
-	flow.DeployContract(rocks)
-	flow.DeployContract(auction)
-
-	// Setup DemoToken account with an NFT Collection and an Auction Collection
-	flow.SendTransaction("setup/create_nft_collection", demoToken)
-	flow.SendTransaction("setup/create_auction_collection", demoToken)
-
-	// Setup Rocks account with DemoToken Vault
-	flow.SendTransaction("setup/create_demotoken_vault", rocks)
-
-	// Setup Auction Account with empty DemoToken Vault and Rock Collection
-	flow.SendTransaction("setup/create_demotoken_vault", auction)
-	flow.SendTransaction("setup/create_nft_collection", auction)
-
-	// Setup NonFungibleToken Account with empty DemoToken Vault and Rock Collection
-	flow.SendTransaction("setup/create_demotoken_vault", nonFungibleToken)
-	flow.SendTransaction("setup/create_nft_collection", nonFungibleToken)
-
-	// set up the demotoken minter for the demoTokenAccount
-	flow.SendTransaction("setup/create_demotoken_minter", demoToken)
-
-	tokensToMint, err := cadence.NewUFix64("100.0")
+func ufix(input string) cadence.UFix64 {
+	amount, err := cadence.NewUFix64(input)
 	if err != nil {
 		panic(err)
 	}
+	return amount
+}
 
-	flow.SendTransactionWithArguments("setup/mint_demotoken", demoToken, flow.FindAddress(rocks), tokensToMint)
-	flow.SendTransactionWithArguments("setup/mint_demotoken", demoToken, flow.FindAddress(demoToken), tokensToMint)
-	flow.SendTransactionWithArguments("setup/mint_demotoken", demoToken, flow.FindAddress(auction), tokensToMint)
-	flow.SendTransactionWithArguments("setup/mint_demotoken", demoToken, flow.FindAddress(nonFungibleToken), tokensToMint)
+//TODO; Add sleep if started with storyteller mode?
+//fmt.Println("Press the Enter Key to continue!")
+//fmt.Scanln() // wai
+func main() {
+	flow := tooling.NewFlowConfigLocalhost()
 
-	//mint 10 rock nfts into demoTokens collection
-	flow.SendTransactionWithArguments("setup/mint_nfts", rocks, flow.FindAddress(demoToken), cadence.NewInt(10))
+	// TODO: Could this minter be in init of demoToken? Do we have any scenario where somebody else should mint art?
+	flow.DeployContract(demoToken)
+	flow.SendTransaction("setup/create_demotoken_minter", demoToken)
 
-	// Check the balances are properly setup for the auction demo
-	flow.RunScript("check_setup")
+	flow.DeployContract(rocks)
+	flow.DeployContract(auction)
 
-	// Add NFTs to the Auction collection for the DemoToken account
-	flow.SendTransaction("list/add_nfts_to_auction", demoToken)
+	//We create the accounts and set up the stakeholdres in our scenario
 
-	// Check the auction sale data for the DemoToken account
-	flow.RunScript("check_sales_listings")
+	//Marketplace will own a marketplace and get a cut for each sale, this account does not own any NFT
+	flow.CreateAccount(marketplace)
+	flow.SendTransaction("setup/create_nft_collection", marketplace)
+	flow.SendTransaction("setup/create_auction_collection", marketplace)
 
-	flow.SendTransaction("buy/bid", rocks)
+	//The artist owns NFTs and sells in the marketplace
+	flow.CreateAccount(artist)
+	flow.SendTransaction("setup/create_demotoken_vault", artist)
+	flow.SendTransaction("setup/create_nft_collection", artist)
 
-	flow.RunScript("check_sales_listings")
+	//Mint 1 new NFTs and add the for sale with a start price of 10.0
+	flow.SendTransactionWithArguments("setup/mint_nfts", rocks, flow.FindAddress(artist), cadence.NewInt(1))
+	flow.SendTransactionWithArguments("list/add_nft_to_auction", artist,
+		flow.FindAddress(marketplace),
+		cadence.NewUInt64(0),
+		ufix("10.0"))
 
-	flow.RunScript("check_setup")
+	//Buyer1 bid on NFTS and hope to grow his NFT collection, Starts out with 100 tokens and no NFTS
+	flow.CreateAccount(buyer1)
+	flow.SendTransaction("setup/create_demotoken_vault", buyer1)
+	flow.SendTransaction("setup/create_nft_collection", buyer1)
+	flow.SendTransactionWithArguments("setup/mint_demotoken", demoToken,
+		flow.FindAddress(buyer1),
+		ufix("100.0"))
 
-	flow.SendTransaction("buy/settle", demoToken)
-	flow.SendTransaction("buy/settle", demoToken)
-	flow.SendTransaction("buy/settle", demoToken)
+	//Buyer2 bid on NFTS and hope to grow his NFT collection, Starts out with 100 tokens and no NFTS
+	flow.CreateAccount(buyer2)
+	flow.SendTransaction("setup/create_demotoken_vault", buyer2)
+	flow.SendTransaction("setup/create_nft_collection", buyer2)
+	flow.SendTransactionWithArguments("setup/mint_demotoken", demoToken,
+		flow.FindAddress(buyer2),
+		ufix("100.0"))
 
-	flow.RunScript("check_sales_listings")
+	//Buyer1 places a bid for 20 tokens on auctionItem1
+	flow.SendTransactionWithArguments("buy/bid", buyer1,
+		flow.FindAddress(marketplace),
+		cadence.UInt64(1),
+		ufix("20.0"))
 
-	flow.RunScript("check_setup")
+	//We try to settle the account but the acution has not ended yet
+	flow.SendTransactionWithArguments("buy/settle", marketplace, cadence.UInt64(1))
 
-	flow.RunScript("check_account", flow.FindAddress(nonFungibleToken))
-	flow.RunScript("check_account", flow.FindAddress(rocks))
-	flow.RunScript("check_account", flow.FindAddress(auction))
-	res := flow.RunScriptReturns("check_account", flow.FindAddress(demoToken))
-	log.Printf("Result %s", res)
+	//now the auction has ended and we can settle
+	flow.SendTransactionWithArguments("buy/settle", marketplace, cadence.UInt64(1))
 
-	// this should panic - "auction has already completed"
-	// flow.SendTransaction("buy/bid", rocks)
+	//check the status of all the accounts involved in this scenario
+	flow.RunScript("check_account", flow.FindAddress(marketplace), cadence.NewString("marketplace"))
+	flow.RunScript("check_account", flow.FindAddress(artist), cadence.NewString("artist"))
+	flow.RunScript("check_account", flow.FindAddress(buyer1), cadence.NewString("buyer1"))
+	flow.RunScript("check_account", flow.FindAddress(buyer2), cadence.NewString("buyer2"))
+
+
 }

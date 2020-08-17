@@ -17,26 +17,31 @@ import VoteyAuction from 0xe03daebed8ca0615
 // Acct 4 - 0xe03daebed8ca0615 - auction.cdc
 
 //TODO use this
-transaction(tokenID: UInt64, startPrice: UFix64) {
+transaction(auction: Address, tokenID: UInt64, startPrice: UFix64) {
     prepare(account: AuthAccount) {
 
-        // borrow a reference to the entire NFT Collection functionality (for withdrawing)
+
+         // borrow a reference to the entire NFT Collection functionality (for withdrawing)
         let accountCollectionRef = account.borrow<&NonFungibleToken.Collection>(from: /storage/RockCollection)!
 
         // get the public Capability for the signer's NFT collection (for the auction)
         let publicCollectionCap = account.getCapability<&{NonFungibleToken.CollectionPublic}>(/public/RockCollection)
-        ?? panic("Unable to borrow a reference to the NFT collection")
+        ?? panic("Unable to borrow the CollectionPublic capability")
 
         // Get the array of token IDs in the account's collection
         let collectionIDs = accountCollectionRef.getIDs()
 
-        let vaultCap = account.getCapability<&{FungibleToken.Receiver}>(/public/DemoTokenVault)??
+        let vaultCap = account.getCapability<&{FungibleToken.Receiver}>(/public/DemoTokenReceiver)??
             panic("Unable to borrow the Vault Receiver capability")
 
-        // borrow a reference to the Auction Collection in account storage
-        let auctionCollectionRef = account.borrow<&VoteyAuction.AuctionCollection>(from: /storage/NFTAuction)!
+        let auctionAccount= getAccount(auction)
+       //get the auctionCollectionReference to add the item to
+        let auctionCollectionRef = auctionAccount.getCapability(/public/NFTAuction)!
+                         .borrow<&{VoteyAuction.AuctionPublic}>()
+                         ?? panic("Could not borrow seller's sale reference")
 
-        for id in collectionIDs {
+        log(collectionIDs)
+
             // Create an empty bid Vault for the auction
             let bidVault <- DemoToken.createEmptyVault()
 
@@ -44,17 +49,17 @@ transaction(tokenID: UInt64, startPrice: UFix64) {
             // and move it into the transaction's context
             let NFT <- accountCollectionRef.withdraw(withdrawID: tokenID)
 
+
             // list the token for sale by moving it into the sale resource
-            auctionCollectionRef.addTokenToAuctionItems(
+            auctionCollectionRef.createAuction(
                 token: <-NFT,
                 minimumBidIncrement: UFix64(5),
-                auctionLengthInBlocks: UInt64(30),
+                auctionLengthInBlocks: UInt64(2),
                 startPrice: startPrice,
                 bidVault: <-bidVault,
                 collectionCap: publicCollectionCap,
                 vaultCap: vaultCap
             )
-        }
     }
 }
  
