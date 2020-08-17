@@ -1,12 +1,4 @@
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
-github.com/0xAlchemist/go-flow-tooling v0.6.0 h1:V8fwXVAJn1pAOqGnzZgFOOA9rCrqyZHS2bIxEzsb4rE=
-github.com/0xAlchemist/go-flow-tooling v0.6.0/go.mod h1:xyNPAePkIs0ClX2p+9QtAi5wIpr/yh0Gkvfy4YRzNPk=
-github.com/0xAlchemist/go-flow-tooling v0.7.0 h1:XhwcEcAamYZgCCwRTZDk7oFJO1M6loBbms9O4OIhUL8=
-github.com/0xAlchemist/go-flow-tooling v0.7.0/go.mod h1:SWowsPSupcwf1WFYBxjIp40TN5m7abWYakE9YvmfehY=
-github.com/0xAlchemist/go-flow-tooling v0.8.0 h1:sVKoSBb6iik2zGtgXfAwqlYTTSGEyRpH4EfDnlYLY2s=
-github.com/0xAlchemist/go-flow-tooling v0.8.0/go.mod h1:SWowsPSupcwf1WFYBxjIp40TN5m7abWYakE9YvmfehY=
-github.com/0xAlchemist/go-flow-tooling v0.9.0 h1:5ZBc6Rt0fKXiGPDCQnJYcvlab6dk2HsNgZtpGSsKeqk=
-github.com/0xAlchemist/go-flow-tooling v0.9.0/go.mod h1:SWowsPSupcwf1WFYBxjIp40TN5m7abWYakE9YvmfehY=
 github.com/Azure/azure-pipeline-go v0.2.1/go.mod h1:UGSo8XybXnIGZ3epmeBw7Jdz+HiUVpqIlpz/HKHylF4=
 github.com/Azure/azure-pipeline-go v0.2.2/go.mod h1:4rQ/NZncSvGqNkkOsNpOU1tgoNuIlp9AfUH5G1tvCHc=
 github.com/Azure/azure-storage-blob-go v0.7.0/go.mod h1:f9YQKtsG1nMisotuTPpO0tjNuEjKRYAcJU8/ydDI++4=
@@ -177,6 +169,8 @@ github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5
 github.com/syndtr/goleveldb v1.0.1-0.20190923125748-758128399b1d/go.mod h1:9OrXJhf154huy1nPWmuSrkgjPUtUNhA+Zmy+6AESzuA=
 github.com/tyler-smith/go-bip39 v1.0.1-0.20181017060643-dbb3b84ba2ef/go.mod h1:sJ5fKU0s6JVwZjjcUEX2zFOnvq0ASQ2K9Zr6cf67kNs=
 github.com/urfave/cli v1.22.1/go.mod h1:Gos4lmkARVdJ6EkW0WaNv/tZAAMe9V7XWyB60NtXRu0=
+github.com/versus-flow/go-flow-tooling v0.10.1 h1:b7T64fdqUWV+Y7MbOUvKKqpXY1d2NPMiY52d3jrqJXo=
+github.com/versus-flow/go-flow-tooling v0.10.1/go.mod h1:et4WtEjDCRFf98L12gnAUJBLHoWR9eeZ5VNBmTvFSEQ=
 github.com/wsddn/go-ecdh v0.0.0-20161211032359-48726bab9208/go.mod h1:IotVbo4F+mw0EzQ08zFqg7pK3FebNXpaMsRy2RT+Ees=
 github.com/x448/float16 v0.8.4 h1:qLwI1I70+NjRFUR3zs1JPUCgaCXSh3SW62uAKT1mSBM=
 github.com/x448/float16 v0.8.4/go.mod h1:14CWIYCyZA/cWjXOioeEpHeN/83MdbZDRQHoFcYsOfg=

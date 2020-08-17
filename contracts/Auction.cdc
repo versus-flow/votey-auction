@@ -66,6 +66,8 @@ pub contract VoteyAuction {
     pub event NewBid(tokenID: UInt64, bidPrice: UFix64)
     pub event AuctionSettled(tokenID: UInt64, price: UFix64)
 
+    pub event MarketplaceEarned(amount:UFix64)
+
     // AuctionItem contains the Resources and metadata for a single auction
     pub resource AuctionItem {
         
@@ -155,6 +157,8 @@ pub contract VoteyAuction {
             // borrow a reference to the owner's NFT receiver
             if let vaultRef = capability.borrow() {
                 let bidVaultRef = &self.bidVault as &FungibleToken.Vault
+                log("Paid out money")
+                log(bidVaultRef.balance)
                 vaultRef.deposit(from: <-bidVaultRef.withdraw(amount: bidVaultRef.balance))
             } else {
                 log("sendBidTokens(): couldn't get vault ref")
@@ -171,7 +175,7 @@ pub contract VoteyAuction {
             }
         }
 
-        pub fun settleAuction()  {
+        pub fun settleAuction(cutPercentage: UFix64, cutVault:Capability<&{FungibleToken.Receiver}> )  {
 
             if self.auctionCompleted {
                 log("this auction is already settled")
@@ -195,6 +199,14 @@ pub contract VoteyAuction {
                 log("No bids. Nothing to settle")
                 return
             }            
+
+            //Withdraw cutPercentage to marketplace and put it in their vault
+            let amount=self.currentPrice*cutPercentage
+            let beneficiaryCut <- self.bidVault.withdraw(amount:amount )
+            log("Marketplace cut was")
+            log(amount)
+            emit MarketplaceEarned(amount: amount)
+            cutVault.borrow()!.deposit(from: <- beneficiaryCut)
 
             self.exchangeTokens()
 
@@ -331,6 +343,7 @@ pub contract VoteyAuction {
     pub resource interface AuctionPublic {
         pub fun getAuctionStatuses(): {UInt64: AuctionStatus}
         pub fun getAuctionStatus(_ id:UInt64): AuctionStatus
+
         pub fun placeBid(
             id: UInt64, 
             bidTokens: @FungibleToken.Vault, 
@@ -345,8 +358,15 @@ pub contract VoteyAuction {
 
         // Auction Items
         pub var auctionItems: @{UInt64: AuctionItem}
-        
-        init() {
+        pub var cutPercentage:UFix64 
+        pub let marketplaceVault: Capability<&{FungibleToken.Receiver}>
+
+        init(
+            marketplaceVault: Capability<&{FungibleToken.Receiver}>, 
+            cutPercentage: UFix64
+        ) {
+            self.cutPercentage= cutPercentage
+            self.marketplaceVault = marketplaceVault
             self.auctionItems <- {}
         }
 
@@ -408,9 +428,8 @@ pub contract VoteyAuction {
         pub fun settleAuction(_ id: UInt64) {
             let itemRef = &self.auctionItems[id] as &AuctionItem
 
-            itemRef.settleAuction()
+            itemRef.settleAuction(cutPercentage: self.cutPercentage, cutVault: self.marketplaceVault)
 
-            //TODO: Marketplace cut
         }
 
         // placeBid sends the bidder's tokens to the bid vault and updates the
@@ -437,8 +456,11 @@ pub contract VoteyAuction {
     }
 
     // createAuctionCollection returns a new AuctionCollection resource to the caller
-    pub fun createAuctionCollection(): @AuctionCollection {
-        let auctionCollection <- create AuctionCollection()
+    pub fun createAuctionCollection(marketplaceVault: Capability<&{FungibleToken.Receiver}>,cutPercentage: UFix64): @AuctionCollection {
+        let auctionCollection <- create AuctionCollection(
+            marketplaceVault: marketplaceVault, 
+            cutPercentage: cutPercentage
+        )
         return <- auctionCollection
     }
 

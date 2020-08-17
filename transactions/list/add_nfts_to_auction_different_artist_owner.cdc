@@ -16,21 +16,23 @@ import VoteyAuction from 0xe03daebed8ca0615
 // Acct 3 - 0xf3fcd2c1a78f5eee - rocks.cdc
 // Acct 4 - 0xe03daebed8ca0615 - auction.cdc
 
-transaction {
+transaction(artist:Address) {
     prepare(account: AuthAccount) {
 
+        let artistAccount = getAccount(artist)
         // borrow a reference to the entire NFT Collection functionality (for withdrawing)
-        let accountCollectionRef = account.borrow<&NonFungibleToken.Collection>(from: /storage/RockCollection)!
+        let artistCollectionCap = artistAccount.getCapability<&{NonFungibleToken.CollectionPublic}>(/public/RockCollection)!
+        let artistCollection= artistCollectionCap.borrow()!
+        let artistVault = artistAccount.getCapability<&{FungibleToken.Receiver}>(/public/DemoTokenReceiver)??
+            panic("Unable to borrow the Vault Receiver capability")
 
         // get the public Capability for the signer's NFT collection (for the auction)
         let publicCollectionCap = account.getCapability<&{NonFungibleToken.CollectionPublic}>(/public/RockCollection)
         ?? panic("Unable to borrow the CollectionPublic capability")
 
         // Get the array of token IDs in the account's collection
-        let collectionIDs = accountCollectionRef.getIDs()
+        let collectionIDs = artistCollection.getIDs()
 
-        let vaultCap = account.getCapability<&{FungibleToken.Receiver}>(/public/DemoTokenReceiver)??
-            panic("Unable to borrow the Vault Receiver capability")
 
         // borrow a reference to the Auction Collection in account storage
         let auctionCollectionRef = account.borrow<&VoteyAuction.AuctionCollection>(from: /storage/NFTAuction)!
@@ -41,9 +43,8 @@ transaction {
 
             // withdraw the NFT from the collection that you want to sell
             // and move it into the transaction's context
-            let NFT <- accountCollectionRef.withdraw(withdrawID: id)
+            let NFT <- artistCollection.withdraw(withdrawID: id)
 
-// TODO: This has to be public for now
             // list the token for sale by moving it into the sale resource
             auctionCollectionRef.addTokenToAuctionItems(
                 token: <-NFT,
@@ -52,7 +53,7 @@ transaction {
                 startPrice: UFix64(10),
                 bidVault: <-bidVault,
                 collectionCap: publicCollectionCap,
-                vaultCap: vaultCap
+                vaultCap: artistVault
             )
         }
     }

@@ -1,10 +1,8 @@
 package main
 
 import (
-	"log"
-
-	"github.com/0xAlchemist/go-flow-tooling/tooling"
 	"github.com/onflow/cadence"
+	"github.com/versus-flow/go-flow-tooling/tooling"
 )
 
 const nonFungibleToken = "NonFungibleToken"
@@ -48,37 +46,36 @@ func main() {
 	flow.SendTransactionWithArguments("setup/mint_demotoken", demoToken, flow.FindAddress(auction), tokensToMint)
 	flow.SendTransactionWithArguments("setup/mint_demotoken", demoToken, flow.FindAddress(nonFungibleToken), tokensToMint)
 
-	//mint 10 rock nfts into demoTokens collection
+	//mint 10 rock nfts into demoToken collection
 	flow.SendTransactionWithArguments("setup/mint_nfts", rocks, flow.FindAddress(demoToken), cadence.NewInt(10))
 
 	// Check the balances are properly setup for the auction demo
-	flow.RunScript("check_setup")
+	//flow.RunScript("check_setup")
 
-	// Add NFTs to the Auction collection for the DemoToken account
-	flow.SendTransaction("list/add_nfts_to_auction", demoToken)
+	//The DemoToken owns an auction and the nonFingibleToken account wants to sell there
+	flow.SendTransactionWithArguments("list/add_nfts_to_auction", demoToken)
 
 	// Check the auction sale data for the DemoToken account
-	flow.RunScript("check_sales_listings")
+	//flow.RunScript("check_sales_listings")
 
 	flow.SendTransaction("buy/bid", rocks)
 
-	flow.RunScript("check_sales_listings")
+	//flow.RunScript("check_sales_listings")
 
-	flow.RunScript("check_setup")
+	//flow.RunScript("check_setup")
 
 	flow.SendTransaction("buy/settle", demoToken)
 	flow.SendTransaction("buy/settle", demoToken)
 	flow.SendTransaction("buy/settle", demoToken)
 
-	flow.RunScript("check_sales_listings")
+	//flow.RunScript("check_sales_listings")
 
-	flow.RunScript("check_setup")
+	//flow.RunScript("check_setup")
 
 	flow.RunScript("check_account", flow.FindAddress(nonFungibleToken))
 	flow.RunScript("check_account", flow.FindAddress(rocks))
 	flow.RunScript("check_account", flow.FindAddress(auction))
-	res := flow.RunScriptReturns("check_account", flow.FindAddress(demoToken))
-	log.Printf("Result %s", res)
+	flow.RunScript("check_account", flow.FindAddress(demoToken))
 
 	// this should panic - "auction has already completed"
 	// flow.SendTransaction("buy/bid", rocks)
