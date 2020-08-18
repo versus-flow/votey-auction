@@ -35,6 +35,22 @@ func createArt(flow *tooling.FlowConfig, edition uint64, maxEdition uint64) {
 		cadence.NewUInt64(maxEdition)) //maxEdition
 }
 
+func bid(flow *tooling.FlowConfig, account string, auctionId int, amount string) {
+
+	flow.CreateAccount(account)
+	flow.SendTransaction("setup/create_demotoken_vault", account)
+	flow.SendTransaction("setup/create_nft_collection", account)
+	flow.SendTransactionWithArguments("setup/mint_demotoken", demoToken,
+		flow.FindAddress(account),
+		ufix("100.0")) //tokens to mint
+	flow.SendTransactionWithArguments("buy/bid", account,
+		flow.FindAddress(marketplace),
+		cadence.UInt64(1),         //id of drop
+		cadence.UInt64(auctionId), //id of auction to bid on
+		ufix(amount))              //amount to bid
+}
+
+// TODO create a script to check if account exist. or just use go flowConfig for that?
 //TODO; Add sleep if started with storyteller mode?
 //fmt.Println("Press the Enter Key to continue!")
 //fmt.Scanln() // wai
@@ -71,8 +87,6 @@ func main() {
 		createArt(flow, i, maxEditions) //these will be index i
 	}
 
-	flow.RunScript("check_account", flow.FindAddress(artist), cadence.NewString("artist"))
-
 	flow.SendTransactionWithArguments("setup/create_drop", artist,
 		flow.FindAddress(marketplace), //marketplace locaion
 		cadence.NewUInt64(0),          //id of unique item
@@ -81,40 +95,19 @@ func main() {
 		ufix("10.0"),                  //start price
 		cadence.NewUInt64(10))         //auction length
 
-	flow.RunScript("check_account", flow.FindAddress(marketplace), cadence.NewString("artist"))
+	bid(flow, buyer1, 1, "20.0")
+	bid(flow, buyer2, 2, "10.0")
+
+	flow.SendTransactionWithArguments("buy/bid", buyer1,
+		flow.FindAddress(marketplace),
+		cadence.UInt64(1), //id of drop
+		cadence.UInt64(2), //id of auction to bid on
+		ufix("20.0"))      //amount to bid
+
+	flow.RunScript("check_account", flow.FindAddress(marketplace), cadence.NewString("marketplace"))
+	flow.RunScript("check_account", flow.FindAddress(buyer1), cadence.NewString("buyer1"))
+	flow.RunScript("check_account", flow.FindAddress(buyer2), cadence.NewString("buyer2"))
 	/*
-		transaction(versus: Address, uniqueId: UInt64, minEditionId: UInt64, maxEditionId:UInt64, startPrice: UFix64, auctionLength: UInt64) {
-	*/
-
-	/*
-		flow.SendTransactionWithArguments("list/add_nft_to_auction", artist,
-			flow.FindAddress(marketplace), //marketplace locaion
-			cadence.NewUInt64(0),          //tokenID
-			ufix("10.0"),                  //minimum bid
-			cadence.NewUInt64(10))         //auction length
-
-		//Buyer1 bid on NFTS and hope to grow his NFT collection, Starts out with 100 tokens and no NFTS
-		flow.CreateAccount(buyer1)
-		flow.SendTransaction("setup/create_demotoken_vault", buyer1)
-		flow.SendTransaction("setup/create_nft_collection", buyer1)
-		flow.SendTransactionWithArguments("setup/mint_demotoken", demoToken,
-			flow.FindAddress(buyer1),
-			ufix("100.0")) //tokens to mint
-
-		//Buyer2 bid on NFTS and hope to grow his NFT collection, Starts out with 100 tokens and no NFTS
-		flow.CreateAccount(buyer2)
-		flow.SendTransaction("setup/create_demotoken_vault", buyer2)
-		flow.SendTransaction("setup/create_nft_collection", buyer2)
-		flow.SendTransactionWithArguments("setup/mint_demotoken", demoToken,
-			flow.FindAddress(buyer2),
-			ufix("100.0")) //token to mint
-
-		//Buyer1 places a bid for 20 tokens on auctionItem1
-		flow.SendTransactionWithArguments("buy/bid", buyer1,
-			flow.FindAddress(marketplace),
-			cadence.UInt64(1), //id of auction to bid on
-			ufix("20.0"))      //amount to bid
-
 		//We try to settle the account but the acution has not ended yet
 		flow.SendTransactionWithArguments("buy/settle", marketplace, cadence.UInt64(1))
 

@@ -14,6 +14,7 @@ pub contract Auction {
     //TODO: expose minNextBid
     pub struct AuctionStatus{
 
+        pub let id: UInt64
         pub let price : UFix64
         pub let bidIncrement : UFix64
         pub let bids : UInt64
@@ -28,7 +29,8 @@ pub contract Auction {
     
         //TODO: Add metadata about the item beeing auctioned Off
 
-        init(currentPrice: UFix64, 
+        init(id:UInt64, 
+        currentPrice: UFix64, 
             bids:UInt64, 
             active: Bool, 
             blocksRemaining:Int64, 
@@ -40,6 +42,7 @@ pub contract Auction {
             endBlock: UInt64,
             minNextBid:UFix64
         ) {
+            self.id=id
             self.price= currentPrice
             self.bids=bids
             self.active=active
@@ -269,8 +272,8 @@ pub contract Auction {
                 panic("auction has already completed")
             }
 
-            if bidTokens.balance <= self.minNextBid() {
-                panic("bid amount be larger than current price + minimum bid increment")
+            if bidTokens.balance < self.minNextBid() {
+                panic("bid amount be larger or equal to the current price + minimum bid increment")
             }
             
             if self.bidVault.balance != UFix64(0) {
@@ -307,6 +310,7 @@ pub contract Auction {
             //log(self.recipientVaultCap!.borrow()!.owner?.address ?? nil)
 
             return AuctionStatus(
+                id:self.auctionID,
                 currentPrice: self.currentPrice, 
                 bids: self.numberOfBids,
                 active: !self.auctionCompleted  && self.isAuctionExpired(),

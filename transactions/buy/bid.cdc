@@ -6,8 +6,9 @@
 import FungibleToken from 0xee82856bf20e2aa6
 import NonFungibleToken from 0x01cf0e2f2f715450
 import Auction from 0xe03daebed8ca0615
+import Versus from 0x045a1763c93006ca
 
-transaction(marketplace: Address, auctionId: UInt64, bidAmount: UFix64) {
+transaction(marketplace: Address, dropId: UInt64, auctionId: UInt64, bidAmount: UFix64) {
     // reference to the buyer's NFT collection where they
     // will store the bought NFT
 
@@ -42,11 +43,11 @@ transaction(marketplace: Address, auctionId: UInt64, bidAmount: UFix64) {
         let seller = getAccount(marketplace)
 
         // get the reference to the seller's sale
-        let auctionRef = seller.getCapability(/public/NFTAuction)!
-                         .borrow<&{Auction.AuctionPublic}>()
+        let versusRef = seller.getCapability(/public/Versus)!
+                         .borrow<&{Versus.PublicDrop}>()
                          ?? panic("Could not borrow seller's sale reference")
 
-        auctionRef.placeBid(id: auctionId, bidTokens: <- self.temporaryVault, vaultCap: self.vaultCap, collectionCap: self.collectionCap)
+        versusRef.placeBid(dropId: dropId, auctionId: auctionId, bidTokens: <- self.temporaryVault, vaultCap: self.vaultCap, collectionCap: self.collectionCap)
     }
 }
  

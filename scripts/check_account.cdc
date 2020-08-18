@@ -59,6 +59,8 @@ pub fun main(address:Address, name: String){
           for s in versusStatuses.keys {
 
              let status = versusStatuses[s]!
+            log("dropid")
+             log(status.dropId)
              log("Price unique")
              log(status.uniquePrice)
              log("Price editioned")
