@@ -8,7 +8,9 @@ import (
 const nonFungibleToken = "NonFungibleToken"
 const demoToken = "DemoToken"
 const art = "Art"
+const versus = "Versus"
 const auction = "Auction"
+
 const marketplace = "Marketplace"
 const artist = "Artist"
 const buyer1 = "Buyer1"
@@ -35,6 +37,7 @@ func main() {
 
 	flow.DeployContract(art)
 	flow.DeployContract(auction)
+	flow.DeployContract(versus)
 
 	//We create the accounts and set up the stakeholdres in our scenario
 
