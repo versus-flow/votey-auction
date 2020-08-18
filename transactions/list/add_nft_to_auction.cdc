@@ -30,9 +30,7 @@ transaction(auction: Address, tokenID: UInt64, startPrice: UFix64, auctionLength
                          .borrow<&{Auction.AuctionPublic}>()
                          ?? panic("Could not borrow seller's sale reference")
 
-            // Create an empty bid Vault for the auction
-            let bidVault <- DemoToken.createEmptyVault()
-
+            
             // withdraw the NFT from the collection that you want to sell
             // and move it into the transaction's context
             let NFT <- accountCollectionRef.withdraw(withdrawID: tokenID)
@@ -44,7 +42,6 @@ transaction(auction: Address, tokenID: UInt64, startPrice: UFix64, auctionLength
                 minimumBidIncrement: UFix64(5),
                 auctionLengthInBlocks: auctionLength,
                 startPrice: startPrice,
-                bidVault: <-bidVault,
                 collectionCap: publicCollectionCap,
                 vaultCap: vaultCap
             )

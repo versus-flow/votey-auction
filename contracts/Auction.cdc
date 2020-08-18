@@ -7,7 +7,7 @@
 //
 import FungibleToken from 0xee82856bf20e2aa6
 import NonFungibleToken from 0x01cf0e2f2f715450
-
+import DemoToken from 0x179b6b1cb6755e31
 
 pub contract Auction {
 
@@ -106,7 +106,6 @@ pub contract Auction {
 
         init(
             NFT: @NonFungibleToken.NFT,
-            bidVault: @FungibleToken.Vault,
             minimumBidIncrement: UFix64,
             auctionLengthInBlocks: UInt64,
             startPrice: UFix64, 
@@ -117,7 +116,7 @@ pub contract Auction {
 
             Auction.totalAuctions = Auction.totalAuctions + UInt64(1)
             self.NFT <- NFT
-            self.bidVault <- bidVault
+            self.bidVault <- DemoToken.createEmptyVault()
             self.auctionID = Auction.totalAuctions
             self.minimumBidIncrement = minimumBidIncrement
             self.auctionLengthInBlocks = auctionLengthInBlocks
@@ -333,7 +332,6 @@ pub contract Auction {
              minimumBidIncrement: UFix64, 
              auctionLengthInBlocks: UInt64, 
              startPrice: UFix64, 
-             bidVault: @FungibleToken.Vault, 
              collectionCap: Capability<&{NonFungibleToken.CollectionPublic}>, 
              vaultCap: Capability<&{FungibleToken.Receiver}>) 
 
@@ -366,6 +364,8 @@ pub contract Auction {
             self.auctionItems <- {}
         }
 
+
+
         // addTokenToauctionItems adds an NFT to the auction items and sets the meta data
         // for the auction item
         pub fun createAuction(
@@ -373,20 +373,17 @@ pub contract Auction {
             minimumBidIncrement: UFix64, 
             auctionLengthInBlocks: UInt64, 
             startPrice: UFix64, 
-            bidVault: @FungibleToken.Vault, 
             collectionCap: Capability<&{NonFungibleToken.CollectionPublic}>, 
             vaultCap: Capability<&{FungibleToken.Receiver}>) {
             
             // create a new auction items resource container
-            let item <- create AuctionItem(
-                NFT: <-token,
-                bidVault: <-bidVault,
+            let item <- Auction.createStandaloneAuction(
+                token: <-token,
                 minimumBidIncrement: minimumBidIncrement,
                 auctionLengthInBlocks: auctionLengthInBlocks,
                 startPrice: startPrice,
-                auctionStartBlock: getCurrentBlock().height,
-                ownerCollectionCap: collectionCap,
-                ownerVaultCap: vaultCap
+                collectionCap: collectionCap,
+                vaultCap: vaultCap
             )
 
             let id = item.auctionID
@@ -467,6 +464,27 @@ pub contract Auction {
         }
     }
 
+        // addTokenToauctionItems adds an NFT to the auction items and sets the meta data
+        // for the auction item
+        pub fun createStandaloneAuction(
+            token: @NonFungibleToken.NFT, 
+            minimumBidIncrement: UFix64, 
+            auctionLengthInBlocks: UInt64, 
+            startPrice: UFix64, 
+            collectionCap: Capability<&{NonFungibleToken.CollectionPublic}>, 
+            vaultCap: Capability<&{FungibleToken.Receiver}>) : @AuctionItem {
+            
+            // create a new auction items resource container
+            return  <- create AuctionItem(
+                NFT: <-token,
+                minimumBidIncrement: minimumBidIncrement,
+                auctionLengthInBlocks: auctionLengthInBlocks,
+                startPrice: startPrice,
+                auctionStartBlock: getCurrentBlock().height,
+                ownerCollectionCap: collectionCap,
+                ownerVaultCap: vaultCap
+            )
+        }
     // createAuctionCollection returns a new AuctionCollection resource to the caller
     pub fun createAuctionCollection(marketplaceVault: Capability<&{FungibleToken.Receiver}>,cutPercentage: UFix64): @AuctionCollection {
         let auctionCollection <- create AuctionCollection(
