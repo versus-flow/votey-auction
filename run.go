@@ -7,7 +7,7 @@ import (
 
 const nonFungibleToken = "NonFungibleToken"
 const demoToken = "DemoToken"
-const rocks = "Rocks"
+const art = "Art"
 const auction = "Auction"
 const marketplace = "Marketplace"
 const artist = "Artist"
@@ -33,7 +33,7 @@ func main() {
 	flow.DeployContract(demoToken)
 	flow.SendTransaction("setup/create_demotoken_minter", demoToken)
 
-	flow.DeployContract(rocks)
+	flow.DeployContract(art)
 	flow.DeployContract(auction)
 
 	//We create the accounts and set up the stakeholdres in our scenario
@@ -48,8 +48,16 @@ func main() {
 	flow.SendTransaction("setup/create_demotoken_vault", artist)
 	flow.SendTransaction("setup/create_nft_collection", artist)
 
-	//Mint 1 new NFTs and add the for sale with a start price of 10.0
-	flow.SendTransactionWithArguments("setup/mint_nfts", rocks, flow.FindAddress(artist), cadence.NewInt(1))
+	//Mint 1 new Art piece and add the for sale with a start price of 10.0
+	flow.SendTransactionWithArguments("setup/mint_art", art,
+		flow.FindAddress(artist),      //artist that owns the art
+		cadence.NewString("Name"),     //name of art
+		cadence.NewString("John Doe"), //artist name
+		cadence.NewString("https://cdn.discordapp.com/attachments/744365120268009472/744964330663051364/image0.png"), //url
+		cadence.NewString("This is the description"),                                                                 //description
+		cadence.NewInt(1), //edition
+		cadence.NewInt(1)) //maxEdition
+
 	flow.SendTransactionWithArguments("list/add_nft_to_auction", artist,
 		flow.FindAddress(marketplace), //marketplace locaion
 		cadence.NewUInt64(0),          //tokenID
@@ -62,7 +70,7 @@ func main() {
 	flow.SendTransaction("setup/create_nft_collection", buyer1)
 	flow.SendTransactionWithArguments("setup/mint_demotoken", demoToken,
 		flow.FindAddress(buyer1),
-		ufix("100.0"))
+		ufix("100.0")) //tokens to mint
 
 	//Buyer2 bid on NFTS and hope to grow his NFT collection, Starts out with 100 tokens and no NFTS
 	flow.CreateAccount(buyer2)
@@ -70,13 +78,13 @@ func main() {
 	flow.SendTransaction("setup/create_nft_collection", buyer2)
 	flow.SendTransactionWithArguments("setup/mint_demotoken", demoToken,
 		flow.FindAddress(buyer2),
-		ufix("100.0"))
+		ufix("100.0")) //token to mint
 
 	//Buyer1 places a bid for 20 tokens on auctionItem1
 	flow.SendTransactionWithArguments("buy/bid", buyer1,
 		flow.FindAddress(marketplace),
-		cadence.UInt64(1),
-		ufix("20.0"))
+		cadence.UInt64(1), //id of auction to bid on
+		ufix("20.0"))      //amount to bid
 
 	//We try to settle the account but the acution has not ended yet
 	flow.SendTransactionWithArguments("buy/settle", marketplace, cadence.UInt64(1))

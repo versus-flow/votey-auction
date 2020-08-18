@@ -7,12 +7,6 @@ import FungibleToken from 0xee82856bf20e2aa6
 import NonFungibleToken from 0x01cf0e2f2f715450
 import Auction from 0xe03daebed8ca0615
 
-// Contract Deployment:
-// Acct 1 - 0x01cf0e2f2f715450 - onflow/NonFungibleToken.cdc
-// Acct 2 - 0x179b6b1cb6755e31 - demo-token.cdc
-// Acct 3 - 0xf3fcd2c1a78f5eee - rocks.cdc
-// Acct 4 - 0xe03daebed8ca0615 - auction.cdc
-
 transaction(auctionId: UInt64) {
     // reference to the buyer's NFT collection where they
     // will store the bought NFT

@@ -6,23 +6,20 @@
 import FungibleToken from 0xee82856bf20e2aa6
 import NonFungibleToken from 0x01cf0e2f2f715450
 import DemoToken from 0x179b6b1cb6755e31
-import Rocks from 0xf3fcd2c1a78f5eee
+import Art from 0xf3fcd2c1a78f5eee
 import Auction from 0xe03daebed8ca0615
-// Contract Deployment:
-// Acct 1 - 0x01cf0e2f2f715450 - onflow/NonFungibleToken.cdc
-// Acct 2 - 0x179b6b1cb6755e31 - demo-token.cdc
-// Acct 3 - 0xf3fcd2c1a78f5eee - rocks.cdc
-// Acct 4 - 0xe03daebed8ca0615 - auction.cdc
+
+
 pub struct AddressStatus {
 
   pub(set) var address:Address
   pub(set) var balance: UFix64
-  pub(set) var rocks: {UInt64: {String : String}}
+  pub(set) var art: {UInt64: {String : String}}
   pub(set) var auctions: {UInt64: Auction.AuctionStatus}
   init (_ address:Address) {
     self.address=address
     self.balance= UFix64(0)
-    self.rocks= {}
+    self.art= {}
     self.auctions ={}
   }
 }
@@ -42,13 +39,13 @@ pub fun main(address:Address, name: String){
         }
     }
 
-    if let rocksCap = account.getCapability(/public/RockCollection) {
-       if let rocks= rocksCap.borrow<&{NonFungibleToken.CollectionPublic}>()  {
-           log("Rocks in collection") 
-           for id in rocks.getIDs() {
-             var metadata=rocks.borrowNFT(id: id).metadata
+    if let artCap = account.getCapability(/public/ArtCollection) {
+       if let art= artCap.borrow<&{NonFungibleToken.CollectionPublic}>()  {
+           log("Art in collection") 
+           for id in art.getIDs() {
+             var metadata=art.borrowNFT(id: id).metadata
              log(metadata)
-             status.rocks[id]=metadata
+             status.art[id]=metadata
            }
        }
     }

@@ -7,13 +7,6 @@ import FungibleToken from 0xee82856bf20e2aa6
 import NonFungibleToken from 0x01cf0e2f2f715450
 import Auction from 0xe03daebed8ca0615
 
-// Contract Deployment:
-// Acct 1 - 0x01cf0e2f2f715450 - onflow/NonFungibleToken.cdc
-// Acct 2 - 0x179b6b1cb6755e31 - demo-token.cdc
-// Acct 3 - 0xf3fcd2c1a78f5eee - rocks.cdc
-// Acct 4 - 0xe03daebed8ca0615 - auction.cdc
-
-//TODO add arguments here
 transaction(marketplace: Address, auctionId: UInt64, bidAmount: UFix64) {
     // reference to the buyer's NFT collection where they
     // will store the bought NFT
@@ -27,11 +20,15 @@ transaction(marketplace: Address, auctionId: UInt64, bidAmount: UFix64) {
     prepare(account: AuthAccount) {
 
         // get the references to the buyer's Vault and NFT Collection receiver
-        self.collectionCap = account.getCapability<&{NonFungibleToken.CollectionPublic}>(/public/RockCollection) 
-            ?? panic("Unable to borrow a reference to the NFT collection")
+        self.collectionCap = account.getCapability<&{NonFungibleToken.CollectionPublic}>(/public/ArtCollection)!
+        if !self.collectionCap.check() {
+           panic("Unable to borrow a reference to the NFT collection")
+        }
 
-        self.vaultCap = account.getCapability<&{FungibleToken.Receiver}>(/public/DemoTokenReceiver) 
-            ?? panic("Could not find demoVaultCap")
+        self.vaultCap = account.getCapability<&{FungibleToken.Receiver}>(/public/DemoTokenReceiver)!
+        if !self.vaultCap.check() {
+           panic("Could not find demoVaultCap")
+        }
                     
         let vaultRef = account.borrow<&FungibleToken.Vault>(from: /storage/DemoTokenVault)
             ?? panic("Could not borrow owner's Vault reference")

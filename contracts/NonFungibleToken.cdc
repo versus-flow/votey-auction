@@ -147,4 +147,3 @@ pub contract interface NonFungibleToken {
 
 // Contract to allow the interface to be deployed
 pub contract Dummy {}
- 

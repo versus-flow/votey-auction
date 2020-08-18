@@ -6,11 +6,6 @@
 import FungibleToken from 0xee82856bf20e2aa6
 import DemoToken from 0x179b6b1cb6755e31
 
-// Contract Deployment:
-// Acct 1 - 0x01cf0e2f2f715450 - onflow/NonFungibleToken.cdc
-// Acct 2 - 0x179b6b1cb6755e31 - demo-token.cdc
-// Acct 3 - 0xf3fcd2c1a78f5eee - rocks.cdc
-// Acct 4 - 0xe03daebed8ca0615 - auction.cdc
 
 // TODO: add argument on capacity here
 transaction {

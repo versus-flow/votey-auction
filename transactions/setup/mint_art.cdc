@@ -7,22 +7,17 @@
 import FungibleToken from 0xee82856bf20e2aa6
 import NonFungibleToken from 0x01cf0e2f2f715450
 import DemoToken from 0x179b6b1cb6755e31
-import Rocks from 0xf3fcd2c1a78f5eee
+import Art from 0xf3fcd2c1a78f5eee
 
-// Contract Deployment:
-// Acct 1 - 0x01cf0e2f2f715450 - onflow/NonFungibleToken.cdc
-// Acct 2 - 0x179b6b1cb6755e31 - demo-token.cdc
-// Acct 3 - 0xf3fcd2c1a78f5eee - rocks.cdc
-// Acct 4 - 0xe03daebed8ca0615 - auction.cdc
 
-transaction(recipient: Address, amount: Int){
+transaction(recipient: Address, name: String, artist: String, url: String, description: String,  edition: Int, maxEdition: Int, ){
 
     // private reference to this account's minter resource
-    let minterRef: &Rocks.NFTMinter
+    let minterRef: &Art.NFTMinter
     
     prepare(acct: AuthAccount) {
         // borrow a reference to the NFTMinter in storage
-        self.minterRef = acct.borrow<&Rocks.NFTMinter>(from: /storage/RockMinter)
+        self.minterRef = acct.borrow<&Art.NFTMinter>(from: /storage/ArtMinter)
             ?? panic("Could not borrow owner's vault minter reference")
         
     }
@@ -32,20 +27,25 @@ transaction(recipient: Address, amount: Int){
 
         // get the collection reference for the receiver
         // getting the public capability and borrowing the reference from it
-        let receiverCap = getAccount(recipient).getCapability(/public/RockCollection)!
+        let receiverCap = getAccount(recipient).getCapability(/public/ArtCollection)!
 
         let receiverRef = receiverCap.borrow<&{NonFungibleToken.CollectionPublic}>()
                                    ?? panic("unable to borrow nft receiver reference")
 
         // mint an NFT and deposit it in the receiver's collection
-        let amountNFTs = amount
-        var counter = 0
 
-        while counter < amountNFTs {
-            self.minterRef.mintNFT(recipient: receiverRef)
-            counter = counter + 1
-            
+        let metadata: {String: String} = {
+            "name" : name, 
+            "artist" : artist,
+            "artistAddress" : recipient.toString(),
+            "url" : url,
+            "description": description, 
+            "edition" : edition.toString(), 
+            "maxEdition": maxEdition.toString()
         }
+
+        self.minterRef.mintNFT(recipient: receiverRef, metadata: metadata)
+            
 
         log("New NFT(s) minted for account 1")
     }
