@@ -5,7 +5,7 @@
 
 import FungibleToken from 0xee82856bf20e2aa6
 import NonFungibleToken from 0x01cf0e2f2f715450
-import VoteyAuction from 0xe03daebed8ca0615
+import Auction from 0xe03daebed8ca0615
 
 // Contract Deployment:
 // Acct 1 - 0x01cf0e2f2f715450 - onflow/NonFungibleToken.cdc
@@ -46,7 +46,7 @@ transaction(marketplace: Address, auctionId: UInt64, bidAmount: UFix64) {
 
         // get the reference to the seller's sale
         let auctionRef = seller.getCapability(/public/NFTAuction)!
-                         .borrow<&{VoteyAuction.AuctionPublic}>()
+                         .borrow<&{Auction.AuctionPublic}>()
                          ?? panic("Could not borrow seller's sale reference")
 
         auctionRef.placeBid(id: auctionId, bidTokens: <- self.temporaryVault, vaultCap: self.vaultCap, collectionCap: self.collectionCap)

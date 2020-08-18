@@ -5,7 +5,7 @@ import FungibleToken from 0xee82856bf20e2aa6
 import NonFungibleToken from 0x01cf0e2f2f715450
 import DemoToken from 0x179b6b1cb6755e31
 import Rocks from 0xf3fcd2c1a78f5eee
-import VoteyAuction from 0xe03daebed8ca0615
+import Auction from 0xe03daebed8ca0615
 // Contract Deployment:
 // Acct 1 - 0x01cf0e2f2f715450 - NonFungibleToken.cdc
 // Acct 2 - 0x179b6b1cb6755e31 - DemoToken.cdc
@@ -25,7 +25,7 @@ transaction {
             panic("Cannot borrow vault receiver")
         }
 
-        let auction <- VoteyAuction.createAuctionCollection(
+        let auction <- Auction.createAuctionCollection(
             marketplaceVault: marketplaceReceiver,
             cutPercentage: UFix64(0.15)
         )
@@ -35,7 +35,7 @@ transaction {
 
         // create a public capability to the sale so that others
         // can call it's methods
-        account.link<&{VoteyAuction.AuctionPublic}>(
+        account.link<&{Auction.AuctionPublic}>(
             /public/NFTAuction,
             target: /storage/NFTAuction
         )

@@ -5,7 +5,7 @@
 
 import FungibleToken from 0xee82856bf20e2aa6
 import NonFungibleToken from 0x01cf0e2f2f715450
-import VoteyAuction from 0xe03daebed8ca0615
+import Auction from 0xe03daebed8ca0615
 
 // Contract Deployment:
 // Acct 1 - 0x01cf0e2f2f715450 - onflow/NonFungibleToken.cdc
@@ -17,11 +17,11 @@ transaction(auctionId: UInt64) {
     // reference to the buyer's NFT collection where they
     // will store the bought NFT
 
-    let vaultCap: &VoteyAuction.AuctionCollection 
+    let vaultCap: &Auction.AuctionCollection 
 
     prepare(account: AuthAccount) {
 
-        self.vaultCap = account.borrow<&VoteyAuction.AuctionCollection>(from: /storage/NFTAuction)
+        self.vaultCap = account.borrow<&Auction.AuctionCollection>(from: /storage/NFTAuction)
             ?? panic("Could not borrow owner's auction collection")
     }
 
