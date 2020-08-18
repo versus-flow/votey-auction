@@ -10,7 +10,7 @@ import DemoToken from 0x179b6b1cb6755e31
 import Art from 0xf3fcd2c1a78f5eee
 
 
-transaction(recipient: Address, name: String, artist: String, url: String, description: String,  edition: Int, maxEdition: Int, ){
+transaction(recipient: Address, name: String, artist: String, url: String, description: String,  edition: UInt64, maxEdition: UInt64, ){
 
     // private reference to this account's minter resource
     let minterRef: &Art.NFTMinter

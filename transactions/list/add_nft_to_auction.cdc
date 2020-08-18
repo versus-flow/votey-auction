@@ -3,6 +3,7 @@ import FungibleToken from 0xee82856bf20e2aa6
 import DemoToken from 0x179b6b1cb6755e31
 import Auction from 0xe03daebed8ca0615
 
+// TODO perform in execute block
 transaction(auction: Address, tokenID: UInt64, startPrice: UFix64, auctionLength: UInt64) {
     prepare(account: AuthAccount) {
 

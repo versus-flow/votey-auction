@@ -24,26 +24,32 @@
 			"sigAlgorithm": "ECDSA_P256",
 			"hashAlgorithm": "SHA3_256"
 		},
-        "Marketplace": {
+		"Versus": {
 			"address": "045a1763c93006ca",
 			"privateKey": "a9a81cdf716f763ac53f59a421e19039dd542ff3a294bde647989841618ea4db",
 			"sigAlgorithm": "ECDSA_P256",
 			"hashAlgorithm": "SHA3_256"
-		}, 
-        "Artist": {
+		},
+        "Marketplace": {
 			"address": "120e725050340cab",
 			"privateKey": "a9a81cdf716f763ac53f59a421e19039dd542ff3a294bde647989841618ea4db",
 			"sigAlgorithm": "ECDSA_P256",
 			"hashAlgorithm": "SHA3_256"
 		}, 
-        "Buyer1": {
+        "Artist": {
 			"address": "f669cb8d41ce0c74",
 			"privateKey": "a9a81cdf716f763ac53f59a421e19039dd542ff3a294bde647989841618ea4db",
 			"sigAlgorithm": "ECDSA_P256",
 			"hashAlgorithm": "SHA3_256"
 		}, 
-        "Buyer2": {
+        "Buyer1": {
 			"address": "192440c99cb17282",
+			"privateKey": "a9a81cdf716f763ac53f59a421e19039dd542ff3a294bde647989841618ea4db",
+			"sigAlgorithm": "ECDSA_P256",
+			"hashAlgorithm": "SHA3_256"
+		}, 
+        "Buyer2": {
+			"address": "fd43f9148d4b725d",
 			"privateKey": "a9a81cdf716f763ac53f59a421e19039dd542ff3a294bde647989841618ea4db",
 			"sigAlgorithm": "ECDSA_P256",
 			"hashAlgorithm": "SHA3_256"

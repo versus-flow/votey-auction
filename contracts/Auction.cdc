@@ -11,6 +11,7 @@ import DemoToken from 0x179b6b1cb6755e31
 
 pub contract Auction {
 
+    //TODO: expose minNextBid
     pub struct AuctionStatus{
 
         pub let price : UFix64
@@ -23,6 +24,7 @@ pub contract Auction {
         pub let metadata : {String: String}
         pub let owner: Address
         pub let leader: Address?
+        pub let minNextBid: UFix64
     
         //TODO: Add metadata about the item beeing auctioned Off
 
@@ -35,7 +37,8 @@ pub contract Auction {
             bidIncrement: UFix64,
             owner: Address, 
             startBlock: UInt64,
-            endBlock: UInt64
+            endBlock: UInt64,
+            minNextBid:UFix64
         ) {
             self.price= currentPrice
             self.bids=bids
@@ -47,6 +50,7 @@ pub contract Auction {
             self.owner=owner
             self.startBlock=startBlock
             self.endBlock=endBlock
+            self.minNextBid=minNextBid
         }
     }
 
@@ -111,7 +115,7 @@ pub contract Auction {
             startPrice: UFix64, 
             auctionStartBlock: UInt64,
             ownerCollectionCap: Capability<&{NonFungibleToken.CollectionPublic}>,
-            ownerVaultCap: Capability<&{FungibleToken.Receiver}>
+            ownerVaultCap: Capability<&{FungibleToken.Receiver}>,
         ) {
 
             Auction.totalAuctions = Auction.totalAuctions + UInt64(1)
@@ -121,7 +125,7 @@ pub contract Auction {
             self.minimumBidIncrement = minimumBidIncrement
             self.auctionLengthInBlocks = auctionLengthInBlocks
             self.startPrice = startPrice
-            self.currentPrice = startPrice
+            self.currentPrice = UFix64(0)
             self.auctionStartBlock = auctionStartBlock
             self.auctionCompleted = false
             self.recipientCollectionCap = nil
@@ -188,7 +192,7 @@ pub contract Auction {
 
                 
             // return if there are no bids to settle
-            if self.currentPrice == self.startPrice {
+            if self.currentPrice == UFix64(0){
                 self.returnAuctionItemToOwner()
                 log("No bids. Nothing to settle")
                 return
@@ -248,6 +252,16 @@ pub contract Auction {
             self.sendBidTokens(self.ownerVaultCap)
         }
 
+        pub fun minNextBid() :UFix64{
+            //If there are bids then the next min bid is the current price plus the increment
+            if self.currentPrice != UFix64(0) {
+                return self.currentPrice+self.minimumBidIncrement
+            }
+            //else start price
+            return self.startPrice
+
+
+        }
         pub fun placeBid(bidTokens: @FungibleToken.Vault, vaultCap: Capability<&{FungibleToken.Receiver}>, collectionCap: Capability<&{NonFungibleToken.CollectionPublic}>) {
 
 
@@ -255,7 +269,7 @@ pub contract Auction {
                 panic("auction has already completed")
             }
 
-            if bidTokens.balance <= self.minimumBidIncrement+self.currentPrice {
+            if bidTokens.balance <= self.minNextBid() {
                 panic("bid amount be larger than current price + minimum bid increment")
             }
             
@@ -302,7 +316,8 @@ pub contract Auction {
                 bidIncrement: self.minimumBidIncrement,
                 owner: self.ownerVaultCap.borrow()!.owner!.address,
                 startBlock: self.auctionStartBlock, 
-                endBlock: self.auctionStartBlock+self.auctionLengthInBlocks
+                endBlock: self.auctionStartBlock+self.auctionLengthInBlocks, 
+                minNextBid: self.minNextBid()
                 )
         }
 

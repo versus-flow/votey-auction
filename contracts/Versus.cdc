@@ -46,9 +46,18 @@ pub contract Versus {
 
             let uniqueRef = &self.uniqueAuction as &Auction.AuctionItem
             let editionRef= &self.editionAuctions as &Auction.AuctionCollection
+
+            let editionStatuses= editionRef.getAuctionStatuses()
+            var sum:UFix64= UFix64(0)
+            for es in editionStatuses.keys {
+                sum = sum + editionStatuses[es]!.price
+            }
+
             return DropStatus(
+                dropId: self.dropID,
                 uniqueStatus: uniqueRef.getAuctionStatus(),
-                editionsStatuses: editionRef.getAuctionStatuses()
+                editionsStatuses: editionStatuses, 
+                editionPrice: sum
             )
         }
 
@@ -69,14 +78,33 @@ pub contract Versus {
     }
 
     pub struct DropStatus {
+        pub let dropId: UInt64
+        pub let uniquePrice: UFix64
+        pub let editionPrice: UFix64
         pub let uniqueStatus: Auction.AuctionStatus
         pub let editionsStatuses: {UInt64: Auction.AuctionStatus}
+
+        pub fun winning(): String {
+            if self.uniquePrice > self.editionPrice {
+                return "UNIQUE"
+            } else if ( self.uniquePrice== self.editionPrice) {
+                return "TIE"
+            } else {
+                return "EDITIONED"
+            }
+        }
+
         init(
+            dropId: UInt64,
             uniqueStatus: Auction.AuctionStatus,
-            editionsStatuses: {UInt64: Auction.AuctionStatus}
+            editionsStatuses: {UInt64: Auction.AuctionStatus},
+            editionPrice: UFix64
             ) {
+                self.dropId=dropId
                 self.uniqueStatus=uniqueStatus
                 self.editionsStatuses=editionsStatuses
+                self.uniquePrice= uniqueStatus.price
+                self.editionPrice= editionPrice
             }
     }
 
@@ -84,7 +112,6 @@ pub contract Versus {
           pub fun createDrop(
              uniqueArt: @NonFungibleToken.NFT, 
              editionsArt: @NonFungibleToken.Collection,
-             editions: UInt64,
              minimumBidIncrement: UFix64, 
              auctionLengthInBlocks: UInt64, 
              startPrice: UFix64,  
@@ -122,7 +149,6 @@ pub contract Versus {
         pub fun createDrop(
              uniqueArt: @NonFungibleToken.NFT, 
              editionsArt: @NonFungibleToken.Collection,
-             editions: UInt64,
              minimumBidIncrement: UFix64, 
              auctionLengthInBlocks: UInt64, 
              startPrice: UFix64,  

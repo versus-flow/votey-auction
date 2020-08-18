@@ -8,6 +8,7 @@ import NonFungibleToken from 0x01cf0e2f2f715450
 import DemoToken from 0x179b6b1cb6755e31
 import Art from 0xf3fcd2c1a78f5eee
 import Auction from 0xe03daebed8ca0615
+import Versus from 0x045a1763c93006ca
 
 pub struct AddressStatus {
 
@@ -50,17 +51,27 @@ pub fun main(address:Address, name: String){
     }
    
    
-    if let auctionCap = account.getCapability(/public/NFTAuction) {
-        if let auctions = auctionCap.borrow<&{Auction.AuctionPublic}>() {
-          log("Items up for auction")
-          let auctionStatus=auctions.getAuctionStatuses()
-          for s in auctionStatus.keys {
-             let status = auctionStatus[s]!
-             if(status.active) {
-              log(auctionStatus[s])
+    if let versusCap = account.getCapability(/public/Versus) {
+        if let versus = versusCap.borrow<&{Versus.PublicDrop}>() {
+          log("Drops available")
+          log("=================")
+          let versusStatuses=versus.getAllStatuses()
+          for s in versusStatuses.keys {
+
+             let status = versusStatuses[s]!
+             log("Price unique")
+             log(status.uniquePrice)
+             log("Price editioned")
+             log(status.editionPrice)
+             log("Winning")
+             log(status.winning())
+             log(status.uniqueStatus)
+             for es in status.editionsStatuses.keys {
+                let es = status.editionsStatuses[es]!
+                log(es)
              }
           }
-          status.auctions=auctionStatus
+          //status.auctions=auctionStatus
         } else {
           log("No items for sale 1")
         }
