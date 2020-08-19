@@ -100,15 +100,6 @@ pub contract Art: NonFungibleToken {
         // Initialize the total supply
         self.totalSupply = 0
 
-        // Create a Collection resource and save it to storage
-        let collection <- create Collection()
-        self.account.save(<-collection, to: /storage/ArtCollection)
-
-        // create a public capability for the collection
-        self.account.link<&{NonFungibleToken.CollectionPublic}>(
-            /public/ArtCollection,
-            target: /storage/ArtCollection
-        )
 
         // Create a Minter resource and save it to storage
         let minter <- create NFTMinter()
