@@ -27,10 +27,8 @@ pub contract Auction {
         pub let leader: Address?
         pub let minNextBid: UFix64
     
-        //TODO: Add metadata about the item beeing auctioned Off
-
         init(id:UInt64, 
-        currentPrice: UFix64, 
+            currentPrice: UFix64, 
             bids:UInt64, 
             active: Bool, 
             blocksRemaining:Int64, 
@@ -319,7 +317,7 @@ pub contract Auction {
                 id:self.auctionID,
                 currentPrice: self.currentPrice, 
                 bids: self.numberOfBids,
-                active: !self.auctionCompleted  && self.isAuctionExpired(),
+                active: !self.auctionCompleted  && !self.isAuctionExpired(),
                 blocksRemaining: self.blocksRemaining(),
                 nftMetadata: self.NFT?.metadata ?? {},
                 leader: leader,
@@ -357,6 +355,7 @@ pub contract Auction {
              token: @NonFungibleToken.NFT, 
              minimumBidIncrement: UFix64, 
              auctionLengthInBlocks: UInt64, 
+             auctionStartBlock: UInt64,
              startPrice: UFix64, 
              collectionCap: Capability<&{NonFungibleToken.CollectionPublic}>, 
              vaultCap: Capability<&{FungibleToken.Receiver}>) 

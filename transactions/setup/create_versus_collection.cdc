@@ -8,7 +8,7 @@ import Art from 0xf3fcd2c1a78f5eee
 import Auction from 0xe03daebed8ca0615
 import Versus from 0x045a1763c93006ca
 
-transaction {
+transaction(cutPercentage: UFix64, dropLength: UInt64, minimumBlockRemainingAfterBidOrTie: UInt64) {
 
     prepare(account: AuthAccount) {
         // create a new sale object     
@@ -23,7 +23,9 @@ transaction {
 
         let versus <- Versus.createVersusDropCollection(
             marketplaceVault: marketplaceReceiver,
-            cutPercentage: UFix64(0.15)
+            cutPercentage: UFix64(0.15),
+            dropLength: dropLength, 
+            minimumBlockRemainingAfterBidOrTie: minimumBlockRemainingAfterBidOrTie
         )
 
         // store the sale resource in the account for storage

@@ -71,7 +71,10 @@ func main() {
 	//Marketplace will own a marketplace and get a cut for each sale, this account does not own any NFT
 	flow.CreateAccount(marketplace)
 	flow.SendTransaction("setup/create_demotoken_vault", marketplace)
-	flow.SendTransaction("setup/create_versus_collection", marketplace)
+	flow.SendTransactionWithArguments("setup/create_versus_collection", marketplace,
+		ufix("0.15"),      //cut percentage,
+		cadence.UInt64(5), //drop length
+		cadence.UInt64(5)) //minimumBlockRemainingAfterBidOrTie
 
 	//The artist owns NFTs and sells in the marketplace
 	flow.CreateAccount(artist)
@@ -93,18 +96,23 @@ func main() {
 		cadence.NewUInt64(1),          //id of start of edition items in storage
 		cadence.NewUInt64(10),         //if of last edition item in storage
 		ufix("10.0"),                  //start price
-		cadence.NewUInt64(10),         //auction length
-		cadence.NewUInt64(20))         //start block
+		cadence.NewUInt64(25))         //start block
 
 	bid(flow, buyer1, 1, "10.0")
-	bid(flow, buyer2, 2, "30.0")
+	flow.SendTransactionWithArguments("tick", marketplace, cadence.NewUInt64(1))
+	flow.SendTransactionWithArguments("tick", marketplace, cadence.NewUInt64(1))
+	flow.SendTransactionWithArguments("tick", marketplace, cadence.NewUInt64(1))
+	flow.SendTransactionWithArguments("tick", marketplace, cadence.NewUInt64(1))
+	flow.SendTransactionWithArguments("tick", marketplace, cadence.NewUInt64(1))
+	flow.SendTransactionWithArguments("tick", marketplace, cadence.NewUInt64(1))
 
-	flow.RunScript("tick", flow.FindAddress(marketplace), cadence.NewUInt64(1))
-	//flow.SendTransactionWithArguments("buy/settle", marketplace, cadence.UInt64(1))
+	//bid(flow, buyer2, 2, "30.0")
+
+	flow.SendTransactionWithArguments("buy/settle", marketplace, cadence.UInt64(1))
 	flow.RunScript("check_account", flow.FindAddress(marketplace), cadence.NewString("marketplace"))
-	//flow.RunScript("check_account", flow.FindAddress(buyer1), cadence.NewString("buyer1"))
-	//flow.RunScript("check_account", flow.FindAddress(buyer2), cadence.NewString("buyer2"))
-	//flow.RunScript("check_account", flow.FindAddress(artist), cadence.NewString("artist"))
+	flow.RunScript("check_account", flow.FindAddress(buyer1), cadence.NewString("buyer1"))
+	flow.RunScript("check_account", flow.FindAddress(buyer2), cadence.NewString("buyer2"))
+	flow.RunScript("check_account", flow.FindAddress(artist), cadence.NewString("artist"))
 
 	/*
 		//We try to settle the account but the acution has not ended yet

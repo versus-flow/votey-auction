@@ -74,8 +74,17 @@ pub contract Versus {
             collectionCap: Capability<&{NonFungibleToken.CollectionPublic}>, 
             minimumBlockRemaining: UInt64) {
 
-            let currentEndBlock = self.uniqueAuction.getAuctionStatus().endBlock
+            let dropStatus = self.getDropStatus()
             let currentBlockHeight=getCurrentBlock().height
+
+            if(dropStatus.uniqueStatus.startBlock > currentBlockHeight) {
+                panic("The drop has not started")
+            }
+            if dropStatus.endBlock < currentBlockHeight && dropStatus.winning() != "TIE" {
+                panic("This drop has ended")
+            }
+           
+            let currentEndBlock = dropStatus.endBlock
             let bidEndBlock = currentBlockHeight + minimumBlockRemaining
 
             if currentEndBlock < bidEndBlock {
@@ -137,7 +146,7 @@ pub contract Versus {
              uniqueArt: @NonFungibleToken.NFT, 
              editionsArt: @NonFungibleToken.Collection,
              minimumBidIncrement: UFix64, 
-             auctionLengthInBlocks: UInt64, 
+             startBlock: UInt64, 
              startPrice: UFix64,  
              collectionCap: Capability<&{NonFungibleToken.CollectionPublic}>, 
              vaultCap: Capability<&{FungibleToken.Receiver}>)
@@ -245,6 +254,11 @@ pub contract Versus {
                     "drop doesn't exist"
             }
             let itemRef = &self.drops[dropId] as &Drop
+
+            if itemRef.uniqueAuction.isAuctionExpired() == false {
+                panic("Auction has not completed yet")
+            }
+
             let status=itemRef.getDropStatus()
             let winning=status.winning()
             if winning == "UNIQUE" {
@@ -271,7 +285,7 @@ pub contract Versus {
                     "NFT doesn't exist"
             }
             let drop = &self.drops[dropId] as &Drop
-            let minimumBlockRemaining=UInt64(5)
+            let minimumBlockRemaining=self.minimumBlockRemainingAfterBidOrTie
 
             drop.placeBid(auctionId: auctionId, bidTokens: <- bidTokens, vaultCap: vaultCap, collectionCap:collectionCap, minimumBlockRemaining: minimumBlockRemaining)
 

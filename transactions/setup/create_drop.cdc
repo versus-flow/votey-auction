@@ -10,7 +10,6 @@ transaction(versus: Address,
     minEditionId: UInt64, 
     maxEditionId:UInt64, 
     startPrice: UFix64, 
-    auctionLength: UInt64, 
     startBlock: UInt64) {
 
 
@@ -62,7 +61,6 @@ transaction(versus: Address,
                 editionsArt: <- editionCollecion,
                 minimumBidIncrement: UFix64(5),
                 startBlock: startBlock,
-                auctionLengthInBlocks: auctionLength,
                 startPrice: startPrice,
                 collectionCap: self.publicCollectionCap,
                 vaultCap: self.vaultCap
