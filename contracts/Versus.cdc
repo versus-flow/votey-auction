@@ -206,6 +206,25 @@ pub contract Versus {
             return itemRef.getDropStatus()
         }
 
+        pub fun settle(_ dropId: UInt64) {
+           pre {
+                self.drops[dropId] != nil:
+                    "drop doesn't exist"
+            }
+            let itemRef = &self.drops[dropId] as &Drop
+            let status=itemRef.getDropStatus()
+            let winning=status.winning()
+            if winning == "UNIQUE" {
+                itemRef.uniqueAuction.settleAuction(cutPercentage: self.cutPercentage, cutVault: self.marketplaceVault)
+                itemRef.editionAuctions.cancelAllAuctions()
+            }else if winning == "EDITIONED" {
+                itemRef.uniqueAuction.returnAuctionItemToOwner()
+                itemRef.editionAuctions.settleAllAuctions()
+            }else {
+                panic("tie")
+            }
+        }
+
         pub fun placeBid(
             dropId: UInt64, 
             auctionId:UInt64,

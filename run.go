@@ -35,7 +35,7 @@ func createArt(flow *tooling.FlowConfig, edition uint64, maxEdition uint64) {
 		cadence.NewUInt64(maxEdition)) //maxEdition
 }
 
-func bid(flow *tooling.FlowConfig, account string, auctionId int, amount string) {
+func bid(flow *tooling.FlowConfig, account string, auctionID int, amount string) {
 
 	flow.CreateAccount(account)
 	flow.SendTransaction("setup/create_demotoken_vault", account)
@@ -46,7 +46,7 @@ func bid(flow *tooling.FlowConfig, account string, auctionId int, amount string)
 	flow.SendTransactionWithArguments("buy/bid", account,
 		flow.FindAddress(marketplace),
 		cadence.UInt64(1),         //id of drop
-		cadence.UInt64(auctionId), //id of auction to bid on
+		cadence.UInt64(auctionID), //id of auction to bid on
 		ufix(amount))              //amount to bid
 }
 
@@ -55,7 +55,7 @@ func bid(flow *tooling.FlowConfig, account string, auctionId int, amount string)
 //fmt.Println("Press the Enter Key to continue!")
 //fmt.Scanln() // wai
 func main() {
-	flow := tooling.NewFlowConfigLocalhost()
+	flow := tooling.NewFlowConfigLocalhostWithGas(2000)
 
 	flow.DeployContract(nonFungibleToken)
 	// TODO: Could this minter be in init of demoToken? Do we have any scenario where somebody else should mint art?
@@ -95,24 +95,21 @@ func main() {
 		ufix("10.0"),                  //start price
 		cadence.NewUInt64(10))         //auction length
 
-	bid(flow, buyer1, 1, "20.0")
-	bid(flow, buyer2, 2, "10.0")
+	bid(flow, buyer1, 1, "10.0")
+	bid(flow, buyer2, 2, "30.0")
 
-	flow.SendTransactionWithArguments("buy/bid", buyer1,
-		flow.FindAddress(marketplace),
-		cadence.UInt64(1), //id of drop
-		cadence.UInt64(2), //id of auction to bid on
-		ufix("20.0"))      //amount to bid
+	flow.SendTransactionWithArguments("buy/settle", marketplace, cadence.UInt64(1))
 
 	flow.RunScript("check_account", flow.FindAddress(marketplace), cadence.NewString("marketplace"))
 	flow.RunScript("check_account", flow.FindAddress(buyer1), cadence.NewString("buyer1"))
 	flow.RunScript("check_account", flow.FindAddress(buyer2), cadence.NewString("buyer2"))
+	flow.RunScript("check_account", flow.FindAddress(artist), cadence.NewString("artist"))
+
 	/*
 		//We try to settle the account but the acution has not ended yet
 		flow.SendTransactionWithArguments("buy/settle", marketplace, cadence.UInt64(1))
 
 		//now the auction has ended and we can settle
-		flow.SendTransactionWithArguments("buy/settle", marketplace, cadence.UInt64(1))
 
 		//check the status of all the accounts involved in this scenario
 		flow.RunScript("check_account", flow.FindAddress(marketplace), cadence.NewString("marketplace"))

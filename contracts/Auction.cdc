@@ -451,6 +451,19 @@ pub contract Auction {
 
         }
 
+        pub fun settleAllAuctions() {
+           for id in self.auctionItems.keys {
+               self.settleAuction(id)
+           } 
+            
+        }
+
+        pub fun cancelAllAuctions() {
+            for id in self.auctionItems.keys {
+                self.cancelAuction(id)
+            }
+        }
+        
         pub fun cancelAuction(_ id: UInt64) {
             pre {
                 self.auctionItems[id] != nil:

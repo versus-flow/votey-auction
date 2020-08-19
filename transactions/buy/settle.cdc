@@ -5,23 +5,21 @@
 
 import FungibleToken from 0xee82856bf20e2aa6
 import NonFungibleToken from 0x01cf0e2f2f715450
-import Auction from 0xe03daebed8ca0615
+import Versus from 0x045a1763c93006ca
 
-transaction(auctionId: UInt64) {
+transaction(dropId: UInt64) {
     // reference to the buyer's NFT collection where they
     // will store the bought NFT
 
-    let vaultCap: &Auction.AuctionCollection 
-
+    let versusRef: &Versus.DropCollection
     prepare(account: AuthAccount) {
 
-        self.vaultCap = account.borrow<&Auction.AuctionCollection>(from: /storage/NFTAuction)
-            ?? panic("Could not borrow owner's auction collection")
+        self.versusRef = account.borrow<&Versus.DropCollection>(from: /storage/Versus) ?? panic("Could not get versus storage")
     }
 
     execute {
         
-        self.vaultCap.settleAuction(auctionId)
+            self.versusRef.settle(dropId)
+        }
     }
-}
  
