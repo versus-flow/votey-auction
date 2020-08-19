@@ -13,10 +13,16 @@ pub contract Versus {
 
     pub var totalDrops: UInt64
 
-    pub fun createVersusDropCollection(marketplaceVault: Capability<&{FungibleToken.Receiver}>,cutPercentage: UFix64): @DropCollection {
+    pub fun createVersusDropCollection(
+        marketplaceVault: Capability<&{FungibleToken.Receiver}>,
+        cutPercentage: UFix64,
+        dropLength: UInt64, 
+        minimumBlockRemainingAfterBidOrTie: UInt64): @DropCollection {
         let collection <- create DropCollection(
             marketplaceVault: marketplaceVault, 
-            cutPercentage: cutPercentage
+            cutPercentage: cutPercentage,
+            dropLength: dropLength,
+            minimumBlockRemainingAfterBidOrTie:minimumBlockRemainingAfterBidOrTie
         )
         return <- collection
     }
@@ -155,12 +161,19 @@ pub contract Versus {
         pub var cutPercentage:UFix64 
         pub let marketplaceVault: Capability<&{FungibleToken.Receiver}>
 
+        pub let minimumBlockRemainingAfterBidOrTie: UInt64
+        pub let dropLength: UInt64
+
         init(
             marketplaceVault: Capability<&{FungibleToken.Receiver}>, 
-            cutPercentage: UFix64
+            cutPercentage: UFix64,
+            dropLength: UInt64,
+            minimumBlockRemainingAfterBidOrTie:UInt64
         ) {
             self.cutPercentage= cutPercentage
             self.marketplaceVault = marketplaceVault
+            self.dropLength=dropLength
+            self.minimumBlockRemainingAfterBidOrTie=minimumBlockRemainingAfterBidOrTie
             self.drops <- {}
         }
 
@@ -168,7 +181,7 @@ pub contract Versus {
              uniqueArt: @NonFungibleToken.NFT, 
              editionsArt: @NonFungibleToken.Collection,
              minimumBidIncrement: UFix64, 
-             auctionLengthInBlocks: UInt64, 
+             startBlock: UInt64, 
              startPrice: UFix64,  
              collectionCap: Capability<&{NonFungibleToken.CollectionPublic}>, 
              vaultCap: Capability<&{FungibleToken.Receiver}>) {
@@ -176,7 +189,8 @@ pub contract Versus {
             let item <- Auction.createStandaloneAuction(
                 token: <-uniqueArt,
                 minimumBidIncrement: minimumBidIncrement,
-                auctionLengthInBlocks: auctionLengthInBlocks,
+                auctionLengthInBlocks: self.dropLength,
+                auctionStartBlock: startBlock,
                 startPrice: startPrice,
                 collectionCap: collectionCap,
                 vaultCap: vaultCap
@@ -190,7 +204,8 @@ pub contract Versus {
                 editionedAuctions.createAuction(
                     token: <- art, 
                     minimumBidIncrement: minimumBidIncrement, 
-                    auctionLengthInBlocks: auctionLengthInBlocks, 
+                    auctionLengthInBlocks: self.dropLength,
+                    auctionStartBlock:startBlock,
                     startPrice: startPrice, 
                     collectionCap: collectionCap, 
                     vaultCap: vaultCap)

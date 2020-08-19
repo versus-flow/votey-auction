@@ -10,7 +10,8 @@ transaction(versus: Address,
     minEditionId: UInt64, 
     maxEditionId:UInt64, 
     startPrice: UFix64, 
-    auctionLength: UInt64) {
+    auctionLength: UInt64, 
+    startBlock: UInt64) {
 
 
     let vaultCap: Capability<&{FungibleToken.Receiver}>
@@ -60,6 +61,7 @@ transaction(versus: Address,
                 uniqueArt: <- uniqueItem,
                 editionsArt: <- editionCollecion,
                 minimumBidIncrement: UFix64(5),
+                startBlock: startBlock,
                 auctionLengthInBlocks: auctionLength,
                 startPrice: startPrice,
                 collectionCap: self.publicCollectionCap,

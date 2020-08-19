@@ -93,7 +93,8 @@ func main() {
 		cadence.NewUInt64(1),          //id of start of edition items in storage
 		cadence.NewUInt64(10),         //if of last edition item in storage
 		ufix("10.0"),                  //start price
-		cadence.NewUInt64(10))         //auction length
+		cadence.NewUInt64(10),         //auction length
+		cadence.NewUInt64(20))         //start block
 
 	bid(flow, buyer1, 1, "10.0")
 	bid(flow, buyer2, 2, "30.0")

@@ -404,6 +404,7 @@ pub contract Auction {
             token: @NonFungibleToken.NFT, 
             minimumBidIncrement: UFix64, 
             auctionLengthInBlocks: UInt64, 
+            auctionStartBlock: UInt64,
             startPrice: UFix64, 
             collectionCap: Capability<&{NonFungibleToken.CollectionPublic}>, 
             vaultCap: Capability<&{FungibleToken.Receiver}>) {
@@ -413,6 +414,7 @@ pub contract Auction {
                 token: <-token,
                 minimumBidIncrement: minimumBidIncrement,
                 auctionLengthInBlocks: auctionLengthInBlocks,
+                auctionStartBlock: auctionStartBlock,
                 startPrice: startPrice,
                 collectionCap: collectionCap,
                 vaultCap: vaultCap
@@ -515,6 +517,7 @@ pub contract Auction {
             token: @NonFungibleToken.NFT, 
             minimumBidIncrement: UFix64, 
             auctionLengthInBlocks: UInt64, 
+            auctionStartBlock: UInt64,
             startPrice: UFix64, 
             collectionCap: Capability<&{NonFungibleToken.CollectionPublic}>, 
             vaultCap: Capability<&{FungibleToken.Receiver}>) : @AuctionItem {
@@ -525,7 +528,7 @@ pub contract Auction {
                 minimumBidIncrement: minimumBidIncrement,
                 auctionLengthInBlocks: auctionLengthInBlocks,
                 startPrice: startPrice,
-                auctionStartBlock: getCurrentBlock().height,
+                auctionStartBlock: auctionStartBlock,
                 ownerCollectionCap: collectionCap,
                 ownerVaultCap: vaultCap
             )
