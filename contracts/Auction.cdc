@@ -91,7 +91,7 @@ pub contract Auction {
         pub(set) var auctionStartBlock: UInt64
 
         //The length in blocks for this auction
-        pub let auctionLengthInBlocks: UInt64
+        pub var auctionLengthInBlocks: UInt64
 
         pub(set) var auctionCompleted: Bool
 
@@ -175,6 +175,8 @@ pub contract Auction {
                 log("unable to get vault capability")
             }
         }
+ 
+
 
         pub fun settleAuction(cutPercentage: UFix64, cutVault:Capability<&{FungibleToken.Receiver}> )  {
 
@@ -265,6 +267,10 @@ pub contract Auction {
 
 
         }
+
+        pub fun extendWith(_ amount: UInt64) {
+            self.auctionLengthInBlocks = self.auctionLengthInBlocks + amount
+        }
         pub fun placeBid(bidTokens: @FungibleToken.Vault, vaultCap: Capability<&{FungibleToken.Receiver}>, collectionCap: Capability<&{NonFungibleToken.CollectionPublic}>) {
 
 
@@ -346,6 +352,7 @@ pub contract Auction {
     // retreiving the auction price list and placing bids
     pub resource interface AuctionPublic {
 
+        pub fun extendAllAuctionsWith(_ amount: UInt64)
          pub fun createAuction(
              token: @NonFungibleToken.NFT, 
              minimumBidIncrement: UFix64, 
@@ -384,7 +391,13 @@ pub contract Auction {
         }
 
 
-
+        pub fun extendAllAuctionsWith(_ amount: UInt64) {
+            for id in self.auctionItems.keys {
+                let itemRef = &self.auctionItems[id] as? &AuctionItem
+                itemRef.extendWith(amount)
+            }
+            
+        }
         // addTokenToauctionItems adds an NFT to the auction items and sets the meta data
         // for the auction item
         pub fun createAuction(

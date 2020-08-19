@@ -65,15 +65,31 @@ pub contract Versus {
             auctionId:UInt64,
             bidTokens: @FungibleToken.Vault, 
             vaultCap: Capability<&{FungibleToken.Receiver}>, 
-            collectionCap: Capability<&{NonFungibleToken.CollectionPublic}>) {
-                if self.uniqueAuction.auctionID == auctionId {
-                    let auctionRef = &self.uniqueAuction as &Auction.AuctionItem
-                    auctionRef.placeBid(bidTokens: <- bidTokens, vaultCap:vaultCap, collectionCap:collectionCap)
-                } else {
-                    let editionsRef = &self.editionAuctions as &Auction.AuctionCollection 
-                    editionsRef.placeBid(id: auctionId, bidTokens: <- bidTokens, vaultCap:vaultCap, collectionCap:collectionCap)
-                }
+            collectionCap: Capability<&{NonFungibleToken.CollectionPublic}>, 
+            minimumBlockRemaining: UInt64) {
+
+            let currentEndBlock = self.uniqueAuction.getAuctionStatus().endBlock
+            let currentBlockHeight=getCurrentBlock().height
+            let bidEndBlock = currentBlockHeight + minimumBlockRemaining
+
+            if currentEndBlock < bidEndBlock {
+                self.extendDropWith(bidEndBlock - currentEndBlock)
             }
+            if self.uniqueAuction.auctionID == auctionId {
+                let auctionRef = &self.uniqueAuction as &Auction.AuctionItem
+                auctionRef.placeBid(bidTokens: <- bidTokens, vaultCap:vaultCap, collectionCap:collectionCap)
+            } else {
+                let editionsRef = &self.editionAuctions as &Auction.AuctionCollection 
+                editionsRef.placeBid(id: auctionId, bidTokens: <- bidTokens, vaultCap:vaultCap, collectionCap:collectionCap)
+            }
+        }
+
+        pub fun extendDropWith(_ block: UInt64) {
+            log("Drop extended with duration")
+            log(block)
+            self.uniqueAuction.extendWith(block)
+            self.editionAuctions.extendAllAuctionsWith(block)
+        }
         
     }
 
@@ -81,6 +97,7 @@ pub contract Versus {
         pub let dropId: UInt64
         pub let uniquePrice: UFix64
         pub let editionPrice: UFix64
+        pub let endBlock: UInt64
         pub let uniqueStatus: Auction.AuctionStatus
         pub let editionsStatuses: {UInt64: Auction.AuctionStatus}
 
@@ -105,6 +122,7 @@ pub contract Versus {
                 self.editionsStatuses=editionsStatuses
                 self.uniquePrice= uniqueStatus.price
                 self.editionPrice= editionPrice
+                self.endBlock=uniqueStatus.endBlock
             }
     }
 
@@ -238,7 +256,9 @@ pub contract Versus {
                     "NFT doesn't exist"
             }
             let drop = &self.drops[dropId] as &Drop
-            drop.placeBid(auctionId: auctionId, bidTokens: <- bidTokens, vaultCap: vaultCap, collectionCap:collectionCap)
+            let minimumBlockRemaining=UInt64(5)
+
+            drop.placeBid(auctionId: auctionId, bidTokens: <- bidTokens, vaultCap: vaultCap, collectionCap:collectionCap, minimumBlockRemaining: minimumBlockRemaining)
 
         }
         destroy() {            

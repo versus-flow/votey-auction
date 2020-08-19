@@ -177,25 +177,6 @@ pub contract DemoToken: FungibleToken {
     init() {
         self.totalSupply = 0.0
 
-        // Create the Vault with the total supply of tokens and save it in storage
-        let vault <-create Vault(balance: self.totalSupply)
-        self.account.save(<-vault, to: /storage/DemoTokenVault)
-
-        // Create a public capability to the stored Vault that only exposes
-        // the 'deposit' method through the 'Receiver' interface
-        //
-        self.account.link<&{FungibleToken.Receiver}>(
-            /public/DemoTokenReceiver,
-            target: /storage/DemoTokenVault
-        )
-
-        // Create a public capability to the stored Vault that only exposes
-        // the 'balance' field through the 'Balance' interface
-        self.account.link<&{FungibleToken.Balance}>(
-            /public/DemoTokenBalance,
-            target: /storage/DemoTokenVault
-        )
-
         let admin <-create Administrator()
         self.account.save(<-admin, to: /storage/DemoTokenAdmin)
 

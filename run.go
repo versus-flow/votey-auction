@@ -98,12 +98,12 @@ func main() {
 	bid(flow, buyer1, 1, "10.0")
 	bid(flow, buyer2, 2, "30.0")
 
-	flow.SendTransactionWithArguments("buy/settle", marketplace, cadence.UInt64(1))
-
+	flow.RunScript("tick", flow.FindAddress(marketplace), cadence.NewUInt64(1))
+	//flow.SendTransactionWithArguments("buy/settle", marketplace, cadence.UInt64(1))
 	flow.RunScript("check_account", flow.FindAddress(marketplace), cadence.NewString("marketplace"))
-	flow.RunScript("check_account", flow.FindAddress(buyer1), cadence.NewString("buyer1"))
-	flow.RunScript("check_account", flow.FindAddress(buyer2), cadence.NewString("buyer2"))
-	flow.RunScript("check_account", flow.FindAddress(artist), cadence.NewString("artist"))
+	//flow.RunScript("check_account", flow.FindAddress(buyer1), cadence.NewString("buyer1"))
+	//flow.RunScript("check_account", flow.FindAddress(buyer2), cadence.NewString("buyer2"))
+	//flow.RunScript("check_account", flow.FindAddress(artist), cadence.NewString("artist"))
 
 	/*
 		//We try to settle the account but the acution has not ended yet

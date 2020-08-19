@@ -13,7 +13,6 @@ transaction(versus: Address,
     auctionLength: UInt64) {
 
 
-    let versusRef: &{Versus.PublicDrop}
     let vaultCap: Capability<&{FungibleToken.Receiver}>
     let accountCollectionRef:&NonFungibleToken.Collection
     let publicCollectionCap:Capability<&{NonFungibleToken.CollectionPublic}>
