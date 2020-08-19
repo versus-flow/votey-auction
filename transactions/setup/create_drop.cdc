@@ -5,7 +5,12 @@ import Auction from 0xe03daebed8ca0615
 import Versus from 0x045a1763c93006ca
 import Art from 0xf3fcd2c1a78f5eee
 
-transaction(versus: Address, uniqueId: UInt64, minEditionId: UInt64, maxEditionId:UInt64, startPrice: UFix64, auctionLength: UInt64) {
+transaction(versus: Address, 
+    uniqueId: UInt64, 
+    minEditionId: UInt64, 
+    maxEditionId:UInt64, 
+    startPrice: UFix64, 
+    auctionLength: UInt64) {
 
 
     let versusRef: &{Versus.PublicDrop}
@@ -31,14 +36,16 @@ transaction(versus: Address, uniqueId: UInt64, minEditionId: UInt64, maxEditionI
             panic("Unable to borrow the Vault Receiver capability")
          }
 
-       //get the auctionCollectionReference to add the item to
-        self.versusRef = getAccount(versus).getCapability(/public/Versus)!
-                         .borrow<&{Versus.PublicDrop}>()
-                         ?? panic("Could not borrow seller's sale reference")
-
+       
     }
 
     execute {
+
+        //get the auctionCollectionReference to add the item to
+        let versusRef = getAccount(versus).getCapability(/public/Versus)!
+                         .borrow<&{Versus.PublicDrop}>()
+                         ?? panic("Could not borrow seller's sale reference")
+
             // withdraw the NFT from the collection that you want to sell
             // and move it into the transaction's context
             let uniqueItem <- self.accountCollectionRef.withdraw(withdrawID: uniqueId)
@@ -50,7 +57,7 @@ transaction(versus: Address, uniqueId: UInt64, minEditionId: UInt64, maxEditionI
                 currentId=currentId+UInt64(1)
             }
 
-            self.versusRef.createDrop(
+            versusRef.createDrop(
                 uniqueArt: <- uniqueItem,
                 editionsArt: <- editionCollecion,
                 minimumBidIncrement: UFix64(5),
