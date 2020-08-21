@@ -71,7 +71,6 @@ func main() {
 	//The artist owns NFTs and sells in the marketplace
 	flow.CreateAccount(artist)
 	flow.SendTransactionWithArguments("setup/actor", artist, ufix("0.0"))
-	flow.SendTransactionWithArguments("setup/actor", artist, ufix("0.0"))
 
 	flow.SendTransactionWithArguments("setup/drop", marketplace,
 		flow.FindAddress(artist),      //marketplace locaion
@@ -84,33 +83,33 @@ func main() {
 		cadence.NewUInt64(10), //number of editions to use for the editioned auction
 		ufix("5.0"))           //minimum bid increment
 
-	bid(flow, buyer1, 1, "10.0")
-	flow.SendTransactionWithArguments("tick", marketplace, cadence.NewUInt64(1))
-	flow.SendTransactionWithArguments("tick", marketplace, cadence.NewUInt64(1))
-	flow.SendTransactionWithArguments("tick", marketplace, cadence.NewUInt64(1))
-	flow.SendTransactionWithArguments("tick", marketplace, cadence.NewUInt64(1))
-	flow.SendTransactionWithArguments("tick", marketplace, cadence.NewUInt64(1))
-	flow.SendTransactionWithArguments("tick", marketplace, cadence.NewUInt64(1))
-
-	//bid(flow, buyer2, 2, "30.0")
-
-	flow.SendTransactionWithArguments("buy/settle", marketplace, cadence.UInt64(1))
-	flow.RunScript("check_account", flow.FindAddress(marketplace), cadence.NewString("marketplace"))
-	flow.RunScript("check_account", flow.FindAddress(buyer1), cadence.NewString("buyer1"))
-	flow.RunScript("check_account", flow.FindAddress(buyer2), cadence.NewString("buyer2"))
-	flow.RunScript("check_account", flow.FindAddress(artist), cadence.NewString("artist"))
-
 	/*
-		//We try to settle the account but the acution has not ended yet
+		bid(flow, buyer1, 1, "10.0")
+		flow.SendTransactionWithArguments("tick", marketplace, cadence.NewUInt64(1))
+		flow.SendTransactionWithArguments("tick", marketplace, cadence.NewUInt64(1))
+		flow.SendTransactionWithArguments("tick", marketplace, cadence.NewUInt64(1))
+		flow.SendTransactionWithArguments("tick", marketplace, cadence.NewUInt64(1))
+		flow.SendTransactionWithArguments("tick", marketplace, cadence.NewUInt64(1))
+		flow.SendTransactionWithArguments("tick", marketplace, cadence.NewUInt64(1))
+
+		//bid(flow, buyer2, 2, "30.0")
+
 		flow.SendTransactionWithArguments("buy/settle", marketplace, cadence.UInt64(1))
-
-		//now the auction has ended and we can settle
-
-		//check the status of all the accounts involved in this scenario
 		flow.RunScript("check_account", flow.FindAddress(marketplace), cadence.NewString("marketplace"))
-		flow.RunScript("check_account", flow.FindAddress(artist), cadence.NewString("artist"))
 		flow.RunScript("check_account", flow.FindAddress(buyer1), cadence.NewString("buyer1"))
 		flow.RunScript("check_account", flow.FindAddress(buyer2), cadence.NewString("buyer2"))
+		flow.RunScript("check_account", flow.FindAddress(artist), cadence.NewString("artist"))
+
+			//We try to settle the account but the acution has not ended yet
+			flow.SendTransactionWithArguments("buy/settle", marketplace, cadence.UInt64(1))
+
+			//now the auction has ended and we can settle
+
+			//check the status of all the accounts involved in this scenario
+			flow.RunScript("check_account", flow.FindAddress(marketplace), cadence.NewString("marketplace"))
+			flow.RunScript("check_account", flow.FindAddress(artist), cadence.NewString("artist"))
+			flow.RunScript("check_account", flow.FindAddress(buyer1), cadence.NewString("buyer1"))
+			flow.RunScript("check_account", flow.FindAddress(buyer2), cadence.NewString("buyer2"))
 
 	*/
 }
