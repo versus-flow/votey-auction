@@ -38,11 +38,9 @@ pub fun main(address:Address, name: String){
           status.balance=demoTokens.balance
         }
     }
-    var isMarketplace=false
     if let versusCap = account.getCapability(/public/Versus) {
 
         if let versus = versusCap.borrow<&{Versus.PublicDrop}>() {
-          isMarketplace=true
           log("Drops available")
           log("=================")
           let versusStatuses=versus.getAllStatuses()
@@ -65,12 +63,9 @@ pub fun main(address:Address, name: String){
              }
           }
           status.drops=versusStatuses
+          return
         } 
     } 
-    
-    if isMarketplace {
-      return 
-    }
 
     if let artCap = account.getCapability(/public/ArtCollection) {
        if let art= artCap.borrow<&{NonFungibleToken.CollectionPublic}>()  {

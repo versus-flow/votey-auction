@@ -8,9 +8,9 @@ import NonFungibleToken from 0x01cf0e2f2f715450
 
 transaction(tokens:UFix64) {
 
-
     prepare(acct: AuthAccount) {
 
+        let tokens:UFix64 = 100.0
         let reciverRef = acct.getCapability(/public/DemoTokenReceiver)!
         //If we have a DemoTokenReceiver then we are already set up so just return
         if reciverRef.check<&{FungibleToken.Receiver}>() {

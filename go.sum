@@ -169,11 +169,8 @@ github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5
 github.com/syndtr/goleveldb v1.0.1-0.20190923125748-758128399b1d/go.mod h1:9OrXJhf154huy1nPWmuSrkgjPUtUNhA+Zmy+6AESzuA=
 github.com/tyler-smith/go-bip39 v1.0.1-0.20181017060643-dbb3b84ba2ef/go.mod h1:sJ5fKU0s6JVwZjjcUEX2zFOnvq0ASQ2K9Zr6cf67kNs=
 github.com/urfave/cli v1.22.1/go.mod h1:Gos4lmkARVdJ6EkW0WaNv/tZAAMe9V7XWyB60NtXRu0=
-github.com/versus-flow/go-flow-tooling v0.10.1 h1:b7T64fdqUWV+Y7MbOUvKKqpXY1d2NPMiY52d3jrqJXo=
-github.com/versus-flow/go-flow-tooling v0.10.1/go.mod h1:et4WtEjDCRFf98L12gnAUJBLHoWR9eeZ5VNBmTvFSEQ=
-github.com/versus-flow/go-flow-tooling v0.11.0 h1:xdbWwIKAqI49GrqzrEhsIFLJEkPiEnIugrq/KWXdVUE=
-github.com/versus-flow/go-flow-tooling v0.12.0 h1:t+QpOVgvq3e/srAWYzyHLrC0fcFn1dJYG+EiMAM4zxc=
-github.com/versus-flow/go-flow-tooling v0.12.0/go.mod h1:LsmAjlrx5HCf4cYKsKWmyYBYKq6qON0HzuiVPWCpiUI=
+github.com/versus-flow/go-flow-tooling v0.13.0 h1:lzA/j0jzjVsJr2MDeb0aFyYrGQGPDM0Pw1FTJ43R8p8=
+github.com/versus-flow/go-flow-tooling v0.13.0/go.mod h1:LsmAjlrx5HCf4cYKsKWmyYBYKq6qON0HzuiVPWCpiUI=
 github.com/wsddn/go-ecdh v0.0.0-20161211032359-48726bab9208/go.mod h1:IotVbo4F+mw0EzQ08zFqg7pK3FebNXpaMsRy2RT+Ees=
 github.com/x448/float16 v0.8.4 h1:qLwI1I70+NjRFUR3zs1JPUCgaCXSh3SW62uAKT1mSBM=
 github.com/x448/float16 v0.8.4/go.mod h1:14CWIYCyZA/cWjXOioeEpHeN/83MdbZDRQHoFcYsOfg=
