@@ -6,12 +6,10 @@ Simulate that the clock is running
  */
 transaction(dropID: UInt64) {
     prepare(account: AuthAccount) {    
-      log("CurrentBlock")
-      log(getCurrentBlock().height)
+      let block=getCurrentBlock()
       if let versus = account.getCapability(/public/Versus).borrow<&{Versus.PublicDrop}>() {
           let versusStatus=versus.getStatus(dropId: dropID)
-          log("Acution end block")
-          log(versusStatus.endBlock)
+          log("currentBlock=".concat(block.height.toString()).concat( " currentTime=").concat(block.timestamp.toString()).concat( " endTime=").concat(versusStatus.endTime.toString()).concat(" timeRemaining=").concat(versusStatus.timeRemaining.toString()))
       }
   }
 }

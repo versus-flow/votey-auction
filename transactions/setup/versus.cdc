@@ -4,10 +4,10 @@ import NonFungibleToken, DemoToken, Art, Auction, Versus from 0x01cf0e2f2f715450
 
 //This transaction setup of a versus marketplace
 //Each drop settlement will deposit cutPercentage number of tokens into the signers vault
-//Standard dropLength can be set and the number of blocks to postpone the drops on if there is a late bid
+//Standard dropLength can be set and the number of seconds to postpone the drops on if there is a late bid
 
-// If there is a bid 1 block before it ends it will be extended with minimumBlockRemainingAfterBidOrTie-1 
-transaction(cutPercentage: UFix64, dropLength: UInt64, minimumBlockRemainingAfterBidOrTie: UInt64) {
+// If there is a bid 1 block before it ends it will be extended with minimumTimeRemainingAfterBidOrTie-1 
+transaction(cutPercentage: UFix64, dropLength: UFix64, minimumTimeRemainingAfterBidOrTie: UFix64) {
 
     prepare(account: AuthAccount) {
         // create a new sale object     
@@ -27,7 +27,7 @@ transaction(cutPercentage: UFix64, dropLength: UInt64, minimumBlockRemainingAfte
             marketplaceNFTTrash:marketplaceNFTTrash,
             cutPercentage: cutPercentage,
             dropLength: dropLength, 
-            minimumBlockRemainingAfterBidOrTie: minimumBlockRemainingAfterBidOrTie
+            minimumTimeRemainingAfterBidOrTie: minimumTimeRemainingAfterBidOrTie
         )
 
         // store the sale resource in the account for storage

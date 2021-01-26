@@ -1,7 +1,7 @@
 
 {
 	"address" : "127.0.0.1:3569",
-	"gasLimit" : 1000, 
+	"gasLimit" : 9999, 
 	"accounts": {
 		"service": {
 			"address": "f8d6e0586b0a20c7",

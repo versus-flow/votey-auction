@@ -15,10 +15,9 @@ pub contract Auction {
         pub let bidIncrement : UFix64
         pub let bids : UInt64
         pub let active: Bool
-        pub let blocksRemaining : Int64
-        //TODO: Timestamps
-        pub let endBlock : UInt64
-        pub let startBlock : UInt64
+        pub let timeRemaining : Fix64
+        pub let endTime : Fix64
+        pub let startTime : Fix64
         pub let metadata : {String: String}
         pub let owner: Address
         pub let leader: Address?
@@ -28,26 +27,26 @@ pub contract Auction {
             currentPrice: UFix64, 
             bids:UInt64, 
             active: Bool, 
-            blocksRemaining:Int64, 
+            timeRemaining:Fix64, 
             nftMetadata: {String: String}, 
             leader:Address?, 
             bidIncrement: UFix64,
             owner: Address, 
-            startBlock: UInt64,
-            endBlock: UInt64,
+            startTime: Fix64,
+            endTime: Fix64,
             minNextBid:UFix64
         ) {
             self.id=id
             self.price= currentPrice
             self.bids=bids
             self.active=active
-            self.blocksRemaining=blocksRemaining
+            self.timeRemaining=timeRemaining
             self.metadata=nftMetadata
             self.leader= leader
             self.bidIncrement=bidIncrement
             self.owner=owner
-            self.startBlock=startBlock
-            self.endBlock=endBlock
+            self.startTime=startTime
+            self.endTime=endTime
             self.minNextBid=minNextBid
         }
     }
@@ -59,7 +58,7 @@ pub contract Auction {
 
 
     pub event CollectionCreated(owner: Address, cutPercentage: UFix64)
-    pub event Created(tokenID: UInt64, owner: Address, startPrice: UFix64, startBlock: UInt64)
+    pub event Created(tokenID: UInt64, owner: Address, startPrice: UFix64, startTime: UFix64)
     pub event Bid(tokenID: UInt64, bidderAddress: Address, bidPrice: UFix64)
     pub event Settled(tokenID: UInt64, price: UFix64)
     pub event Canceled(tokenID: UInt64)
@@ -85,11 +84,11 @@ pub contract Auction {
         //The minimum increment for a bid. This is an english auction style system where bids increase
         pub let minimumBidIncrement: UFix64
 
-        //the block this auction should start at
-        pub(set) var auctionStartBlock: UInt64
+        //the time the acution should start at
+        pub(set) var auctionStartTime: UFix64
 
-        //The length in blocks for this auction
-        pub var auctionLengthInBlocks: UInt64
+        //The length in seconsd for this auction
+        pub var auctionLength: UFix64
 
         //Right now the dropitem is not moved from the collection when it ends, it is just marked here that it has ended 
         pub(set) var auctionCompleted: Bool
@@ -113,9 +112,9 @@ pub contract Auction {
         init(
             NFT: @NonFungibleToken.NFT,
             minimumBidIncrement: UFix64,
-            auctionLengthInBlocks: UInt64,
+            auctionStartTime: UFix64,
             startPrice: UFix64, 
-            auctionStartBlock: UInt64,
+            auctionLength: UFix64,
             ownerCollectionCap: Capability<&{NonFungibleToken.CollectionPublic}>,
             ownerVaultCap: Capability<&{FungibleToken.Receiver}>,
         ) {
@@ -125,10 +124,10 @@ pub contract Auction {
             self.bidVault <- DemoToken.createEmptyVault()
             self.auctionID = Auction.totalAuctions
             self.minimumBidIncrement = minimumBidIncrement
-            self.auctionLengthInBlocks = auctionLengthInBlocks
+            self.auctionLength = auctionLength
             self.startPrice = startPrice
             self.currentPrice = 0.0
-            self.auctionStartBlock = auctionStartBlock
+            self.auctionStartTime = auctionStartTime
             self.auctionCompleted = false
             self.recipientCollectionCap = nil
             self.recipientVaultCap = nil
@@ -220,18 +219,22 @@ pub contract Auction {
          }
 
         //this can be negative if is expired
-        pub fun blocksRemaining() : Int64 {
-            let auctionLength = self.auctionLengthInBlocks
+        pub fun timeRemaining() : Fix64 {
+            let auctionLength = self.auctionLength
 
-            let startBlock = self.auctionStartBlock 
+            let startTime = self.auctionStartTime
+            let currentTime = getCurrentBlock().timestamp
 
-            let currentBlock = getCurrentBlock().height
-            return Int64(startBlock+auctionLength) - Int64(currentBlock) 
+            let remaining= Fix64(startTime+auctionLength) - Fix64(currentTime)
+        //    log("timeRemaining=".concat(remaining.toString()))
+            return remaining
         }
 
       
         pub fun isAuctionExpired(): Bool {
-            return self.blocksRemaining() < (0 as Int64)
+            let timeRemaining= self.timeRemaining()
+            //log("timeRemaining=".concat(timeRemaining.toString()))
+            return timeRemaining <= Fix64(0.0)
         }
 
         // exchangeTokens sends the purchased NFT to the buyer and the bidTokens to the seller
@@ -259,8 +262,8 @@ pub contract Auction {
         }
 
         //Extend an auction with a given set of blocks
-        pub fun extendWith(_ amount: UInt64) {
-            self.auctionLengthInBlocks = self.auctionLengthInBlocks + amount
+        pub fun extendWith(_ amount: UFix64) {
+            self.auctionLength= self.auctionLength + amount
         }
 
         // This method should probably use preconditions more
@@ -313,13 +316,13 @@ pub contract Auction {
                 currentPrice: self.currentPrice, 
                 bids: self.numberOfBids,
                 active: !self.auctionCompleted  && !self.isAuctionExpired(),
-                blocksRemaining: self.blocksRemaining(),
+                timeRemaining: self.timeRemaining(),
                 nftMetadata: self.NFT?.metadata ?? {},
                 leader: leader,
                 bidIncrement: self.minimumBidIncrement,
                 owner: self.ownerVaultCap.borrow()!.owner!.address,
-                startBlock: self.auctionStartBlock, 
-                endBlock: self.auctionStartBlock+self.auctionLengthInBlocks, 
+                startTime: Fix64(self.auctionStartTime),
+                endTime: Fix64(self.auctionStartTime+self.auctionLength),
                 minNextBid: self.minNextBid()
             )
         }
@@ -345,7 +348,7 @@ pub contract Auction {
     // retreiving the auction price list and placing bids
     pub resource interface AuctionPublic {
 
-        pub fun extendAllAuctionsWith(_ amount: UInt64)
+        pub fun extendAllAuctionsWith(_ amount: UFix64)
 
 
         //It could be argued that this method should not be here in the public contract. I guss it could be an interface of its own
@@ -354,8 +357,8 @@ pub contract Auction {
          pub fun createAuction(
              token: @NonFungibleToken.NFT, 
              minimumBidIncrement: UFix64, 
-             auctionLengthInBlocks: UInt64, 
-             auctionStartBlock: UInt64,
+             auctionLength: UFix64, 
+             auctionStartTime: UFix64,
              startPrice: UFix64, 
              collectionCap: Capability<&{NonFungibleToken.CollectionPublic}>, 
              vaultCap: Capability<&{FungibleToken.Receiver}>) 
@@ -390,7 +393,7 @@ pub contract Auction {
         }
 
 
-        pub fun extendAllAuctionsWith(_ amount: UInt64) {
+        pub fun extendAllAuctionsWith(_ amount: UFix64) {
             for id in self.auctionItems.keys {
                 let itemRef = &self.auctionItems[id] as? &AuctionItem
                 itemRef.extendWith(amount)
@@ -402,8 +405,8 @@ pub contract Auction {
         pub fun createAuction(
             token: @NonFungibleToken.NFT, 
             minimumBidIncrement: UFix64, 
-            auctionLengthInBlocks: UInt64, 
-            auctionStartBlock: UInt64,
+            auctionLength: UFix64, 
+            auctionStartTime: UFix64,
             startPrice: UFix64, 
             collectionCap: Capability<&{NonFungibleToken.CollectionPublic}>, 
             vaultCap: Capability<&{FungibleToken.Receiver}>) {
@@ -412,8 +415,8 @@ pub contract Auction {
             let item <- Auction.createStandaloneAuction(
                 token: <-token,
                 minimumBidIncrement: minimumBidIncrement,
-                auctionLengthInBlocks: auctionLengthInBlocks,
-                auctionStartBlock: auctionStartBlock,
+                auctionLength: auctionLength,
+                auctionStartTime: auctionStartTime,
                 startPrice: startPrice,
                 collectionCap: collectionCap,
                 vaultCap: vaultCap
@@ -427,7 +430,7 @@ pub contract Auction {
 
             let owner= vaultCap.borrow()!.owner!.address
 
-            emit Created(tokenID: id, owner: owner, startPrice: startPrice, startBlock: auctionStartBlock)
+            emit Created(tokenID: id, owner: owner, startPrice: startPrice, startTime: auctionStartTime)
         }
 
 
@@ -518,8 +521,8 @@ pub contract Auction {
         pub fun createStandaloneAuction(
             token: @NonFungibleToken.NFT, 
             minimumBidIncrement: UFix64, 
-            auctionLengthInBlocks: UInt64, 
-            auctionStartBlock: UInt64,
+            auctionLength: UFix64,
+            auctionStartTime: UFix64,
             startPrice: UFix64, 
             collectionCap: Capability<&{NonFungibleToken.CollectionPublic}>, 
             vaultCap: Capability<&{FungibleToken.Receiver}>) : @AuctionItem {
@@ -528,9 +531,9 @@ pub contract Auction {
             return  <- create AuctionItem(
                 NFT: <-token,
                 minimumBidIncrement: minimumBidIncrement,
-                auctionLengthInBlocks: auctionLengthInBlocks,
+                auctionStartTime: auctionStartTime,
                 startPrice: startPrice,
-                auctionStartBlock: auctionStartBlock,
+                auctionLength: auctionLength,
                 ownerCollectionCap: collectionCap,
                 ownerVaultCap: vaultCap
             )

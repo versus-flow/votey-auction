@@ -11,8 +11,9 @@ import Auction, Versus from 0x01cf0e2f2f715450
 pub fun main(address:Address) : Versus.DropStatus?{
     // get the accounts' public address objects
     let account = getAccount(address)
-   
-    if let versus = account.getCapability(/public/Versus).borrow<&{Versus.PublicDrop}>() {
+
+    let versusCap=account.getCapability<&{Versus.PublicDrop}>(/public/Versus)
+    if let versus = versusCap.borrow() {
       let versusStatuses=versus.getAllStatuses()
       for s in versusStatuses.keys {
           let status = versusStatuses[s]!
@@ -20,9 +21,8 @@ pub fun main(address:Address) : Versus.DropStatus?{
             log(status)
             return nil
           }
-      }
+      } 
     } 
-
   return nil
 
 }

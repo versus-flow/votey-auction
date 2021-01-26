@@ -4,7 +4,7 @@ import NonFungibleToken, DemoToken, Art, Auction from 0x01cf0e2f2f715450
 
 pub contract Versus {
    init() {
-        self.totalDrops = UInt64(0)
+        self.totalDrops = (0 as UInt64)
     }
 
     pub var totalDrops: UInt64
@@ -14,11 +14,11 @@ pub contract Versus {
     pub event CollectionCreated(owner:Address, cutPercentage: UFix64)
 
     //When a drop is extended due to a late bid or bid after tie we emit and event
-    pub event DropExtended(id: UInt64, extendWith: UInt64, extendTo: UInt64)
+    pub event DropExtended(id: UInt64, extendWith: Fix64, extendTo: Fix64)
 
     //When somebody bids on a versus drop we emit and event with the  id of the drop and acution as well as who bid and how much
     //TODO: timestamp
-    pub event Bid(dropId: UInt64, auctionId: UInt64, bidderAddress: Address, bidPrice: UFix64, time: UFix64, blockHeight:UInt64)
+    pub event Bid(dropId: UInt64, auctionId: UInt64, bidderAddress: Address, bidPrice: UFix64, time: Fix64, blockHeight:UInt64)
 
     //When a drop is created we emit and event with its id, who owns the art, how many editions are sold vs the unique and the metadata
     pub event DropCreated(id: UInt64, owner: Address, editions: UInt64, metadata: {String: String} )
@@ -32,14 +32,14 @@ pub contract Versus {
         marketplaceVault: Capability<&{FungibleToken.Receiver}>,
         marketplaceNFTTrash: Capability<&{NonFungibleToken.CollectionPublic}>,
         cutPercentage: UFix64,
-        dropLength: UInt64, 
-        minimumBlockRemainingAfterBidOrTie: UInt64): @DropCollection {
+        dropLength: UFix64, 
+        minimumTimeRemainingAfterBidOrTie: UFix64): @DropCollection {
         let collection <- create DropCollection(
             marketplaceVault: marketplaceVault, 
             marketplaceNFTTrash: marketplaceNFTTrash,
             cutPercentage: cutPercentage,
             dropLength: dropLength,
-            minimumBlockRemainingAfterBidOrTie:minimumBlockRemainingAfterBidOrTie
+            minimumTimeRemainingAfterBidOrTie:minimumTimeRemainingAfterBidOrTie
         )
         emit CollectionCreated(owner: marketplaceVault.borrow()!.owner!.address, cutPercentage:cutPercentage)
         return <- collection
@@ -60,7 +60,7 @@ pub contract Versus {
         init( uniqueAuction: @Auction.AuctionItem, 
             editionAuctions: @Auction.AuctionCollection) { 
 
-            Versus.totalDrops = Versus.totalDrops + 1 as UInt64
+            Versus.totalDrops = Versus.totalDrops + (1 as UInt64)
 
             self.dropID=Versus.totalDrops
             self.uniqueAuction <-uniqueAuction
@@ -88,6 +88,7 @@ pub contract Versus {
             var price= uniqueStatus.price
 
 
+            //TODO ENUM!
             //Can has Enums.
             var winningStatus="UNIQUE"
             if(sum > price) {
@@ -114,28 +115,26 @@ pub contract Versus {
             bidTokens: @FungibleToken.Vault, 
             vaultCap: Capability<&{FungibleToken.Receiver}>, 
             collectionCap: Capability<&{NonFungibleToken.CollectionPublic}>, 
-            minimumBlockRemaining: UInt64) {
+            minimumTimeRemaining: UFix64) {
 
             let dropStatus = self.getDropStatus()
             let block=getCurrentBlock()
-            let time=block.timestamp
-            let currentBlockHeight=block.height
+            let time=Fix64(block.timestamp)
 
-            if(dropStatus.uniqueStatus.startBlock > currentBlockHeight) {
+            if(dropStatus.startTime > time) {
                 panic("The drop has not started")
             }
-            if dropStatus.endBlock < currentBlockHeight && dropStatus.winning != "TIE" {
+            if dropStatus.endTime < time && dropStatus.winning != "TIE" {
                 panic("This drop has ended")
             }
            
-            let currentEndBlock = dropStatus.endBlock
-            let bidEndBlock = currentBlockHeight + minimumBlockRemaining
+            let bidEndTime = time + Fix64(minimumTimeRemaining)
 
             //We need to extend the auction since there is too little time left. If we did not do this a late user could potentially win with a cheecky bid
-            if currentEndBlock < bidEndBlock {
-                let extendWith=bidEndBlock - currentEndBlock
-                emit DropExtended(id: self.dropID, extendWith: extendWith, extendTo: bidEndBlock)
-                self.extendDropWith(extendWith)
+            if dropStatus.endTime < bidEndTime {
+                let extendWith=bidEndTime - dropStatus.endTime
+                emit DropExtended(id: self.dropID, extendWith: extendWith, extendTo: bidEndTime)
+                self.extendDropWith(UFix64(extendWith))
             }
 
             let bidPrice = bidTokens.balance
@@ -149,14 +148,13 @@ pub contract Versus {
                 let editionsRef = &self.editionAuctions as &Auction.AuctionCollection 
                 editionsRef.placeBid(id: auctionId, bidTokens: <- bidTokens, vaultCap:vaultCap, collectionCap:collectionCap)
             }
-            emit Bid(dropId: self.dropID, auctionId: auctionId, bidderAddress: bidder , bidPrice: bidPrice, time: time, blockHeight: currentBlockHeight)
+            emit Bid(dropId: self.dropID, auctionId: auctionId, bidderAddress: bidder , bidPrice: bidPrice, time: time, blockHeight: block.height)
         }
 
-        pub fun extendDropWith(_ block: UInt64) {
+        pub fun extendDropWith(_ time: UFix64) {
             log("Drop extended with duration")
-            log(block)
-            self.uniqueAuction.extendWith(block)
-            self.editionAuctions.extendAllAuctionsWith(block)
+            self.uniqueAuction.extendWith(time)
+            self.editionAuctions.extendAllAuctionsWith(time)
         }
         
     }
@@ -170,11 +168,14 @@ pub contract Versus {
         pub let dropId: UInt64
         pub let uniquePrice: UFix64
         pub let editionPrice: UFix64
-        pub let endBlock: UInt64
+        pub let endTime: Fix64
+        pub let startTime: Fix64
         pub let uniqueStatus: Auction.AuctionStatus
         pub let editionsStatuses: {UInt64: Auction.AuctionStatus}
         pub let price: UFix64
         pub let winning: String
+        pub let active: Bool
+        pub let timeRemaining: Fix64
 
         init(
             dropId: UInt64,
@@ -189,7 +190,10 @@ pub contract Versus {
                 self.editionsStatuses=editionsStatuses
                 self.uniquePrice= uniqueStatus.price
                 self.editionPrice= editionPrice
-                self.endBlock=uniqueStatus.endBlock
+                self.endTime=uniqueStatus.endTime
+                self.startTime=uniqueStatus.startTime
+                self.timeRemaining=uniqueStatus.timeRemaining
+                self.active=uniqueStatus.active
                 self.price=price
                 self.winning=status
             }
@@ -219,22 +223,23 @@ pub contract Versus {
         pub let marketplaceNFTTrash: Capability<&{NonFungibleToken.CollectionPublic}>
 
         //naming things are hard...
-        pub let minimumBlockRemainingAfterBidOrTie: UInt64
-        pub let dropLength: UInt64
+        pub let minimumTimeRemainingAfterBidOrTie: UFix64
+        //seconds
+        pub let dropLength: UFix64
 
 
         init(
             marketplaceVault: Capability<&{FungibleToken.Receiver}>, 
             marketplaceNFTTrash: Capability<&{NonFungibleToken.CollectionPublic}>,
             cutPercentage: UFix64,
-            dropLength: UInt64,
-            minimumBlockRemainingAfterBidOrTie:UInt64
+            dropLength: UFix64,
+            minimumTimeRemainingAfterBidOrTie:UFix64
         ) {
             self.marketplaceNFTTrash=marketplaceNFTTrash
             self.cutPercentage= cutPercentage
             self.marketplaceVault = marketplaceVault
             self.dropLength=dropLength
-            self.minimumBlockRemainingAfterBidOrTie=minimumBlockRemainingAfterBidOrTie
+            self.minimumTimeRemainingAfterBidOrTie=minimumTimeRemainingAfterBidOrTie
             self.drops <- {}
         }
 
@@ -247,7 +252,7 @@ pub contract Versus {
              nft: @NonFungibleToken.NFT,
              editions: UInt64,
              minimumBidIncrement: UFix64, 
-             startBlock: UInt64, 
+             startTime: UFix64, 
              startPrice: UFix64,  
              vaultCap: Capability<&{FungibleToken.Receiver}>) {
 
@@ -261,8 +266,8 @@ pub contract Versus {
             let item <- Auction.createStandaloneAuction(
                 token: <- nft,
                 minimumBidIncrement: minimumBidIncrement,
-                auctionLengthInBlocks: self.dropLength,
-                auctionStartBlock: startBlock,
+                auctionLength: self.dropLength,
+                auctionStartTime: startTime,
                 startPrice: startPrice,
                 collectionCap: self.marketplaceNFTTrash,
                 vaultCap: vaultCap
@@ -273,7 +278,7 @@ pub contract Versus {
                 marketplaceVault: self.marketplaceVault , 
                 cutPercentage: self.cutPercentage)
             metadata["maxEdition"]= editions.toString()
-            var currentEdition=(1 as UInt64
+            var currentEdition=(1 as UInt64)
             while(currentEdition <= editions) {
                 metadata["edition"]= currentEdition.toString()
                 currentEdition=currentEdition+(1 as UInt64)
@@ -283,8 +288,8 @@ pub contract Versus {
                 editionedAuctions.createAuction(
                     token: <- Art.createArt(metadata), 
                     minimumBidIncrement: minimumBidIncrement, 
-                    auctionLengthInBlocks: self.dropLength,
-                    auctionStartBlock:startBlock,
+                    auctionLength: self.dropLength,
+                    auctionStartTime:startTime,
                     startPrice: startPrice, 
                     collectionCap: self.marketplaceNFTTrash, 
                     vaultCap: vaultCap)
@@ -326,19 +331,20 @@ pub contract Versus {
             }
             let itemRef = &self.drops[dropId] as &Drop
 
+            let status=itemRef.getDropStatus()
+
             if itemRef.uniqueAuction.isAuctionExpired() == false {
                 panic("Auction has not completed yet")
             }
 
-            let status=itemRef.getDropStatus()
             let winning=status.winning
             if winning == "UNIQUE" {
                 itemRef.uniqueAuction.settleAuction(cutPercentage: self.cutPercentage, cutVault: self.marketplaceVault)
                 itemRef.editionAuctions.cancelAllAuctions()
-            }else if winning == "EDITIONED" {
+            } else if winning == "EDITIONED" {
                 itemRef.uniqueAuction.returnAuctionItemToOwner()
                 itemRef.editionAuctions.settleAllAuctions()
-            }else {
+            } else {
                 panic("tie")
             }
             emit Settle(id: dropId, winner: winning, price: status.price )
@@ -362,9 +368,10 @@ pub contract Versus {
 
             }
             let drop = &self.drops[dropId] as &Drop
-            let minimumBlockRemaining=self.minimumBlockRemainingAfterBidOrTie
+            let minimumTimeRemainingAfterBidOrTie=self.minimumTimeRemainingAfterBidOrTie
 
-            drop.placeBid(auctionId: auctionId, bidTokens: <- bidTokens, vaultCap: vaultCap, collectionCap:collectionCap, minimumBlockRemaining: minimumBlockRemaining)
+
+            drop.placeBid(auctionId: auctionId, bidTokens: <- bidTokens, vaultCap: vaultCap, collectionCap:collectionCap, minimumTimeRemaining: minimumTimeRemainingAfterBidOrTie)
 
         }
         destroy() {            

@@ -5,7 +5,7 @@ import NonFungibleToken, DemoToken, Art, Auction, Versus from 0x01cf0e2f2f715450
 transaction(
     artist: Address, 
     startPrice: UFix64, 
-    startBlock: UInt64,
+    startTime: UFix64,
     artistName: String, 
     artName: String, 
     url: String, 
@@ -37,7 +37,7 @@ transaction(
            nft:  <-  Art.createArt(metadata),
            editions: editions,
            minimumBidIncrement: minimumBidIncrement,
-           startBlock: startBlock,
+           startTime: startTime,
            startPrice: startPrice,
            vaultCap: self.artistWallet
        )

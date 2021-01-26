@@ -6,8 +6,9 @@
 import FungibleToken from 0xee82856bf20e2aa6
 
 
+//TODO: Drop this
 pub contract DemoToken: FungibleToken {
- /// The total number of tokens in existence.
+    /// The total number of tokens in existence.
     /// It is up to the implementer to ensure that the total supply
     /// stays accurate and up to date
     ///
