@@ -234,7 +234,7 @@ pub contract Auction {
         pub fun isAuctionExpired(): Bool {
             let timeRemaining= self.timeRemaining()
             //log("timeRemaining=".concat(timeRemaining.toString()))
-            return timeRemaining <= Fix64(0.0)
+            return timeRemaining < Fix64(0.0)
         }
 
         // exchangeTokens sends the purchased NFT to the buyer and the bidTokens to the seller
