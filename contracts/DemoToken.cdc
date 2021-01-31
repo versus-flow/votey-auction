@@ -1,3 +1,4 @@
+//TODO delete
 // DemoToken is a fungible token used for testing marketplace purchases
 
 // This has been left really really simple since we expect the Flow token will replace this.

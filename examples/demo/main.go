@@ -19,7 +19,7 @@ func main() {
 
 	flow := gwtf.NewGoWithTheFlowEmulator()
 	fmt.Println("Demo of Versus@Flow")
-	flow.CreateAccountWithContracts("accounts", "NonFungibleToken", "DemoToken", "Art", "Auction", "Versus")
+	flow.CreateAccountWithContracts("accounts", "NonFungibleToken", "Content", "DemoToken", "Art", "Auction", "Versus")
 
 	flow.CreateAccount("marketplace", "artist", "buyer1", "buyer2")
 

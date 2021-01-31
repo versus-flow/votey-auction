@@ -4,7 +4,7 @@
 // can purchase these NFTs with fungible tokens.
 //
 import FungibleToken from 0xee82856bf20e2aa6
-import NonFungibleToken, DemoToken from 0x01cf0e2f2f715450
+import NonFungibleToken, Art, DemoToken from 0x01cf0e2f2f715450
 
 pub contract Auction {
 
@@ -18,7 +18,8 @@ pub contract Auction {
         pub let timeRemaining : Fix64
         pub let endTime : Fix64
         pub let startTime : Fix64
-        pub let metadata : {String: String}
+        //TODO add more here
+        pub let name: String?
         pub let owner: Address
         pub let leader: Address?
         pub let minNextBid: UFix64
@@ -28,7 +29,7 @@ pub contract Auction {
             bids:UInt64, 
             active: Bool, 
             timeRemaining:Fix64, 
-            nftMetadata: {String: String}, 
+            name: String?,
             leader:Address?, 
             bidIncrement: UFix64,
             owner: Address, 
@@ -41,7 +42,7 @@ pub contract Auction {
             self.bids=bids
             self.active=active
             self.timeRemaining=timeRemaining
-            self.metadata=nftMetadata
+            self.name=name
             self.leader= leader
             self.bidIncrement=bidIncrement
             self.owner=owner
@@ -73,7 +74,7 @@ pub contract Auction {
         //The Item that is sold at this auction
         //It would be really easy to extend this auction with using a NFTCollection here to be able to auction of several NFTs as a single
         //Lets say if you want to auction of a pack of TopShot moments
-        pub(set) var NFT: @NonFungibleToken.NFT?
+        pub(set) var NFT: @Art.NFT?
 
         //This is the escrow vault that holds the tokens for the current largest bid
         pub let bidVault: @FungibleToken.Vault
@@ -110,7 +111,7 @@ pub contract Auction {
         pub let ownerVaultCap: Capability<&{FungibleToken.Receiver}>
 
         init(
-            NFT: @NonFungibleToken.NFT,
+            NFT: @Art.NFT,
             minimumBidIncrement: UFix64,
             auctionStartTime: UFix64,
             startPrice: UFix64, 
@@ -311,13 +312,15 @@ pub contract Auction {
                 leader=recipient.borrow()!.owner!.address
             }
 
+
+
             return AuctionStatus(
                 id:self.auctionID,
                 currentPrice: self.currentPrice, 
                 bids: self.numberOfBids,
                 active: !self.auctionCompleted  && !self.isAuctionExpired(),
                 timeRemaining: self.timeRemaining(),
-                nftMetadata: self.NFT?.metadata ?? {},
+                name: self.NFT?.name,
                 leader: leader,
                 bidIncrement: self.minimumBidIncrement,
                 owner: self.ownerVaultCap.borrow()!.owner!.address,
@@ -355,7 +358,7 @@ pub contract Auction {
         //That way when you create an auction you chose if this is a curated auction or an auction where everybody can put their pieces up for sale
         
          pub fun createAuction(
-             token: @NonFungibleToken.NFT, 
+             token: @Art.NFT, 
              minimumBidIncrement: UFix64, 
              auctionLength: UFix64, 
              auctionStartTime: UFix64,
@@ -403,7 +406,7 @@ pub contract Auction {
         // addTokenToauctionItems adds an NFT to the auction items and sets the meta data
         // for the auction item
         pub fun createAuction(
-            token: @NonFungibleToken.NFT, 
+            token: @Art.NFT, 
             minimumBidIncrement: UFix64, 
             auctionLength: UFix64, 
             auctionStartTime: UFix64,
@@ -519,7 +522,7 @@ pub contract Auction {
         // addTokenToauctionItems adds an NFT to the auction items and sets the meta data
         // for the auction item
         pub fun createStandaloneAuction(
-            token: @NonFungibleToken.NFT, 
+            token: @Art.NFT, 
             minimumBidIncrement: UFix64, 
             auctionLength: UFix64,
             auctionStartTime: UFix64,

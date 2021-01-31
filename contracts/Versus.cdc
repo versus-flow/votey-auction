@@ -21,7 +21,7 @@ pub contract Versus {
     pub event Bid(dropId: UInt64, auctionId: UInt64, bidderAddress: Address, bidPrice: UFix64, time: Fix64, blockHeight:UInt64)
 
     //When a drop is created we emit and event with its id, who owns the art, how many editions are sold vs the unique and the metadata
-    pub event DropCreated(id: UInt64, owner: Address, editions: UInt64, metadata: {String: String} )
+    pub event DropCreated(id: UInt64, owner: Address, editions: UInt64)
 
     //Versus drop is settled
     pub event Settle(id: UInt64, winner: String, price:UFix64)
@@ -256,15 +256,37 @@ pub contract Versus {
              startPrice: UFix64,  
              vaultCap: Capability<&{FungibleToken.Receiver}>) {
 
+
             pre {
                 vaultCap.check() == true : "Vault capability should exist"
             }
 
-            //copy the metadata of the previous art since that is used to mint the copies
-            var metadata=nft.metadata
-            let originalMetadata=nft.metadata
+            //TODO this should probably be some sort of interface in Versus.  so that other types can be sold aswell
+            let art <- nft as! @Art.NFT
+
+            //Sending in a NFTEditioner capability here and using that instead of this loop would probably make sense. 
+            let editionedAuctions <- Auction.createAuctionCollection( 
+                marketplaceVault: self.marketplaceVault , 
+                cutPercentage: self.cutPercentage)
+
+            var currentEdition=(1 as UInt64)
+            while(currentEdition <= editions) {
+                //A nice enhancement here would be that the art created is done through a minter so it is not art specific.
+                //It could even be a Cloner capability or maybe a editionMinter? 
+                editionedAuctions.createAuction(
+                    token: <- art.makeEdition(edition: currentEdition, maxEdition: editions),
+                    minimumBidIncrement: minimumBidIncrement, 
+                    auctionLength: self.dropLength,
+                    auctionStartTime:startTime,
+                    startPrice: startPrice, 
+                    collectionCap: self.marketplaceNFTTrash, 
+                    vaultCap: vaultCap)
+                currentEdition=currentEdition+(1 as UInt64)
+            }
+
+                //copy the metadata of the previous art since that is used to mint the copies
             let item <- Auction.createStandaloneAuction(
-                token: <- nft,
+                token: <- art,
                 minimumBidIncrement: minimumBidIncrement,
                 auctionLength: self.dropLength,
                 auctionStartTime: startTime,
@@ -272,31 +294,9 @@ pub contract Versus {
                 collectionCap: self.marketplaceNFTTrash,
                 vaultCap: vaultCap
             )
-
-            //Sending in a NFTEditioner capability here and using that instead of this loop would probably make sense. 
-            let editionedAuctions <- Auction.createAuctionCollection( 
-                marketplaceVault: self.marketplaceVault , 
-                cutPercentage: self.cutPercentage)
-            metadata["maxEdition"]= editions.toString()
-            var currentEdition=(1 as UInt64)
-            while(currentEdition <= editions) {
-                metadata["edition"]= currentEdition.toString()
-                currentEdition=currentEdition+(1 as UInt64)
-
-                //A nice enhancement here would be that the art created is done through a minter so it is not art specific.
-                //It could even be a Cloner capability or maybe a editionMinter? 
-                editionedAuctions.createAuction(
-                    token: <- Art.createArt(metadata), 
-                    minimumBidIncrement: minimumBidIncrement, 
-                    auctionLength: self.dropLength,
-                    auctionStartTime:startTime,
-                    startPrice: startPrice, 
-                    collectionCap: self.marketplaceNFTTrash, 
-                    vaultCap: vaultCap)
-            }
             
             let drop  <- create Drop(uniqueAuction: <- item, editionAuctions:  <- editionedAuctions)
-            emit DropCreated(id: drop.dropID, owner: vaultCap.borrow()!.owner!.address, editions: editions,  metadata: originalMetadata )
+            emit DropCreated(id: drop.dropID, owner: vaultCap.borrow()!.owner!.address, editions: editions)
 
             let oldDrop <- self.drops[drop.dropID] <- drop
             destroy oldDrop

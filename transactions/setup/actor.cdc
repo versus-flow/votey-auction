@@ -8,12 +8,7 @@ transaction(tokens:UFix64) {
 
     prepare(acct: AuthAccount) {
 
-        let reciverRef = acct.getCapability(/public/DemoTokenReceiver)
-        //If we have a DemoTokenReceiver then we are already set up so just return
-        if reciverRef.check<&{FungibleToken.Receiver}>() {
-            log("Account already initalized")
-            return
-        }
+        //TODO: replace with transaction to mint flow tokens and a seperate for setting up art collection let reciverRef = acct.getCapability(/public/DemoTokenReceiver)
 
         // create a new empty Vault resource
         let vaultA <- DemoToken.createVaultWithTokens(tokens)

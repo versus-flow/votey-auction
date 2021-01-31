@@ -1,6 +1,6 @@
 
 import FungibleToken from 0xee82856bf20e2aa6
-import NonFungibleToken, DemoToken, Art, Auction, Versus from 0x01cf0e2f2f715450
+import NonFungibleToken, Content, DemoToken, Art, Auction, Versus from 0x01cf0e2f2f715450
 
 //This transaction setup of a versus marketplace
 //Each drop settlement will deposit cutPercentage number of tokens into the signers vault
@@ -40,7 +40,8 @@ transaction(cutPercentage: UFix64, dropLength: UFix64, minimumTimeRemainingAfter
             target: /storage/Versus
         )
 
-        log("Versus collection and public capability created created.")
+        account.save(<- Content.createEmptyCollection(), to: /storage/VersusContent)
+        account.link<&Content.Collection>(/private/VersusContent, target: /storage/VersusContent)
     }
 }
  

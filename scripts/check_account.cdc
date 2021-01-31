@@ -64,12 +64,12 @@ pub fun main(address:Address, name: String){
     } 
 
 
-    if let art= account.getCapability(/public/ArtCollection) .borrow<&{NonFungibleToken.CollectionPublic}>()  {
+    if let art= account.getCapability(/public/ArtCollection).borrow<&{NonFungibleToken.CollectionPublic}>()  {
         log("Art in collection") 
         for id in art.getIDs() {
-          var metadata=art.borrowNFT(id: id).metadata
+          var metadata=art.borrowNFT(id: id)
           log(metadata)
-          status.art[id]=metadata
+         // status.art[id]=metadata
         }
     }
     

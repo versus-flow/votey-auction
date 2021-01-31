@@ -1,4 +1,4 @@
-all: setup-marketplace create-drop setup-bidders bid settle check
+all: demo
 
 .PHONY: demo
 demo:

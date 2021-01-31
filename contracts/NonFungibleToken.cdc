@@ -44,9 +44,6 @@ Collection to complete the transfer.
 // The main NFT contract interface. Other NFT contracts will
 // import and implement this interface
 //
-
-//For versus this interface was extended with the metadata dictionary for convenience sake. 
-//When the metadata issue has been solved versus should move to the standard implementation
 pub contract interface NonFungibleToken {
 
     // The total number of tokens of this type in existence
@@ -74,14 +71,12 @@ pub contract interface NonFungibleToken {
     pub resource interface INFT {
         // The unique ID that each NFT has
         pub let id: UInt64
-        pub var metadata: {String:String}    
     }
 
     // Requirement that all conforming NFT smart contracts have
     // to define a resource called NFT that conforms to INFT
     pub resource NFT: INFT {
         pub let id: UInt64
-        pub var metadata: {String:String}
     }
 
     // Interface to mediate withdraws from the Collection
