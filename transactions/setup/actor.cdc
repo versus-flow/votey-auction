@@ -26,7 +26,7 @@ transaction(tokens:UFix64) {
         acct.save<@NonFungibleToken.Collection>(<- Art.createEmptyCollection(), to: /storage/ArtCollection)
 
         // publish a capability to the Collection in storage
-        acct.link<&{NonFungibleToken.CollectionPublic}>(/public/ArtCollection, target: /storage/ArtCollection)
+        acct.link<&{Art.CollectionPublic}>(/public/ArtCollection, target: /storage/ArtCollection)
       
     }
 

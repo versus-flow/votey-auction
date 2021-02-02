@@ -18,6 +18,7 @@ func main() {
 	timeString := strconv.FormatInt(t, 10) + ".0"
 
 	flow := gwtf.NewGoWithTheFlowEmulator()
+
 	fmt.Println("Demo of Versus@Flow")
 	flow.CreateAccountWithContracts("accounts", "NonFungibleToken", "Content", "DemoToken", "Art", "Auction", "Versus")
 

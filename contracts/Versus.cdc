@@ -30,7 +30,7 @@ pub contract Versus {
     //sending in a reference to a editionMinter would be a nice enhancement here. So that the Art NFT is not coded in here at all. 
     pub fun createVersusDropCollection(
         marketplaceVault: Capability<&{FungibleToken.Receiver}>,
-        marketplaceNFTTrash: Capability<&{NonFungibleToken.CollectionPublic}>,
+        marketplaceNFTTrash: Capability<&{Art.CollectionPublic}>,
         cutPercentage: UFix64,
         dropLength: UFix64, 
         minimumTimeRemainingAfterBidOrTie: UFix64): @DropCollection {
@@ -114,7 +114,7 @@ pub contract Versus {
             auctionId:UInt64,
             bidTokens: @FungibleToken.Vault, 
             vaultCap: Capability<&{FungibleToken.Receiver}>, 
-            collectionCap: Capability<&{NonFungibleToken.CollectionPublic}>, 
+            collectionCap: Capability<&{Art.CollectionPublic}>, 
             minimumTimeRemaining: UFix64) {
 
             let dropStatus = self.getDropStatus()
@@ -210,7 +210,7 @@ pub contract Versus {
             auctionId:UInt64,
             bidTokens: @FungibleToken.Vault, 
             vaultCap: Capability<&{FungibleToken.Receiver}>, 
-            collectionCap: Capability<&{NonFungibleToken.CollectionPublic}>
+            collectionCap: Capability<&{Art.CollectionPublic}>
         )
 
     }
@@ -220,7 +220,7 @@ pub contract Versus {
         pub var drops: @{UInt64: Drop}
         pub var cutPercentage:UFix64 
         pub let marketplaceVault: Capability<&{FungibleToken.Receiver}>
-        pub let marketplaceNFTTrash: Capability<&{NonFungibleToken.CollectionPublic}>
+        pub let marketplaceNFTTrash: Capability<&{Art.CollectionPublic}>
 
         //naming things are hard...
         pub let minimumTimeRemainingAfterBidOrTie: UFix64
@@ -230,7 +230,7 @@ pub contract Versus {
 
         init(
             marketplaceVault: Capability<&{FungibleToken.Receiver}>, 
-            marketplaceNFTTrash: Capability<&{NonFungibleToken.CollectionPublic}>,
+            marketplaceNFTTrash: Capability<&{Art.CollectionPublic}>,
             cutPercentage: UFix64,
             dropLength: UFix64,
             minimumTimeRemainingAfterBidOrTie:UFix64
@@ -356,7 +356,7 @@ pub contract Versus {
             auctionId:UInt64,
             bidTokens: @FungibleToken.Vault, 
             vaultCap: Capability<&{FungibleToken.Receiver}>, 
-            collectionCap: Capability<&{NonFungibleToken.CollectionPublic}>
+            collectionCap: Capability<&{Art.CollectionPublic}>
         ) {
             pre {
                 self.drops[dropId] != nil:

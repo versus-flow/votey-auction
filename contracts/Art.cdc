@@ -10,54 +10,63 @@ pub contract Art: NonFungibleToken {
     pub event ContractInitialized()
     pub event Withdraw(id: UInt64, from: Address?)
     pub event Deposit(id: UInt64, to: Address?)
-    pub event Created(id: UInt64, name: String)
+    pub event Created(id: UInt64, metadata: Metadata)
 
     pub resource interface Public {
         pub let id: UInt64
+        pub let metadata: Metadata
+        pub fun content() : String?
+    }
+
+    pub struct Metadata {
         pub let name: String
+        pub let artist: String
         pub let artistAddress:String
         pub let description: String
         pub let type: String
         pub let edition: UInt64
         pub let maxEdition: UInt64
 
-        pub fun content() : String?
+
+        init(name: String, 
+            artist: String,
+            artistAddress:String, 
+            description: String, 
+            type: String, 
+            edition: UInt64,
+            maxEdition: UInt64) {
+                self.name=name
+                self.artist=artist
+                self.artistAddress=artistAddress
+                self.description=description
+                self.type=type
+                self.edition=edition
+                self.maxEdition=maxEdition
+        }
+
     }
+
 
     pub resource NFT: NonFungibleToken.INFT, Public {
         pub let id: UInt64
         //move all metadata to a struct except content including editions
-        pub let name: String
-        pub let artistAddress:String
-        pub let description: String
-        pub let type: String
         pub let contentCapability:Capability<&Content.Collection>?
         pub let contentId: UInt64?
         pub let url: String?
-        pub let edition: UInt64
-        pub let maxEdition: UInt64
+        pub let metadata: Metadata
+
         init(
             initID: UInt64, 
-            name: String, 
-            artistAddress:String, 
-            description: String, 
-            type: String, 
+            metadata: Metadata,
             contentCapability:Capability<&Content.Collection>?, 
             contentId: UInt64?, 
-            url: String?, 
-            edition: UInt64,
-            maxEdition: UInt64) {
+            url: String?) {
 
             self.id = initID
-            self.name=name
-            self.artistAddress=artistAddress
-            self.description=description
-            self.type=type
+            self.metadata=metadata
             self.contentCapability=contentCapability
             self.contentId=contentId
             self.url=url
-            self.edition=edition
-            self.maxEdition=maxEdition
         }
 
         pub fun content() : String {
@@ -74,24 +83,37 @@ pub contract Art: NonFungibleToken {
         pub fun makeEdition(edition: UInt64, maxEdition:UInt64) : @Art.NFT {
             var newNFT <- create NFT(
             initID: Art.totalSupply,
-            name: self.name, 
-            artistAddress: self.artistAddress, 
-            description:self.description,
-            type:self.type,
-            contentCapability:self.contentCapability,
+            metadata: Metadata(
+                name: self.metadata.name,
+                artist:self.metadata.artist,
+                artistAddress:self.metadata.artistAddress,
+                description:self.metadata.description,
+                type:self.metadata.type,
+                edition: edition,
+                maxEdition:maxEdition
+            ),
+            contentCapability: self.contentCapability,
             contentId:self.contentId,
             url:self.url,
-            edition: edition,
-            maxEdition:maxEdition
             )
-            emit Created(id: Art.totalSupply, name: self.name.concat(" edition ").concat(edition.toString()))
+            emit Created(id: Art.totalSupply, metadata: newNFT.metadata)
 
             Art.totalSupply = Art.totalSupply + UInt64(1)
             return <- newNFT
         }
     }
 
-    pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic {
+ 
+    pub resource interface CollectionPublic {
+
+        pub fun deposit(token: @NonFungibleToken.NFT)
+        pub fun getIDs(): [UInt64]
+        pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
+        pub fun borrowArt(id: UInt64): &{Art.Public}?
+    }
+
+
+    pub resource Collection: CollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
         pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
@@ -141,7 +163,7 @@ pub contract Art: NonFungibleToken {
         // Parameters: id: The ID of the NFT to get the reference for
         //
         // Returns: A reference to the NFT
-        pub fun borrowArt(id: UInt64): &Art.NFT? {
+        pub fun borrowArt(id: UInt64): &{Art.Public}? {
             if self.ownedNFTs[id] != nil {
                 let ref = &self.ownedNFTs[id] as auth &NonFungibleToken.NFT
                 return ref as! &Art.NFT
@@ -161,21 +183,24 @@ pub contract Art: NonFungibleToken {
     }
 
 
-    pub fun createArtWithPointer(name: String, artistAddress:String, description: String, type: String, contentCapability:Capability<&Content.Collection>, contentId: UInt64) : @Art.NFT{
+    pub fun createArtWithPointer(name: String, artist: String, artistAddress:String, description: String, type: String, contentCapability:Capability<&Content.Collection>, contentId: UInt64) : @Art.NFT{
         
         var newNFT <- create NFT(
             initID: Art.totalSupply,
-            name: name, 
-            artistAddress: artistAddress, 
-            description:description,
-            type:type,
+            metadata: Metadata(
+              name: name, 
+              artist: artist,
+              artistAddress: artistAddress, 
+              description:description,
+              type:type,
+              edition:1,
+              maxEdition:1
+            ),
             contentCapability:contentCapability, 
             contentId:contentId,
             url:nil,
-            edition:1,
-            maxEdition:1
         )
-        emit Created(id: Art.totalSupply, name: name)
+        emit Created(id: Art.totalSupply, metadata: newNFT.metadata)
 
         Art.totalSupply = Art.totalSupply + UInt64(1)
         return <- newNFT
@@ -183,20 +208,23 @@ pub contract Art: NonFungibleToken {
 
          
 
-    pub fun createArtWithContent(name: String, artistAddress:String, description: String, url: String, type: String) : @Art.NFT {
+    pub fun createArtWithContent(name: String, artist:String, artistAddress:String, description: String, url: String, type: String) : @Art.NFT {
          var newNFT <- create NFT(
             initID: Art.totalSupply,
-            name: name, 
-            artistAddress: artistAddress, 
-            description:description,
-            type:type,
+            metadata: Metadata(
+              name: name, 
+              artist: artist,
+              artistAddress: artistAddress, 
+              description:description,
+              type:type,
+              edition:1,
+              maxEdition:1
+            ),
             contentCapability:nil,
             contentId:nil,
             url:url, 
-            edition:1,
-            maxEdition:1
         )
-        emit Created(id: Art.totalSupply, name: name)
+        emit Created(id: Art.totalSupply, metadata: newNFT.metadata)
 
         Art.totalSupply = Art.totalSupply + UInt64(1)
         return <- newNFT

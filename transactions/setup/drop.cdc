@@ -28,17 +28,17 @@ transaction(
 
     execute {
 
+        //TODO: does this need type?
         var contentItem  <- Content.createContent(url)
         let contentId= contentItem.id
         self.contentCapability.borrow()!.deposit(token: <- contentItem)
 
-          //  artist: artistName, TOOD add this
-
         let art <- Art.createArtWithPointer(
             name: artName,
+            artist:artistName,
             artistAddress : artist.toString(),
             description: description,
-            type: "UNIQUE", 
+            type: "png", 
             contentCapability: self.contentCapability,
             contentId: contentId,
         )

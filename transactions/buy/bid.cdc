@@ -1,5 +1,5 @@
 import FungibleToken from 0xee82856bf20e2aa6
-import NonFungibleToken, Auction, Versus from 0x01cf0e2f2f715450
+import NonFungibleToken, Art, Auction, Versus from 0x01cf0e2f2f715450
 
 /*
     Transaction to make a bid in a marketplace for the given dropId and auctionId
@@ -10,7 +10,7 @@ transaction(marketplace: Address, dropId: UInt64, auctionId: UInt64, bidAmount: 
     // will store the bought NFT
 
     let vaultCap: Capability<&{FungibleToken.Receiver}>
-    let collectionCap: Capability<&{NonFungibleToken.CollectionPublic}> 
+    let collectionCap: Capability<&{Art.CollectionPublic}> 
     // Vault that will hold the tokens that will be used
     // to buy the NFT
     let temporaryVault: @FungibleToken.Vault
@@ -18,7 +18,7 @@ transaction(marketplace: Address, dropId: UInt64, auctionId: UInt64, bidAmount: 
     prepare(account: AuthAccount) {
 
         // get the references to the buyer's Vault and NFT Collection receiver
-        self.collectionCap = account.getCapability<&{NonFungibleToken.CollectionPublic}>(/public/ArtCollection)
+        self.collectionCap = account.getCapability<&{Art.CollectionPublic}>(/public/ArtCollection)
         
         self.vaultCap = account.getCapability<&{FungibleToken.Receiver}>(/public/DemoTokenReceiver)
                    
