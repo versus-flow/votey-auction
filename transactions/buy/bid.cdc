@@ -18,7 +18,18 @@ transaction(marketplace: Address, dropId: UInt64, auctionId: UInt64, bidAmount: 
     prepare(account: AuthAccount) {
 
         // get the references to the buyer's Vault and NFT Collection receiver
-        self.collectionCap = account.getCapability<&{Art.CollectionPublic}>(/public/ArtCollection)
+        var collectionCap = account.getCapability<&{Art.CollectionPublic}>(/public/ArtCollection)
+
+        // if collection is not created yet we make it.
+        if !collectionCap.check() {
+            // store an empty NFT Collection in account storage
+            account.save<@NonFungibleToken.Collection>(<- Art.createEmptyCollection(), to: /storage/ArtCollection)
+
+            // publish a capability to the Collection in storage
+            account.link<&{Art.CollectionPublic}>(/public/ArtCollection, target: /storage/ArtCollection)
+        }
+
+        self.collectionCap=collectionCap
         
         self.vaultCap = account.getCapability<&{FungibleToken.Receiver}>(/public/DemoTokenReceiver)
                    
