@@ -1,5 +1,5 @@
 import FungibleToken from 0xee82856bf20e2aa6
-import NonFungibleToken, DemoToken, Content, Art, Auction, Versus from 0x01cf0e2f2f715450
+import NonFungibleToken, Content, Art, Auction, Versus from 0x01cf0e2f2f715450
 
 //This transaction will setup a drop in a versus auction
 transaction(
@@ -23,7 +23,7 @@ transaction(
         self.versus= account.borrow<&Versus.DropCollection>(from: /storage/Versus)!
         self.contentCapability=account.getCapability<&Content.Collection>(/private/VersusContent)
 
-        self.artistWallet=  getAccount(artist).getCapability<&{FungibleToken.Receiver}>(/public/DemoTokenReceiver)
+        self.artistWallet=  getAccount(artist).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
     }
 
     execute {

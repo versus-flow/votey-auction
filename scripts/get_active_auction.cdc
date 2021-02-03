@@ -1,7 +1,5 @@
 // This script checks that the accounts are set up correctly for the marketplace tutorial.
 //
-// Account 0x01: DemoToken Vault Balance = 1050, No NFTs
-// Account 0x02: DemoToken Vault Balance = 10, NFT.id = 1
 
 import Auction, Versus from 0x01cf0e2f2f715450
 

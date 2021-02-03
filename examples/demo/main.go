@@ -20,7 +20,7 @@ func main() {
 	flow := gwtf.NewGoWithTheFlowEmulator()
 
 	fmt.Println("Demo of Versus@Flow")
-	flow.CreateAccountWithContracts("accounts", "NonFungibleToken", "Content", "DemoToken", "Art", "Auction", "Versus")
+	flow.CreateAccountWithContracts("accounts", "NonFungibleToken", "Content", "Art", "Auction", "Versus")
 
 	flow.CreateAccount("marketplace", "artist", "buyer1", "buyer2")
 
@@ -29,10 +29,9 @@ func main() {
 	fmt.Println("MarketplaceCut: 15%, drop length: 5 ticks")
 	fmt.Scanln()
 	flow.CreateAccount("marketplace")
-	gwtf.PrintEvents(flow.TransactionFromFile("setup/actor").
-		SignProposeAndPayAs("marketplace").
-		UFix64Argument("0.0").
-		Run(), emptyMap)
+
+	flow.TransactionFromFile("setup/mint_tokens").SignProposeAndPayAsService().AccountArgument("artist").UFix64Argument("100.0").RunPrintEventsFull()
+	flow.TransactionFromFile("setup/mint_tokens").SignProposeAndPayAsService().AccountArgument("marketplace").UFix64Argument("100.0").RunPrintEventsFull()
 
 	gwtf.PrintEvents(flow.TransactionFromFile("setup/versus").
 		SignProposeAndPayAs("marketplace").
@@ -45,8 +44,6 @@ func main() {
 	fmt.Println()
 	fmt.Println("Create a drop in versus that is already started with 10 editions")
 	fmt.Scanln()
-	gwtf.PrintEvents(flow.TransactionFromFile("setup/actor").SignProposeAndPayAs("artist").UFix64Argument("0.0").Run(), emptyMap)
-
 	gwtf.PrintEvents(flow.TransactionFromFile("setup/drop").
 		SignProposeAndPayAs("marketplace").
 		AccountArgument("artist").                                                                      //marketplace location
@@ -69,7 +66,7 @@ func main() {
 	fmt.Println("Setup a buyer and make him bid on the unique auction")
 	fmt.Scanln()
 
-	gwtf.PrintEvents(flow.TransactionFromFile("setup/actor").SignProposeAndPayAs("buyer1").UFix64Argument("100.0").Run(), emptyMap) //tokens to mint
+	flow.TransactionFromFile("setup/mint_tokens").SignProposeAndPayAsService().AccountArgument("buyer1").UFix64Argument("1000.0").RunPrintEventsFull()
 
 	gwtf.PrintEvents(flow.TransactionFromFile("buy/bid").
 		SignProposeAndPayAs("buyer1").

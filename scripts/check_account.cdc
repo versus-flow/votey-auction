@@ -1,10 +1,8 @@
 // This script checks that the accounts are set up correctly for the marketplace tutorial.
 //
-// Account 0x01: DemoToken Vault Balance = 1050, No NFTs
-// Account 0x02: DemoToken Vault Balance = 10, NFT.id = 1
 
 import FungibleToken from 0xee82856bf20e2aa6
-import NonFungibleToken, DemoToken, Art, Auction, Versus from 0x01cf0e2f2f715450
+import NonFungibleToken, Art, Auction, Versus from 0x01cf0e2f2f715450
 
 pub struct AddressStatus {
 
@@ -14,7 +12,7 @@ pub struct AddressStatus {
   pub(set) var drops: {UInt64: Versus.DropStatus}
   init (_ address:Address) {
     self.address=address
-    self.balance= UFix64(0)
+    self.balance= 0.0
     self.art= {}
     self.drops ={}
   }
@@ -30,10 +28,10 @@ pub fun main(address:Address, name: String){
     log(name)
     log("=====================")
     
-    if let demoTokens= account.getCapability(/public/DemoTokenBalance).borrow<&{FungibleToken.Balance}>() {
-       log("Balance of DemoTokens")
-       log(demoTokens.balance)
-       status.balance=demoTokens.balance
+    if let vault= account.getCapability(/public/flowTokenBalance).borrow<&{FungibleToken.Balance}>() {
+       log("Balance of Flow")
+       log(vault.balance)
+       status.balance=vault.balance
     }
 
 
