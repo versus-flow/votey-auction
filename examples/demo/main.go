@@ -62,8 +62,7 @@ func main() {
 		UFix64Argument("5.0").  // bump on late bid
 		Run(), emptyMap)
 
-	image := fileAsImageData("dude.jpg")
-	fmt.Println(image)
+	image := fileAsImageData("bull.png")
 	fmt.Println()
 	fmt.Println()
 	fmt.Println("Create a drop in versus that is already started with 10 editions")
