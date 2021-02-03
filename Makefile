@@ -8,6 +8,10 @@ demo:
 clean:
 	rm -Rf flowdb
 
+.PHONY: mint
+mint:
+	go run ./examples/demo/main.go
+
 .PHONY: emulator
 emulator: clean
 	flow emulator start -v --persist

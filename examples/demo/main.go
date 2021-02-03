@@ -1,13 +1,35 @@
 package main
 
 import (
+	"bufio"
+	"encoding/base64"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"os"
 	"strconv"
 	"time"
 
 	"github.com/bjartek/go-with-the-flow/gwtf"
 	"github.com/onflow/cadence"
 )
+
+func fileAsImageData(path string) string {
+	f, _ := os.Open("./" + path)
+
+	defer f.Close()
+
+	// Read entire JPG into byte slice.
+	reader := bufio.NewReader(f)
+	content, _ := ioutil.ReadAll(reader)
+
+	contentType := http.DetectContentType(content)
+
+	// Encode as base64.
+	encoded := base64.StdEncoding.EncodeToString(content)
+
+	return "data:" + contentType + ";base64, " + encoded
+}
 
 //NB! start from root dir with makefile
 func main() {
@@ -40,6 +62,8 @@ func main() {
 		UFix64Argument("5.0").  // bump on late bid
 		Run(), emptyMap)
 
+	image := fileAsImageData("dude.jpg")
+	fmt.Println(image)
 	fmt.Println()
 	fmt.Println()
 	fmt.Println("Create a drop in versus that is already started with 10 editions")
@@ -51,7 +75,7 @@ func main() {
 		UFix64Argument(timeString).                                                                     //start time
 		StringArgument("Vincent Kamp").                                                                 //artist name
 		StringArgument("when?").                                                                        //name of art
-		StringArgument("https://ipfs.io/ipfs/QmURySCXsDh5tZUVVVNSnV1L8nxjVAoyChShGkvZ9NWF9A").          //image
+		StringArgument(image).                                                                          //imaage
 		StringArgument("Here's a lockdown painting I did of a super cool guy and pal, @jburrowsactor"). //description
 		Argument(cadence.NewUInt64(10)).                                                                //number of editions to use for the editioned auction
 		UFix64Argument("5.0").                                                                          //min bid increment

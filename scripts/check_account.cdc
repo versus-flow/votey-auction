@@ -8,7 +8,7 @@ pub struct AddressStatus {
 
   pub(set) var address:Address
   pub(set) var balance: UFix64
-  pub(set) var art: {UInt64: {String : String}}
+  pub(set) var art: {UInt64: Art.Metadata}
   pub(set) var drops: {UInt64: Versus.DropStatus}
   init (_ address:Address) {
     self.address=address
@@ -68,7 +68,7 @@ pub fun main(address:Address, name: String){
         for id in art.getIDs() {
           var art=art.borrowArt(id: id) 
           log(art?.metadata)
-         // status.art[id]=metadata
+          status.art[id]=art!.metadata
         }
     }
     
