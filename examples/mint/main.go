@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/hex"
 	"fmt"
 	"os"
 
@@ -12,21 +13,21 @@ func main() {
 
 	flow := gwtf.NewGoWithTheFlowEmulator()
 
-	account, ok := os.LookupEnv("ACCOUNT")
+	account, ok := os.LookupEnv("account")
 	if !ok {
-		fmt.Println("REDIS_HOST is not present")
+		fmt.Println("account is not present")
 		os.Exit(1)
-
 	}
 
-	amount, ok := os.LookupEnv("AMOUNT")
+	amount, ok := os.LookupEnv("amount")
 	if !ok {
-		fmt.Println("REDIS_HOST is not present")
-		os.Exit(1)
-	} else {
 		amount = "100.0"
 	}
 
-	flow.TransactionFromFile("setup/mint_tokens").SignProposeAndPayAsService().Argument(cadence.String(account)).UFix64Argument(amount).RunPrintEventsFull()
-
+	accountHex, err := hex.DecodeString(account)
+	if err != nil {
+		panic(err)
+	}
+	accountArg := cadence.BytesToAddress(accountHex)
+	flow.TransactionFromFile("setup/mint_tokens").SignProposeAndPayAsService().Argument(accountArg).UFix64Argument(amount).RunPrintEventsFull()
 }

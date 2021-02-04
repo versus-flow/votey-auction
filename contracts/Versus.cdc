@@ -17,7 +17,6 @@ pub contract Versus {
     pub event DropExtended(id: UInt64, extendWith: Fix64, extendTo: Fix64)
 
     //When somebody bids on a versus drop we emit and event with the  id of the drop and acution as well as who bid and how much
-    //TODO: timestamp
     pub event Bid(dropId: UInt64, auctionId: UInt64, bidderAddress: Address, bidPrice: UFix64, time: Fix64, blockHeight:UInt64)
 
     //When a drop is created we emit and event with its id, who owns the art, how many editions are sold vs the unique and the metadata
@@ -55,6 +54,7 @@ pub contract Versus {
         pub let uniqueAuction: @Auction.AuctionItem
         pub let editionAuctions: @Auction.AuctionCollection
         pub let dropID: UInt64
+        pub var firstBidBlock: UInt64?
 
 
         init( uniqueAuction: @Auction.AuctionItem, 
@@ -65,6 +65,7 @@ pub contract Versus {
             self.dropID=Versus.totalDrops
             self.uniqueAuction <-uniqueAuction
             self.editionAuctions <- editionAuctions
+            self.firstBidBlock=nil
         }
             
         destroy(){
@@ -88,8 +89,6 @@ pub contract Versus {
             var price= uniqueStatus.price
 
 
-            //TODO ENUM!
-            //Can has Enums.
             var winningStatus="UNIQUE"
             if(sum > price) {
                 winningStatus="EDITIONED"
@@ -103,7 +102,8 @@ pub contract Versus {
                 editionsStatuses: editionStatuses, 
                 editionPrice: sum,
                 price: price, 
-                status: winningStatus
+                status: winningStatus,
+                firstBidBlock: self.firstBidBlock
             )
         }
 
@@ -128,6 +128,7 @@ pub contract Versus {
                 panic("This drop has ended")
             }
            
+            //TODO: save time of first bid
             let bidEndTime = time + Fix64(minimumTimeRemaining)
 
             //We need to extend the auction since there is too little time left. If we did not do this a late user could potentially win with a cheecky bid
@@ -176,6 +177,7 @@ pub contract Versus {
         pub let winning: String
         pub let active: Bool
         pub let timeRemaining: Fix64
+        pub let firstBidBlock:UInt64?
 
         init(
             dropId: UInt64,
@@ -183,7 +185,8 @@ pub contract Versus {
             editionsStatuses: {UInt64: Auction.AuctionStatus},
             editionPrice: UFix64, 
             price: UFix64,
-            status: String //can has enum!
+            status: String,
+            firstBidBlock:UInt64? //can has enum!
             ) {
                 self.dropId=dropId
                 self.uniqueStatus=uniqueStatus
@@ -196,6 +199,7 @@ pub contract Versus {
                 self.active=uniqueStatus.active
                 self.price=price
                 self.winning=status
+                self.firstBidBlock=firstBidBlock
             }
     }
 
@@ -243,7 +247,6 @@ pub contract Versus {
             self.drops <- {}
         }
 
-        //TODO: different start price for unique and editioned, different bid increment aswell?
 
         // When creating a drop you send in an NFT and the number of editions you want to sell vs the unique one
         // There will then be minted edition number of extra copies and put into the editions auction
@@ -261,7 +264,6 @@ pub contract Versus {
                 vaultCap.check() == true : "Vault capability should exist"
             }
 
-            //TODO this should probably be some sort of interface in Versus.  so that other types can be sold aswell
             let art <- nft as! @Art.NFT
 
             //Sending in a NFTEditioner capability here and using that instead of this loop would probably make sense. 

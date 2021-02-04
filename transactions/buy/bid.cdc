@@ -33,7 +33,6 @@ transaction(marketplace: Address, dropId: UInt64, auctionId: UInt64, bidAmount: 
         
         self.vaultCap = account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
                    
-        //todo will this work?
         let vaultRef = account.borrow<&FungibleToken.Vault>(from: /storage/flowTokenVault)
             ?? panic("Could not borrow owner's Vault reference")
 

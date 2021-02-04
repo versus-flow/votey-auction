@@ -79,7 +79,6 @@ pub contract Art: NonFungibleToken {
             return contentCollection.content(self.contentId!)!
         }
 
-        //TODO: this should probably not be here? or create an interface that does not expose it?
         pub fun makeEdition(edition: UInt64, maxEdition:UInt64) : @Art.NFT {
             var newNFT <- create NFT(
             initID: Art.totalSupply,

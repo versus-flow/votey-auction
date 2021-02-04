@@ -28,7 +28,6 @@ transaction(
 
     execute {
 
-        //TODO: does this need type?
         var contentItem  <- Content.createContent(url)
         let contentId= contentItem.id
         self.contentCapability.borrow()!.deposit(token: <- contentItem)
@@ -38,12 +37,11 @@ transaction(
             artist:artistName,
             artistAddress : artist.toString(),
             description: description,
-            type: "png", 
+            type: "png",
             contentCapability: self.contentCapability,
             contentId: contentId,
         )
 
-       
        self.versus.createDrop(
            nft:  <- art,
            editions: editions,
@@ -54,4 +52,4 @@ transaction(
        )
     }
 }
- 
+

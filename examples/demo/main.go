@@ -49,7 +49,7 @@ func main() {
 	fmt.Println()
 	fmt.Println()
 	fmt.Println("MarketplaceCut: 15%, drop length: 5 ticks")
-	fmt.Scanln()
+	//fmt.Scanln()
 	flow.CreateAccount("marketplace")
 
 	flow.TransactionFromFile("setup/mint_tokens").SignProposeAndPayAsService().AccountArgument("artist").UFix64Argument("100.0").RunPrintEventsFull()
@@ -66,7 +66,7 @@ func main() {
 	fmt.Println()
 	fmt.Println()
 	fmt.Println("Create a drop in versus that is already started with 10 editions")
-	fmt.Scanln()
+	//fmt.Scanln()
 	gwtf.PrintEvents(flow.TransactionFromFile("setup/drop").
 		SignProposeAndPayAs("marketplace").
 		AccountArgument("artist").                                                                      //marketplace location
@@ -87,7 +87,7 @@ func main() {
 	fmt.Println()
 	fmt.Println()
 	fmt.Println("Setup a buyer and make him bid on the unique auction")
-	fmt.Scanln()
+	//fmt.Scanln()
 
 	flow.TransactionFromFile("setup/mint_tokens").SignProposeAndPayAsService().AccountArgument("buyer1").UFix64Argument("1000.0").RunPrintEventsFull()
 
@@ -102,7 +102,7 @@ func main() {
 	fmt.Println()
 	fmt.Println()
 	fmt.Println("Go to website to bid there")
-	fmt.Scanln()
+	//fmt.Scanln()
 	fmt.Println("Tick the clock to make the auction end and settle it")
 	time.Sleep(1 * time.Second)
 	flow.TransactionFromFile("tick").SignProposeAndPayAs("marketplace").Argument(cadence.UInt64(1)).Run()

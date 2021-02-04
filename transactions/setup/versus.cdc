@@ -20,7 +20,9 @@ transaction(cutPercentage: UFix64, dropLength: UFix64, minimumTimeRemainingAfter
             panic("Cannot borrow vault receiver run the setup/actor transaction first")
         }
 
-         let marketplaceNFTTrash=account.getCapability<&{Art.CollectionPublic}>(/public/NFTCollection)
+         account.save<@NonFungibleToken.Collection>(<- Art.createEmptyCollection(), to: /storage/ArtCollection)
+         account.link<&{Art.CollectionPublic}>(/public/ArtCollection, target: /storage/ArtCollection)
+         let marketplaceNFTTrash=account.getCapability<&{Art.CollectionPublic}>(/public/ArtCollection)
 
         let versus <- Versus.createVersusDropCollection(
             marketplaceVault: marketplaceReceiver,
