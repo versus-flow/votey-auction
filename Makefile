@@ -15,3 +15,7 @@ mint:
 .PHONY: emulator
 emulator: clean
 	flow emulator start -v --persist
+
+.PHONY: testnet
+testnet:
+	go run ./examples/testnet/main.go

@@ -1,5 +1,6 @@
-import FungibleToken from 0xee82856bf20e2aa6
-import NonFungibleToken, Versus from 0x01cf0e2f2f715450
+import FungibleToken from 0x9a0766d93b6608b7
+import NonFungibleToken from 0x631e88ae7f1d7c20
+import Versus from 0x1ff7e32d71183db0
 /*
 Transaction to settle/finish off an auction. Has to be signed by the owner of the versus marketplace
  */

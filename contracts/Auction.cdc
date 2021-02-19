@@ -3,9 +3,10 @@
 // This contract allows users to put their NFTs up for sale. Other users
 // can purchase these NFTs with fungible tokens.
 //
-import FungibleToken from 0xee82856bf20e2aa6
-import NonFungibleToken, Art from 0x01cf0e2f2f715450
-import FlowToken from 0x0ae53cb6e3f42a79
+import FungibleToken from 0x9a0766d93b6608b7
+import NonFungibleToken from 0x631e88ae7f1d7c20
+import Art from 0x1ff7e32d71183db0
+import FlowToken from 0x7e60df042a9c0868
 
 pub contract Auction {
 
@@ -20,7 +21,6 @@ pub contract Auction {
         pub let endTime : Fix64
         pub let startTime : Fix64
         pub let metadata: Art.Metadata?
-        pub let art: String?
         pub let owner: Address
         pub let leader: Address?
         pub let minNextBid: UFix64
@@ -31,7 +31,6 @@ pub contract Auction {
             active: Bool, 
             timeRemaining:Fix64, 
             metadata: Art.Metadata?,
-            art: String?,
             leader:Address?, 
             bidIncrement: UFix64,
             owner: Address, 
@@ -45,7 +44,6 @@ pub contract Auction {
             self.active=active
             self.timeRemaining=timeRemaining
             self.metadata=metadata
-            self.art=art
             self.leader= leader
             self.bidIncrement=bidIncrement
             self.owner=owner
@@ -322,7 +320,6 @@ pub contract Auction {
                 active: !self.auctionCompleted  && !self.isAuctionExpired(),
                 timeRemaining: self.timeRemaining(),
                 metadata: self.NFT?.metadata,
-                art: self.NFT?.content(),
                 leader: leader,
                 bidIncrement: self.minimumBidIncrement,
                 owner: self.ownerVaultCap.borrow()!.owner!.address,

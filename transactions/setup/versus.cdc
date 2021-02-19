@@ -1,6 +1,7 @@
 
-import FungibleToken from 0xee82856bf20e2aa6
-import NonFungibleToken, Content, Art, Auction, Versus from 0x01cf0e2f2f715450
+import FungibleToken from 0x9a0766d93b6608b7
+import NonFungibleToken from 0x631e88ae7f1d7c20
+import Content, Art, Auction, Versus from 0x1ff7e32d71183db0
 
 //This transaction setup of a versus marketplace
 //Each drop settlement will deposit cutPercentage number of tokens into the signers vault
@@ -12,7 +13,6 @@ transaction(cutPercentage: UFix64, dropLength: UFix64, minimumTimeRemainingAfter
     prepare(account: AuthAccount) {
         // create a new sale object     
         // initializing it with the reference to the owner's Vault
-
 
         // Would this fail if the capability was not here? 
         let marketplaceReceiver=account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)

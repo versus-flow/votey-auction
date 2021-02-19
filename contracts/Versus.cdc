@@ -1,6 +1,7 @@
 
-import FungibleToken from 0xee82856bf20e2aa6
-import NonFungibleToken, Art, Auction from 0x01cf0e2f2f715450
+import FungibleToken from 0x9a0766d93b6608b7
+import NonFungibleToken from 0x631e88ae7f1d7c20
+import Art, Auction from 0x1ff7e32d71183db0
 
 pub contract Versus {
    init() {
@@ -16,6 +17,7 @@ pub contract Versus {
     //When a drop is extended due to a late bid or bid after tie we emit and event
     pub event DropExtended(id: UInt64, extendWith: Fix64, extendTo: Fix64)
 
+    //TODO: businessEvent and technicalEvent
     //When somebody bids on a versus drop we emit and event with the  id of the drop and acution as well as who bid and how much
     pub event Bid(dropId: UInt64, auctionId: UInt64, bidderAddress: Address, bidPrice: UFix64, time: Fix64, blockHeight:UInt64)
 
@@ -103,7 +105,8 @@ pub contract Versus {
                 editionPrice: sum,
                 price: price, 
                 status: winningStatus,
-                firstBidBlock: self.firstBidBlock
+                firstBidBlock: self.firstBidBlock,
+                art: uniqueRef.NFT?.content()
             )
         }
 
@@ -181,6 +184,7 @@ pub contract Versus {
         pub let active: Bool
         pub let timeRemaining: Fix64
         pub let firstBidBlock:UInt64?
+        pub let art: String?
 
         init(
             dropId: UInt64,
@@ -189,7 +193,8 @@ pub contract Versus {
             editionPrice: UFix64, 
             price: UFix64,
             status: String,
-            firstBidBlock:UInt64? //can has enum!
+            firstBidBlock:UInt64?,
+            art:String? //can has enum!
             ) {
                 self.dropId=dropId
                 self.uniqueStatus=uniqueStatus
@@ -203,6 +208,7 @@ pub contract Versus {
                 self.price=price
                 self.winning=status
                 self.firstBidBlock=firstBidBlock
+                self.art=art
             }
     }
 
