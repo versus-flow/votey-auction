@@ -8,5 +8,5 @@ import Auction, Versus from 0x1ff7e32d71183db0
  */
 pub fun main(address:Address) : Versus.DropStatus?{
 
-    return Versus.getActiveDrop(address)
+    return Versus.getActiveDrop(address: address)
 }

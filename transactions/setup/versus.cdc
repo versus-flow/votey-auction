@@ -20,6 +20,7 @@ transaction(cutPercentage: UFix64, dropLength: UFix64, minimumTimeRemainingAfter
             panic("Cannot borrow vault receiver run the setup/actor transaction first")
         }
 
+
         account.save<@NonFungibleToken.Collection>(<- Art.createEmptyCollection(), to: Art.CollectionStoragePath)
         account.link<&{Art.CollectionPublic}>(Art.CollectionPublicPath, target: Art.CollectionStoragePath)
 
@@ -34,7 +35,7 @@ transaction(cutPercentage: UFix64, dropLength: UFix64, minimumTimeRemainingAfter
         )
 
         // store the sale resource in the account for storage
-        account.save(<-versus, to: /storage/Versus)
+        account.save(<-versus, to: Versus.CollectionStoragePath)
 
         // create a public capability to the sale so that others
         // can call it's methods

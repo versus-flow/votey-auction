@@ -371,7 +371,7 @@ pub contract Versus {
         ) {
             pre {
                 self.drops[dropId] != nil:
-                    "NFT doesn't exist"
+                    "Drop does not exist"
 
                 collectionCap.check() == true : "Collection capability must be linked"
 

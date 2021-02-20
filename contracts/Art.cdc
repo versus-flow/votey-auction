@@ -8,6 +8,7 @@ pub contract Art: NonFungibleToken {
 
     pub let CollectionStoragePath: StoragePath
     pub let CollectionPublicPath: PublicPath
+
     pub var totalSupply: UInt64
 
     pub event ContractInitialized()
@@ -261,7 +262,7 @@ pub contract Art: NonFungibleToken {
             }
         }
         return artData
-    }
+    } 
 
 	init() {
         // Initialize the total supply

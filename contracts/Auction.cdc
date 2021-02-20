@@ -501,7 +501,7 @@ pub contract Auction {
         pub fun placeBid(id: UInt64, bidTokens: @FungibleToken.Vault, vaultCap: Capability<&{FungibleToken.Receiver}>, collectionCap: Capability<&{Art.CollectionPublic}>) {
             pre {
                 self.auctionItems[id] != nil:
-                    "NFT doesn't exist"
+                    "Auction does not exist in this drop"
             }
 
             // Get the auction item resources

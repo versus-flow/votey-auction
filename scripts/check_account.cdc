@@ -28,7 +28,7 @@ pub fun main(address:Address) : AddressStatus {
        status.balance=vault.balance
     }
 
-    status.art= Art.getArt(address)
+    status.art= Art.getArt(address: address)
     
     return status
 

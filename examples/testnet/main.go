@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/bjartek/go-with-the-flow/gwtf"
+	"github.com/davecgh/go-spew/spew"
 )
 
 func fileAsImageData(path string) string {
@@ -30,7 +31,9 @@ func fileAsImageData(path string) string {
 func main() {
 
 	flow := gwtf.NewGoWithTheFlowDevNet()
-	flow.ScriptFromFile("check_account").AccountArgument("buyer1").RunReturns()
+	value := flow.ScriptFromFile("get_active_auction").AccountArgument("versus").RunReturns()
+	//value := flow.ScriptFromFile("check_account").AccountArgument("buyer1").RunReturns()
+	spew.Dump(value)
 
 	//	flow.TransactionFromFile("buy/settle").SignProposeAndPayAs("versus").Argument(cadence.UInt64(1)).RunPrintEventsFull()
 
@@ -55,15 +58,13 @@ func main() {
 	//flow.TransactionFromFile("setup/transfer_flow").SignProposeAndPayAsService().UFix64Argument("1000.0").AccountArgument("artist").RunPrintEventsFull()
 
 	/*
-		flow.TransactionFromFile("setup/versus").
-			SignProposeAndPayAs("versus").
-			UFix64Argument("0.15").    //cut percentage,
-			UFix64Argument("86400.0"). //length
-			UFix64Argument("300.0").   // bump on late bid
-			RunPrintEventsFull()
-	*/
+				flow.TransactionFromFile("setup/versus").
+					SignProposeAndPayAs("versus").
+					UFix64Argument("0.15").    //cut percentage,
+					UFix64Argument("86400.0"). //length
+					UFix64Argument("300.0").   // bump on late bid
+					RunPrintEventsFull()
 
-	/*
 			now := time.Now()
 			t := now.Unix()
 			timeString := strconv.FormatInt(t, 10) + ".0"
@@ -83,12 +84,11 @@ func main() {
 				RunPrintEventsFull()
 
 
-
 		flow.TransactionFromFile("buy/bid").
 			SignProposeAndPayAs("buyer1").
 			AccountArgument("versus").
 			Argument(cadence.UInt64(1)).  //id of drop
-			Argument(cadence.UInt64(11)). //id of unique auction auction to bid on
+			Argument(cadence.UInt64(21)). //id of unique auction auction to bid on
 			UFix64Argument("10.01").      //amount to bid
 			RunPrintEventsFull()
 
