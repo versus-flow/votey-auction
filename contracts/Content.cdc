@@ -7,6 +7,9 @@ pub contract Content: NonFungibleToken {
 
     pub var totalSupply: UInt64
 
+    pub let CollectionStoragePath: StoragePath
+    pub let CollectionPrivatePath: PrivatePath
+
     pub event ContractInitialized()
     pub event Withdraw(id: UInt64, from: Address?)
     pub event Deposit(id: UInt64, to: Address?)
@@ -106,6 +109,8 @@ pub contract Content: NonFungibleToken {
 	init() {
         // Initialize the total supply
         self.totalSupply = 0
+        self.CollectionPrivatePath=/private/VersusContentCollection
+        self.CollectionStoragePath=/storage/VersusContentCollection
         emit ContractInitialized()
 	}
 }

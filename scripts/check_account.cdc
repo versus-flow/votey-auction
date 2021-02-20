@@ -8,11 +8,11 @@ pub struct AddressStatus {
 
   pub(set) var address:Address
   pub(set) var balance: UFix64
-  pub(set) var art: {UInt64: Art.Metadata}
+  pub(set) var art: [Art.ArtData]
   init (_ address:Address) {
     self.address=address
     self.balance= 0.0
-    self.art= {}
+    self.art= []
   }
 }
 
@@ -28,15 +28,7 @@ pub fun main(address:Address) : AddressStatus {
        status.balance=vault.balance
     }
 
-
-    if let art= account.getCapability(/public/ArtCollection).borrow<&{Art.CollectionPublic}>()  {
-       
-        for id in art.getIDs() {
-          var art=art.borrowArt(id: id) 
-          status.art[id]=art!.metadata
-        }
-    }
-    
+    status.art= Art.getArt(address)
     
     return status
 

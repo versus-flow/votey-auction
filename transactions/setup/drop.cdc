@@ -21,8 +21,8 @@ transaction(
 
     prepare(account: AuthAccount) {
 
-        self.versus= account.borrow<&Versus.DropCollection>(from: /storage/Versus)!
-        self.contentCapability=account.getCapability<&Content.Collection>(/private/VersusContent)
+        self.versus= account.borrow<&Versus.DropCollection>(from: Versus.CollectionStoragePath)!
+        self.contentCapability=account.getCapability<&Content.Collection>(Content.CollectionPrivatePath)
 
         self.artistWallet=  getAccount(artist).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
     }

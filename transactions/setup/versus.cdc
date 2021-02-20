@@ -20,9 +20,10 @@ transaction(cutPercentage: UFix64, dropLength: UFix64, minimumTimeRemainingAfter
             panic("Cannot borrow vault receiver run the setup/actor transaction first")
         }
 
-        account.save<@NonFungibleToken.Collection>(<- Art.createEmptyCollection(), to: /storage/ArtCollection)
-        account.link<&{Art.CollectionPublic}>(/public/ArtCollection, target: /storage/ArtCollection)
-        let marketplaceNFTTrash=account.getCapability<&{Art.CollectionPublic}>(/public/ArtCollection)
+        account.save<@NonFungibleToken.Collection>(<- Art.createEmptyCollection(), to: Art.CollectionStoragePath)
+        account.link<&{Art.CollectionPublic}>(Art.CollectionPublicPath, target: Art.CollectionStoragePath)
+
+        let marketplaceNFTTrash=account.getCapability<&{Art.CollectionPublic}>(Art.CollectionPublicPath)
 
         let versus <- Versus.createVersusDropCollection(
             marketplaceVault: marketplaceReceiver,
@@ -37,13 +38,9 @@ transaction(cutPercentage: UFix64, dropLength: UFix64, minimumTimeRemainingAfter
 
         // create a public capability to the sale so that others
         // can call it's methods
-        account.link<&{Versus.PublicDrop}>(
-            /public/Versus,
-            target: /storage/Versus
-        )
-
-        account.save(<- Content.createEmptyCollection(), to: /storage/VersusContent)
-        account.link<&Content.Collection>(/private/VersusContent, target: /storage/VersusContent)
+        account.link<&{Versus.PublicDrop}>(Versus.CollectionPublicPath, target: Versus.CollectionStoragePath)
+        account.save(<- Content.createEmptyCollection(), to: Content.CollectionStoragePath)
+        account.link<&Content.Collection>(Content.CollectionPrivatePath, target: Content.CollectionStoragePath)
     }
 }
  

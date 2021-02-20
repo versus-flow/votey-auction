@@ -6,6 +6,8 @@ import Content from 0x1ff7e32d71183db0
 
 pub contract Art: NonFungibleToken {
 
+    pub let CollectionStoragePath: StoragePath
+    pub let CollectionPublicPath: PublicPath
     pub var totalSupply: UInt64
 
     pub event ContractInitialized()
@@ -232,9 +234,41 @@ pub contract Art: NonFungibleToken {
 
     }
 
+    pub struct ArtData {
+        pub let metadata: Art.Metadata
+        pub let content: String
+        pub let id: UInt64
+        init(metadata: Art.Metadata, content:String, id: UInt64) {
+            self.metadata= metadata
+            self.content=content
+            self.id=id
+        }
+    }
+
+
+    pub fun getArt(address:Address) : [ArtData] {
+
+        var artData: [ArtData] = []
+        let account=getAccount(address)
+
+        if let artCollection= account.getCapability(self.CollectionPublicPath).borrow<&{Art.CollectionPublic}>()  {
+            for id in artCollection.getIDs() {
+                var art=artCollection.borrowArt(id: id) 
+                artData.append(ArtData(
+                    metadata: art!.metadata,
+                    content: art!.content()!,
+                    id: id))
+            }
+        }
+        return artData
+    }
+
 	init() {
         // Initialize the total supply
         self.totalSupply = 0
+        self.CollectionPublicPath=/public/VersusArtCollection
+        self.CollectionStoragePath=/storage/VersusArtCollection
+
         emit ContractInitialized()
 	}
 }

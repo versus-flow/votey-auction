@@ -19,15 +19,15 @@ transaction(marketplace: Address, dropId: UInt64, auctionId: UInt64, bidAmount: 
     prepare(account: AuthAccount) {
 
         // get the references to the buyer's Vault and NFT Collection receiver
-        var collectionCap = account.getCapability<&{Art.CollectionPublic}>(/public/ArtCollection)
+        var collectionCap = account.getCapability<&{Art.CollectionPublic}>(Art.CollectionPublicPath)
 
         // if collection is not created yet we make it.
         if !collectionCap.check() {
             // store an empty NFT Collection in account storage
-            account.save<@NonFungibleToken.Collection>(<- Art.createEmptyCollection(), to: /storage/ArtCollection)
+            account.save<@NonFungibleToken.Collection>(<- Art.createEmptyCollection(), to: Art.CollectionStoragePath)
 
             // publish a capability to the Collection in storage
-            account.link<&{Art.CollectionPublic}>(/public/ArtCollection, target: /storage/ArtCollection)
+            account.link<&{Art.CollectionPublic}>(Art.CollectionPublicPath, target: Art.CollectionStoragePath)
         }
 
         self.collectionCap=collectionCap
@@ -46,7 +46,7 @@ transaction(marketplace: Address, dropId: UInt64, auctionId: UInt64, bidAmount: 
         let seller = getAccount(marketplace)
 
         // get the reference to the seller's sale
-        let versusRef = seller.getCapability(/public/Versus)
+        let versusRef = seller.getCapability(Versus.CollectionPublicPath)
                          .borrow<&{Versus.PublicDrop}>()
                          ?? panic("Could not borrow seller's sale reference")
 

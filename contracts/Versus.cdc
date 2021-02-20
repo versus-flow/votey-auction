@@ -4,10 +4,10 @@ import NonFungibleToken from 0x631e88ae7f1d7c20
 import Art, Auction from 0x1ff7e32d71183db0
 
 pub contract Versus {
-   init() {
-        self.totalDrops = (0 as UInt64)
-    }
 
+   
+    pub let CollectionStoragePath: StoragePath
+    pub let CollectionPublicPath: PublicPath
     pub var totalDrops: UInt64
 
     //Events
@@ -388,6 +388,36 @@ pub contract Versus {
         destroy() {            
             destroy self.drops
         }
+    }
+
+
+    /*
+     Get an active drop in the versus marketplace with the given address
+     
+     */
+    pub fun getActiveDrop(address:Address) : Versus.DropStatus?{
+        // get the accounts' public address objects
+        let account = getAccount(address)
+
+        let versusCap=account.getCapability<&{Versus.PublicDrop}>(self.CollectionPublicPath)
+        if let versus = versusCap.borrow() {
+            let versusStatuses=versus.getAllStatuses()
+            for s in versusStatuses.keys {
+                let status = versusStatuses[s]!
+                if status.uniqueStatus.active != false {
+                    return status
+                }
+            } 
+        } 
+        return nil
+    }
+
+    init() {
+
+        self.CollectionPublicPath= /public/versusCollection
+        self.CollectionStoragePath= /storage/versusCollection
+
+        self.totalDrops = (0 as UInt64)
     }
      
 }
