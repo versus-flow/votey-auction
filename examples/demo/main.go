@@ -39,7 +39,8 @@ func main() {
 	t := now.Unix() - 5
 	timeString := strconv.FormatInt(t, 10) + ".0"
 
-	flow := gwtf.NewGoWithTheFlowEmulator()
+	//GWTF has no future anymore?
+	flow := gwtf.NewGoWithTheFlow("./versus-flow.json")
 
 	fmt.Println("Demo of Versus@Flow")
 	//flow.CreateAccountWithContracts("accounts", "NonFungibleToken", "Content", "Art", "Auction", "Versus")
@@ -49,8 +50,7 @@ func main() {
 	fmt.Println()
 	fmt.Println()
 	fmt.Println("MarketplaceCut: 15%, drop length: 5 ticks")
-	//fmt.Scanln()
-	flow.CreateAccount("marketplace")
+	fmt.Scanln()
 
 	flow.TransactionFromFile("setup/mint_tokens").SignProposeAndPayAsService().AccountArgument("artist").UFix64Argument("100.0").RunPrintEventsFull()
 	flow.TransactionFromFile("setup/mint_tokens").SignProposeAndPayAsService().AccountArgument("marketplace").UFix64Argument("100.0").RunPrintEventsFull()
@@ -110,14 +110,18 @@ func main() {
 	flow.TransactionFromFile("tick").SignProposeAndPayAs("marketplace").Argument(cadence.UInt64(1)).Run()
 	time.Sleep(1 * time.Second)
 	flow.TransactionFromFile("tick").SignProposeAndPayAs("marketplace").Argument(cadence.UInt64(1)).Run()
+	time.Sleep(1 * time.Second)
+	flow.TransactionFromFile("tick").SignProposeAndPayAs("marketplace").Argument(cadence.UInt64(1)).Run()
+	time.Sleep(1 * time.Second)
+	flow.TransactionFromFile("tick").SignProposeAndPayAs("marketplace").Argument(cadence.UInt64(1)).Run()
 	fmt.Println("settle")
 	fmt.Scanln()
 	flow.TransactionFromFile("tick").SignProposeAndPayAs("marketplace").Argument(cadence.UInt64(1)).Run()
 	gwtf.PrintEvents(flow.TransactionFromFile("buy/settle").SignProposeAndPayAs("marketplace").Argument(cadence.UInt64(1)).Run(), emptyMap)
 
-	flow.ScriptFromFile("check_account").AccountArgument("buyer1").StringArgument("buyer1").Run()
-	flow.ScriptFromFile("check_account").AccountArgument("buyer2").StringArgument("buyer2").Run()
-	flow.ScriptFromFile("check_account").AccountArgument("artist").StringArgument("artist").Run()
-	flow.ScriptFromFile("check_account").AccountArgument("marketplace").StringArgument("marketplace").Run()
+	flow.ScriptFromFile("check_account").AccountArgument("buyer1").Run()
+	flow.ScriptFromFile("check_account").AccountArgument("buyer2").Run()
+	flow.ScriptFromFile("check_account").AccountArgument("artist").Run()
+	flow.ScriptFromFile("check_account").AccountArgument("marketplace").Run()
 
 }

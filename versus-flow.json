@@ -1,0 +1,22 @@
+
+{
+	"address" : "127.0.0.1:3569",
+	"gasLimit" : 9999, 
+	"accounts": {
+		"service": {
+			"address": "f8d6e0586b0a20c7",
+			"privateKey": "bf9db4706c2fdb9011ee7e170ccac492f05427b96ab41d8bf2d8c58443704b76",
+			"sigAlgorithm": "ECDSA_P256",
+			"hashAlgorithm": "SHA3_256"
+		}
+	}, 
+	"emulatorAccounts" : {
+		"accounts" : "01cf0e2f2f715450",
+		"marketplace" : "179b6b1cb6755e31",
+		"artist" : "f3fcd2c1a78f5eee",
+		"buyer1" : "e03daebed8ca0615",
+		"buyer2": "045a1763c93006ca"
+        
+	}
+}
+ 

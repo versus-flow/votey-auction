@@ -237,16 +237,15 @@ pub contract Art: NonFungibleToken {
 
     pub struct ArtData {
         pub let metadata: Art.Metadata
-        pub let content: String
         pub let id: UInt64
-        init(metadata: Art.Metadata, content:String, id: UInt64) {
+        init(metadata: Art.Metadata, id: UInt64) {
             self.metadata= metadata
-            self.content=content
             self.id=id
         }
     }
 
 
+    // We cannot return the art here since it will be too big to run in a script
     pub fun getArt(address:Address) : [ArtData] {
 
         var artData: [ArtData] = []
@@ -257,7 +256,6 @@ pub contract Art: NonFungibleToken {
                 var art=artCollection.borrowArt(id: id) 
                 artData.append(ArtData(
                     metadata: art!.metadata,
-                    content: art!.content()!,
                     id: id))
             }
         }

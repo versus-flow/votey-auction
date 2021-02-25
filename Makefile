@@ -1,7 +1,7 @@
 all: demo
 
 .PHONY: demo
-demo:
+demo: deploy
 	go run ./examples/demo/main.go
 
 .PHONY: clean
@@ -19,3 +19,7 @@ emulator: clean
 .PHONY: testnet
 testnet:
 	go run ./examples/testnet/main.go
+
+.PHONY: deploy
+deploy:
+	flow project deploy 
