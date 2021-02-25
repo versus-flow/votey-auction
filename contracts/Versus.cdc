@@ -92,7 +92,7 @@ pub contract Versus {
 
 
             var winningStatus="UNIQUE"
-            if(sum > price) {
+            if sum > price {
                 winningStatus="EDITIONED"
                 price=sum
             } else if (sum == price) {
@@ -124,7 +124,7 @@ pub contract Versus {
             let block=getCurrentBlock()
             let time=Fix64(block.timestamp)
 
-            if(dropStatus.startTime > time) {
+            if dropStatus.startTime > time {
                 panic("The drop has not started")
             }
             if dropStatus.endTime < time && dropStatus.winning != "TIE" {
@@ -281,7 +281,7 @@ pub contract Versus {
                 cutPercentage: self.cutPercentage)
 
             var currentEdition=(1 as UInt64)
-            while(currentEdition <= editions) {
+            while currentEdition <= editions {
                 //A nice enhancement here would be that the art created is done through a minter so it is not art specific.
                 //It could even be a Cloner capability or maybe a editionMinter? 
                 editionedAuctions.createAuction(

@@ -272,6 +272,7 @@ pub contract Auction {
         pub fun placeBid(bidTokens: @FungibleToken.Vault, vaultCap: Capability<&{FungibleToken.Receiver}>, collectionCap: Capability<&{Art.CollectionPublic}>) {
 
 
+            //TODO: use pre
             if self.auctionCompleted {
                 panic("auction has already completed")
             }
