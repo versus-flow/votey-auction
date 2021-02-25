@@ -1,8 +1,8 @@
 
-import FungibleToken from FungibleToken
-import NonFungibleToken from NonFungibleToken
-import Art from Art
-import Auction from Auction
+import FungibleToken from "./standard/FungibleToken.cdc"
+import NonFungibleToken from "./standard/NonFungibleToken.cdc"
+import Art from "./Art.cdc"
+import Auction from "./Auction.cdc"
 
 pub contract Versus {
 

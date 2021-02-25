@@ -3,10 +3,10 @@
 // This contract allows users to put their NFTs up for sale. Other users
 // can purchase these NFTs with fungible tokens.
 //
-import FungibleToken from FungibleToken
-import Art from Art
-import NonFungibleToken from NonFungibleToken
-import FlowToken from FlowToken
+import FungibleToken from "./standard/FungibleToken.cdc"
+import Art from "./Art.cdc"
+import NonFungibleToken from "./standard/NonFungibleToken.cdc"
+import FlowToken from "./standard/FlowToken.cdc"
 
 pub contract Auction {
 

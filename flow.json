@@ -30,8 +30,8 @@
 			"emulator-account": [
 				"NonFungibleToken",
 				"Content",
-				"Art",
-				"Auction",
+				"Art", 
+				"Auction", 
 				"Versus"
 			]
 		}
@@ -52,7 +52,8 @@
 	"networks": {
 		"emulator": {
 			"host": "127.0.0.1:3569",
-			"serviceAccount": "emulator-account"
+			"serviceAccount": "emulator-account",
+			"chain" : "flow-emulator"
 		}
 	}
 }

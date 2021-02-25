@@ -1,7 +1,7 @@
 //This contract is on purpose pretty simple, it does not have a minter on anything
 //It should probably not be as loose permission wise at it is now.
 
-import NonFungibleToken from NonFungibleToken
+import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 
 pub contract Content: NonFungibleToken {
 
