@@ -18,7 +18,7 @@ pub contract Content: NonFungibleToken {
     pub resource NFT: NonFungibleToken.INFT {
         pub let id: UInt64
 
-        pub var content: String
+        access(contract) var content: String
 
         init(initID: UInt64, content: String) {
             self.id = initID

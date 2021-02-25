@@ -54,10 +54,10 @@ pub contract Versus {
         //It would be really simple here to support many vs many or even a many vs many vs many vs many type of auction here
         //just convert these to a dictionary of key:AuctionCollection.
 
-        pub let uniqueAuction: @Auction.AuctionItem
-        pub let editionAuctions: @Auction.AuctionCollection
+        access(contract) let uniqueAuction: @Auction.AuctionItem
+        access(contract) let editionAuctions: @Auction.AuctionCollection
         pub let dropID: UInt64
-        pub var firstBidBlock: UInt64?
+        access(contract) var firstBidBlock: UInt64?
 
 
         init( uniqueAuction: @Auction.AuctionItem, 
@@ -107,7 +107,7 @@ pub contract Versus {
                 price: price, 
                 status: winningStatus,
                 firstBidBlock: self.firstBidBlock,
-                art: uniqueRef.NFT?.content()
+                art: uniqueRef.content()
             )
         }
 
