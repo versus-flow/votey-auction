@@ -12,7 +12,7 @@ This is a git repo for the cadence contrats for versus@flow. Follow the guide be
 ## How to run the sample
 
 Start two terminals. Both from the root directory.
- - `flow project start-emualator -v`
+ - `flow project start-emulator -v`
 - `make demo`
 
 ## What happends in the sample
