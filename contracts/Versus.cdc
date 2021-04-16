@@ -2,6 +2,7 @@
 import FungibleToken from "./standard/FungibleToken.cdc"
 import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import Art from "./Art.cdc"
+import Content from "./Content.cdc"
 import Auction from "./Auction.cdc"
 
 /*
@@ -18,12 +19,11 @@ import Auction from "./Auction.cdc"
 pub contract Versus {
 
     //A set of capability and storage paths used in this contract
-    pub let VersusAdministratorPrivatePath: PrivatePath
-    pub let VersusAdministratorStoragePath: StoragePath
     pub let VersusAdminClientPublicPath: PublicPath
     pub let VersusAdminClientStoragePath: StoragePath
     pub let CollectionStoragePath: StoragePath
     pub let CollectionPublicPath: PublicPath
+    pub let CollectionPrivatePath: PrivatePath
 
 
     //counter for drops that is incremented every time there is a new versus drop made
@@ -344,8 +344,7 @@ pub contract Versus {
              minimumBidUniqueIncrement: UFix64,
              startTime: UFix64, 
              startPrice: UFix64,  //TODO: seperate startPrice for unique and edition
-             vaultCap: Capability<&{FungibleToken.Receiver}>, 
-             artAdmin: &Art.Administrator)
+             vaultCap: Capability<&{FungibleToken.Receiver}>) 
 
         pub fun settle(_ dropId: UInt64)
     }
@@ -393,8 +392,7 @@ pub contract Versus {
              minimumBidUniqueIncrement: UFix64,
              startTime: UFix64, 
              startPrice: UFix64,  //TODO: seperate startPrice for unique and edition
-             vaultCap: Capability<&{FungibleToken.Receiver}>, 
-             artAdmin: &Art.Administrator) {
+             vaultCap: Capability<&{FungibleToken.Receiver}> ) {
 
             pre {
                 vaultCap.check() == true : "Vault capability should exist"
@@ -411,7 +409,7 @@ pub contract Versus {
             var currentEdition=(1 as UInt64)
             while currentEdition <= editions {
                 editionedAuctions.createAuction(
-                    token: <- artAdmin.makeEdition(original: &art as &Art.NFT, edition: currentEdition, maxEdition: editions),
+                    token: <- Art.makeEdition(original: &art as &Art.NFT, edition: currentEdition, maxEdition: editions),
                     minimumBidIncrement: minimumBidIncrement, 
                     auctionLength: self.dropLength,
                     auctionStartTime:startTime,
@@ -521,41 +519,22 @@ pub contract Versus {
     }
 
  
-    //An Administrator resource that is stored as a private capability. That capability will be given to another account using a capability receiver
-    pub resource Administrator {
-        pub fun createVersusDropCollection(
-            marketplaceVault: Capability<&{FungibleToken.Receiver}>,
-            marketplaceNFTTrash: Capability<&{Art.CollectionPublic}>,
-            cutPercentage: UFix64,
-            dropLength: UFix64, 
-            minimumTimeRemainingAfterBidOrTie: UFix64): @DropCollection {
-            let collection <- create DropCollection(
-                marketplaceVault: marketplaceVault, 
-                marketplaceNFTTrash: marketplaceNFTTrash,
-                cutPercentage: cutPercentage,
-                dropLength: dropLength,
-                minimumTimeRemainingAfterBidOrTie:minimumTimeRemainingAfterBidOrTie
-            )
-            return <- collection
-        }
-    }
-
 
     //The interface used to add a Administrator capability to a client
     pub resource interface VersusAdminClient {
-        pub fun addCapability(_ cap: Capability<&Administrator>)
+        pub fun addCapability(_ cap: Capability<&Versus.DropCollection>)
     }
 
     //The versus admin resource that a client will create and store, then link up a public VersusAdminClient
     pub resource VersusAdmin: VersusAdminClient {
 
-        access(self) var server: Capability<&Administrator>?
+        access(self) var server: Capability<&Versus.DropCollection>?
 
         init() {
             self.server = nil
         }
 
-         pub fun addCapability(_ cap: Capability<&Administrator>) {
+         pub fun addCapability(_ cap: Capability<&Versus.DropCollection>) {
             pre {
                 cap.check() : "Invalid server capablity"
                 self.server == nil : "Server already set"
@@ -563,26 +542,40 @@ pub contract Versus {
             self.server = cap
         }
 
-        //make it possible to create a versus marketplace. Will just delegate to the administrator
-        pub fun createVersusMarketplace(
-            marketplaceVault: Capability<&{FungibleToken.Receiver}>,
-            marketplaceNFTTrash: Capability<&{Art.CollectionPublic}>,
-            cutPercentage: UFix64,
-            dropLength: UFix64, 
-            minimumTimeRemainingAfterBidOrTie: UFix64) :@DropCollection {
+        /*
+          A stored Transaction to mintArt on versus to a given artist 
+         */
+        pub fun mintArt(artist: Address, artistName: String, artName: String, content:String, description: String) : @Art.NFT {
+            
+            //TODO: check that it is linked
 
-            pre {
-                self.server != nil: 
-                    "Cannot create versus marketplace if server is not set"
+            let artistAccount = getAccount(artist)
+            var contentItem  <- Content.createContent(content)
+            let contentId= contentItem.id
+            let contentCapability=Versus.account.getCapability<&Content.Collection>(Content.CollectionPrivatePath)
+            contentCapability.borrow()!.deposit(token: <- contentItem)
+
+
+            let artistWallet= artistAccount.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
+            let versusWallet=  Versus.account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
+
+            let royalty = {
+                "artist" : Art.Royalty(wallet: artistWallet, cut: 0.05),
+                "minter" : Art.Royalty(wallet: versusWallet, cut: 0.025)
             }
-            return <- self.server!.borrow()!.createVersusDropCollection(
-                marketplaceVault: marketplaceVault, 
-                marketplaceNFTTrash: marketplaceNFTTrash, 
-                cutPercentage: cutPercentage, 
-                dropLength: dropLength, 
-                minimumTimeRemainingAfterBidOrTie: minimumTimeRemainingAfterBidOrTie
-            )
-        }
+            let art <- Art.createArtWithPointer(
+                name: artName,
+                artist:artistName,
+                artistAddress : artist,
+                description: description,
+                type: "png",
+                contentCapability: contentCapability,
+                contentId: contentId,
+                royalty: royalty)
+            return <- art
+        } 
+
+
     }
 
     //make it possible for a user that wants to be a versus admin to create the client
@@ -594,6 +587,14 @@ pub contract Versus {
 
     //initialize all the paths and create and link up the admin proxy
     init() {
+
+        self.CollectionPublicPath= /public/versusCollection
+        self.CollectionPrivatePath= /private/versusCollection
+        self.CollectionStoragePath= /storage/versusCollection
+        self.VersusAdminClientPublicPath= /public/versusAdminClient
+        self.VersusAdminClientStoragePath=/storage/versusAdminClient
+
+
         self.totalDrops = (0 as UInt64)
 
 
@@ -603,37 +604,32 @@ pub contract Versus {
         let marketplaceReceiver=account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
         let marketplaceNFTTrash: Capability<&{Art.CollectionPublic}> =account.getCapability<&{Art.CollectionPublic}>(Art.CollectionPublicPath)
 
-        let content: 
+
         if !marketplaceNFTTrash.check() {
             account.save<@NonFungibleToken.Collection>(<- Art.createEmptyCollection(), to: Art.CollectionStoragePath)
             account.link<&{Art.CollectionPublic}>(Art.CollectionPublicPath, target: Art.CollectionStoragePath)
         }
 
+        let contentCapability=account.getCapability<&Content.Collection>(Content.CollectionPrivatePath)
 
-        //TODO:check if already linked
+        if !contentCapability.check() {
+            account.save(<- Content.createEmptyCollection(), to: Content.CollectionStoragePath)
+            account.link<&Content.Collection>(Content.CollectionPrivatePath, target: Content.CollectionStoragePath)
+        }
+
+        let versusCapability = account.getCapability<&{Versus.PublicDrop}>(Versus.CollectionPublicPath)
+        if !versusCapability.check() {
             let collection <- create DropCollection(
-                marketplaceVault: marketplaceVault, 
+                marketplaceVault: marketplaceReceiver, 
                 marketplaceNFTTrash: marketplaceNFTTrash,
                 cutPercentage: 0.15,
-                dropLength: 86400,
-                minimumTimeRemainingAfterBidOrTie: 3000
+                dropLength: 86400.0,
+                minimumTimeRemainingAfterBidOrTie: 3000.0
             )
-
-
-       
-        //create empty content collection
-        account.save(<- Content.createEmptyCollection(), to: Content.CollectionStoragePath)
-        account.link<&Content.Collection>(Content.CollectionPrivatePath, target: Content.CollectionStoragePath)
-
-        self.CollectionPublicPath= /public/versusCollection
-        self.CollectionStoragePath= /storage/versusCollection
-        self.VersusAdminClientPublicPath= /public/versusAdminClient
-        self.VersusAdminClientStoragePath=/storage/versusAdminClient
-        self.VersusAdministratorStoragePath=/storage/versusAdmin
-        self.VersusAdministratorPrivatePath=/private/versusAdmin
-
-        self.account.save(<- create Administrator(), to: self.VersusAdministratorStoragePath)
-        self.account.link<&Administrator>(self.VersusAdministratorPrivatePath, target: self.VersusAdministratorStoragePath)
+            account.save(<-collection, to: Versus.CollectionStoragePath)
+            account.link<&{Versus.PublicDrop}>(Versus.CollectionPublicPath, target: Versus.CollectionStoragePath) 
+            account.link<&Versus.DropCollection>(Versus.CollectionPrivatePath, target: Versus.CollectionStoragePath) 
+        }
     }
      
 }

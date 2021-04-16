@@ -67,17 +67,19 @@ func main() {
 		StringArgument("Here's a lockdown painting I did of a super cool guy and pal, @jburrowsactor"). //description
 		RunPrintEventsFull()
 
-	flow.TransactionFromFile("setup/setup_marketplace_with_art").
-		SignProposeAndPayAs("artist").
-		UInt64Argument(0).       //artId
-		UFix64Argument("10.00"). //price
-		RunPrintEventsFull()
+	/*
+		flow.TransactionFromFile("setup/setup_marketplace_with_art").
+			SignProposeAndPayAs("artist").
+			UInt64Argument(0).       //artId
+			UFix64Argument("10.00"). //price
+			RunPrintEventsFull()
 
-	flow.TransactionFromFile("buy/marketplace").
-		SignProposeAndPayAs("buyer1").
-		AccountArgument("artist").
-		UInt64Argument(0).
-		UFix64Argument("10.0").
-		RunPrintEventsFull()
+		flow.TransactionFromFile("buy/marketplace").
+			SignProposeAndPayAs("buyer1").
+			AccountArgument("artist").
+			UInt64Argument(0).
+			UFix64Argument("10.0").
+			RunPrintEventsFull()
 
+	*/
 }

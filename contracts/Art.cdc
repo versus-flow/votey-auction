@@ -8,10 +8,6 @@ pub contract Art: NonFungibleToken {
 
     pub let CollectionStoragePath: StoragePath
     pub let CollectionPublicPath: PublicPath
-    pub let MinterStoragePath: StoragePath
-    pub let MinterPrivatePath: PrivatePath
-    pub let AdministratorPublicPath: PublicPath
-    pub let AdministratorStoragePath:StoragePath
 
     pub var totalSupply: UInt64
 
