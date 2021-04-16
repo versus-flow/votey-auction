@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/bjartek/go-with-the-flow/gwtf"
+	"github.com/mitchellh/go-homedir"
 	"github.com/onflow/cadence"
 )
 
@@ -38,7 +39,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	flow := gwtf.NewGoWithTheFlowDevNet()
+	flowConfigFile, _ := homedir.Expand("~/.flow-testnet.json")
+	flow := gwtf.NewGoWithTheFlow(flowConfigFile)
 
 	now := time.Now()
 	t := now.Unix()
@@ -48,7 +50,7 @@ func main() {
 
 	flow.TransactionFromFile("setup/drop_testnet").
 		SignProposeAndPayAs("versus").
-		AccountArgument("artist").             //marketplace location
+		AccountArgument("artist").             //artist address
 		UFix64Argument("1.00").               //start price
 		UFix64Argument(timeString).            //start time
 		StringArgument("Kinger9999").          //artist name

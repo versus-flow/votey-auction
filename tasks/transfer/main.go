@@ -5,11 +5,14 @@ import (
 	"os"
 
 	"github.com/bjartek/go-with-the-flow/gwtf"
+	"github.com/mitchellh/go-homedir"
 )
 
 func main() {
 
-	flow := gwtf.NewGoWithTheFlowDevNet()
+
+	flowConfigFile, _ := homedir.Expand("~/.flow-testnet.json")
+	flow := gwtf.NewGoWithTheFlow(flowConfigFile)
 
 	account, ok := os.LookupEnv("account")
 	if !ok {
