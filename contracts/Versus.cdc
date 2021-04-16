@@ -596,6 +596,35 @@ pub contract Versus {
     init() {
         self.totalDrops = (0 as UInt64)
 
+
+        let account=self.account
+
+
+        let marketplaceReceiver=account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
+        let marketplaceNFTTrash: Capability<&{Art.CollectionPublic}> =account.getCapability<&{Art.CollectionPublic}>(Art.CollectionPublicPath)
+
+        let content: 
+        if !marketplaceNFTTrash.check() {
+            account.save<@NonFungibleToken.Collection>(<- Art.createEmptyCollection(), to: Art.CollectionStoragePath)
+            account.link<&{Art.CollectionPublic}>(Art.CollectionPublicPath, target: Art.CollectionStoragePath)
+        }
+
+
+        //TODO:check if already linked
+            let collection <- create DropCollection(
+                marketplaceVault: marketplaceVault, 
+                marketplaceNFTTrash: marketplaceNFTTrash,
+                cutPercentage: 0.15,
+                dropLength: 86400,
+                minimumTimeRemainingAfterBidOrTie: 3000
+            )
+
+
+       
+        //create empty content collection
+        account.save(<- Content.createEmptyCollection(), to: Content.CollectionStoragePath)
+        account.link<&Content.Collection>(Content.CollectionPrivatePath, target: Content.CollectionStoragePath)
+
         self.CollectionPublicPath= /public/versusCollection
         self.CollectionStoragePath= /storage/versusCollection
         self.VersusAdminClientPublicPath= /public/versusAdminClient
