@@ -71,12 +71,12 @@ pub contract Content {
         }
     }
 
-    pub fun createEmptyCollection(): @Content.Collection {
+    access(account) fun createEmptyCollection(): @Content.Collection {
         return <- create Collection()
     }
 
 
-	pub fun createContent(_ content: String) : @Content.Blob {
+	access(account) fun createContent(_ content: String) : @Content.Blob {
 
         var newNFT <- create Blob(initID: Content.totalSupply, content:content)
         emit Created(id: Content.totalSupply)
