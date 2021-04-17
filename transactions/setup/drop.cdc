@@ -51,6 +51,12 @@ transaction(
            vaultCap: self.artistWallet
        )
 
+       let content=self.client.getContent()
+       log(content.contents.keys)
+
+       let wallet=self.client.getFlowWallet()
+       log(wallet.balance)
+
 
     }
 }

@@ -22,7 +22,6 @@ transaction(dropId: UInt64) {
 
     execute {
         self.client.settle(dropId)
-          //should maybe consider to delete the trash here
     }
 }
  

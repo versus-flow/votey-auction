@@ -90,6 +90,14 @@ pub contract Content {
         self.totalSupply = 0
         self.CollectionPrivatePath=/private/VersusContentCollection
         self.CollectionStoragePath=/storage/VersusContentCollection
+
+        let account =self.account
+        let contentCapability=account.getCapability<&Content.Collection>(Content.CollectionPrivatePath)
+
+        if !contentCapability.check() {
+            account.save(<- Content.createEmptyCollection(), to: Content.CollectionStoragePath)
+            account.link<&Content.Collection>(Content.CollectionPrivatePath, target: Content.CollectionStoragePath)
+        }
         emit ContractInitialized()
 	}
 }

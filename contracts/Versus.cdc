@@ -545,13 +545,20 @@ pub contract Versus {
             }
             self.server = cap
         }
-
+            
+        // This will settle/end an auction
         pub fun settle(_ dropId: UInt64) { 
            pre { 
              self.server != nil : "Your client has not been linked to the server"
            } 
            self.server!.borrow()!.settle(dropId)
 
+          //since settling will return all items not sold to the NFTTrash, we take out the trash here.
+          let artC=Versus.account.borrow<&NonFungibleToken.Collection>(from: Art.CollectionStoragePath)!    
+          for key in artC.ownedNFTs.keys{
+            log("burning art with key=".concat(key.toString()))
+            destroy <- artC.ownedNFTs.remove(key: key)
+          }
         }
 
         pub fun setDropLength(_ num:UFix64) {
@@ -575,7 +582,7 @@ pub contract Versus {
           pub fun setVersusCut(_ num:UFix64) {
            pre {
               self.server != nil : "Your client has not been linked to the server"
-          }
+           }
 
             let dc:&Versus.DropCollection=self.server!.borrow()!
             dc.cutPercentage=num
@@ -637,6 +644,26 @@ pub contract Versus {
             return <- art
         } 
 
+        pub fun getContent():&Content.Collection {
+          pre {
+            self.server != nil : "Your client has not been linked to the server"
+          }
+          return Versus.account.borrow<&Content.Collection>(from: Content.CollectionStoragePath)!
+        }
+
+        pub fun getFlowWallet():&FungibleToken.Vault {
+          pre {
+            self.server != nil : "Your client has not been linked to the server"
+          }
+          return Versus.account.borrow<&FungibleToken.Vault>(from: /storage/flowTokenVault)!
+        }
+
+        pub fun getArtCollection() : &NonFungibleToken.Collection {
+          pre {
+            self.server != nil : "Your client has not been linked to the server"
+          }
+          return Versus.account.borrow<&NonFungibleToken.Collection>(from: Art.CollectionStoragePath)!
+        }
 
     }
 
@@ -659,24 +686,14 @@ pub contract Versus {
 
         self.totalDrops = (0 as UInt64)
 
-
         let account=self.account
-
 
         let marketplaceReceiver=account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
         let marketplaceNFTTrash: Capability<&{Art.CollectionPublic}> =account.getCapability<&{Art.CollectionPublic}>(Art.CollectionPublicPath)
 
-
         if !marketplaceNFTTrash.check() {
             account.save<@NonFungibleToken.Collection>(<- Art.createEmptyCollection(), to: Art.CollectionStoragePath)
             account.link<&{Art.CollectionPublic}>(Art.CollectionPublicPath, target: Art.CollectionStoragePath)
-        }
-
-        let contentCapability=account.getCapability<&Content.Collection>(Content.CollectionPrivatePath)
-
-        if !contentCapability.check() {
-            account.save(<- Content.createEmptyCollection(), to: Content.CollectionStoragePath)
-            account.link<&Content.Collection>(Content.CollectionPrivatePath, target: Content.CollectionStoragePath)
         }
 
         let versusCapability = account.getCapability<&{Versus.PublicDrop}>(Versus.CollectionPublicPath)
@@ -691,7 +708,6 @@ pub contract Versus {
             account.save(<-collection, to: Versus.CollectionStoragePath)
             account.link<&{Versus.PublicDrop}>(Versus.CollectionPublicPath, target: Versus.CollectionStoragePath) 
             account.link<&Versus.DropCollection>(Versus.CollectionPrivatePath, target: Versus.CollectionStoragePath) 
-            log("linked versus")
         }
     }
      
