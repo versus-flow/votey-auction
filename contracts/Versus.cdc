@@ -248,6 +248,7 @@ pub contract Versus {
     //edition and maxEidtion will not be kept here after the auction has been settled.
     //Really not sure on how to handle showing historic drops so for now I will just leave it as it is
     pub struct DropAuctionStatus {
+        pub let id: UInt64
         pub let price : UFix64
         pub let bidIncrement : UFix64
         pub let bids : UInt64
@@ -263,6 +264,7 @@ pub contract Versus {
                 self.maxEdition=auctionStatus.metadata?.maxEdition ?? (0 as UInt64)
                 self.leader=auctionStatus.leader
                 self.minNextBid=auctionStatus.minNextBid
+                self.id=auctionStatus.id
             }
     }
 
@@ -381,11 +383,6 @@ pub contract Versus {
             self.minimumTimeRemainingAfterBidOrTie=minimumTimeRemainingAfterBidOrTie
             self.drops <- {}
         }
-
-
-     
-
-
 
         // When creating a drop you send in an NFT and the number of editions you want to sell vs the unique one
         // There will then be minted edition number of extra copies and put into the editions auction
