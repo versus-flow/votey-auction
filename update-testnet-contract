@@ -1,3 +1,0 @@
-#!/bin/bash
-
-flow accounts update-contract $1 contracts/$1.cdc --host access.devnet.nodes.onflow.org:9000 -f ~/.flow-dev.json --results

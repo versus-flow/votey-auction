@@ -25,5 +25,9 @@ func main() {
 		amount = "1000.0"
 	}
 
-	flow.TransactionFromFile("setup/transfer_flow").SignProposeAndPayAsService().UFix64Argument(amount).RawAccountArgument(account).RunPrintEventsFull()
+	flow.TransactionFromFile("setup/transfer_flow").
+		SignProposeAndPayAsService().
+		UFix64Argument(amount).
+		RawAccountArgument(account).
+		RunPrintEventsFull()
 }

@@ -12,11 +12,11 @@ func main() {
 	//fetch the current block height
 	eb := g.SendEventsTo("beta").
 		TrackProgressIn("/Users/bjartek/.flow-dev.events").
-		Event("A.1ff7e32d71183db0.Versus.Bid").
-		Event("A.1ff7e32d71183db0.Versus.LeaderChanged").
-		Event("A.1ff7e32d71183db0.Versus.Settle").
-		Event("A.1ff7e32d71183db0.Versus.DropExtended").
-		Event("A.1ff7e32d71183db0.Versus.DropCreated")
+		Event("A.467694dd28ef0a12.Versus.Bid").
+		Event("A.467694dd28ef0a12.Versus.LeaderChanged").
+		Event("A.467694dd28ef0a12.Versus.Settle").
+		Event("A.467694dd28ef0a12.Versus.DropExtended").
+		Event("A.467694dd28ef0a12.Versus.DropCreated")
 
 	_, err := eb.Run()
 	if err != nil {

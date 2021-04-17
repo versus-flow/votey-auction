@@ -8,8 +8,6 @@ import (
 func main() {
 
 	flow := gwtf.NewGoWithTheFlowDevNet()
-	flow.TransactionFromFile("remove_contract").SignProposeAndPayAsService().StringArgument("Content").RunPrintEventsFull()
-	flow.TransactionFromFile("remove_contract").SignProposeAndPayAsService().StringArgument("Art").RunPrintEventsFull()
-	flow.TransactionFromFile("remove_contract").SignProposeAndPayAsService().StringArgument("Versus").RunPrintEventsFull()
+	flow.TransactionFromFile("remove_contract").SignProposeAndPayAs("testnet-account").StringArgument("Versus").RunPrintEventsFull()
 
 }
