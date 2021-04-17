@@ -13,7 +13,6 @@ transaction(
     startTime: UFix64,
     artistName: String, 
     artName: String, 
-    //TODO: change to content
     content: String, 
     description: String, 
     editions: UInt64,
@@ -22,42 +21,19 @@ transaction(
     ) {
 
 
-    let artistWallet: Capability<&{FungibleToken.Receiver}>
-    let versusWallet: Capability<&{FungibleToken.Receiver}>
-    let versus: &Versus.DropCollection
-    let contentCapability: Capability<&Content.Collection>
+    let client: &Versus.VersusAdmin
 
     prepare(account: AuthAccount) {
 
-        self.versus= account.borrow<&Versus.DropCollection>(from: Versus.CollectionStoragePath)!
-        self.contentCapability=account.getCapability<&Content.Collection>(Content.CollectionPrivatePath)
-        self.versusWallet=  account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
-        self.artistWallet=  getAccount(artist).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
+        self.client = account.borrow<&Versus.VersusAdmin>(from: Versus.VersusAdminClientStoragePath) ?? panic("could not load versus admin")
     }
     
     execute {
 
-        var contentItem  <- Content.createContent(content)
-        let contentId= contentItem.id
-        self.contentCapability.borrow()!.deposit(token: <- contentItem)
+        let art <-  self.client.mintArt(artist: artist, artistName: artistName, artName: artName, content:content, description: description)
+       
 
-        
-        let royalty = {
-            "artist" : Art.Royalty(wallet: self.artistWallet, cut: 0.05), 
-            "minter" : Art.Royalty(wallet: self.versusWallet, cut: 0.025)
-        }
-        let art <- self.artAdmin.createArtWithPointer(
-            name: artName,
-            artist:artistName,
-            artistAddress : artist,
-            description: description,
-            type: "png",
-            contentCapability: self.contentCapability,
-            contentId: contentId,
-            royalty: royalty
-        )
-
-        self.versus.createDrop(
+        self.client.createDrop(
            nft:  <- art,
            editions: editions,
            minimumBidIncrement: minimumBidIncrement,

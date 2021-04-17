@@ -542,12 +542,43 @@ pub contract Versus {
             self.server = cap
         }
 
+        pub fun settle(_ dropId: UInt64) { 
+           pre { 
+             self.server != nil : "Your client has not been linked to the server"
+           } 
+           self.server!.borrow()!.settle(dropId)
+
+        }
+
+        pub fun createDrop(
+          nft: @NonFungibleToken.NFT,
+          editions: UInt64,
+          minimumBidIncrement: UFix64, 
+          minimumBidUniqueIncrement: UFix64,
+          startTime: UFix64, 
+          startPrice: UFix64,  //TODO: seperate startPrice for unique and edition
+          vaultCap: Capability<&{FungibleToken.Receiver}>)  {
+ 
+          pre {
+              self.server != nil : "Your client has not been linked to the server"
+          }
+
+          self.server!.borrow()!.createDrop(nft: <- nft, 
+            editions:editions, 
+            minimumBidIncrement:minimumBidIncrement, 
+            minimumBidUniqueIncrement:minimumBidUniqueIncrement, 
+            startTime:startTime, 
+            startPrice:startPrice, 
+            vaultCap:vaultCap)
+        }
         /*
           A stored Transaction to mintArt on versus to a given artist 
          */
         pub fun mintArt(artist: Address, artistName: String, artName: String, content:String, description: String) : @Art.NFT {
             
-            //TODO: check that it is linked
+            pre {
+                self.server != nil : "Your client has not been linked to the server"
+            }
 
             let artistAccount = getAccount(artist)
             var contentItem  <- Content.createContent(content)
@@ -629,6 +660,7 @@ pub contract Versus {
             account.save(<-collection, to: Versus.CollectionStoragePath)
             account.link<&{Versus.PublicDrop}>(Versus.CollectionPublicPath, target: Versus.CollectionStoragePath) 
             account.link<&Versus.DropCollection>(Versus.CollectionPrivatePath, target: Versus.CollectionStoragePath) 
+            log("linked versus")
         }
     }
      

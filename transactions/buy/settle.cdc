@@ -14,14 +14,14 @@ transaction(dropId: UInt64) {
     // reference to the buyer's NFT collection where they
     // will store the bought NFT
 
-    let versusRef: &Versus.DropCollection
+    let client: &Versus.VersusAdmin
     prepare(account: AuthAccount) {
 
-        self.versusRef = account.borrow<&Versus.DropCollection>(from: Versus.CollectionStoragePath) ?? panic("Could not get versus storage")
+        self.client = account.borrow<&Versus.VersusAdmin>(from: Versus.VersusAdminClientStoragePath) ?? panic("could not load versus admin")
     }
 
     execute {
-        self.versusRef.settle(dropId)
+        self.client.settle(dropId)
           //should maybe consider to delete the trash here
     }
 }
