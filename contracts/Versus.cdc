@@ -383,6 +383,10 @@ pub contract Versus {
         }
 
 
+     
+
+
+
         // When creating a drop you send in an NFT and the number of editions you want to sell vs the unique one
         // There will then be minted edition number of extra copies and put into the editions auction
         pub fun createDrop(
@@ -548,6 +552,33 @@ pub contract Versus {
            } 
            self.server!.borrow()!.settle(dropId)
 
+        }
+
+        pub fun setDropLength(_ num:UFix64) {
+           pre {
+              self.server != nil : "Your client has not been linked to the server"
+          }
+
+            let dc:&Versus.DropCollection=self.server!.borrow()!
+            dc.dropLength=num
+        }
+
+        pub fun setExtentionPeriod(_ num:UFix64) {
+           pre {
+              self.server != nil : "Your client has not been linked to the server"
+          }
+
+            let dc:&Versus.DropCollection=self.server!.borrow()!
+            dc.minimumTimeRemainingAfterBidOrTie=num
+        }
+
+          pub fun setVersusCut(_ num:UFix64) {
+           pre {
+              self.server != nil : "Your client has not been linked to the server"
+          }
+
+            let dc:&Versus.DropCollection=self.server!.borrow()!
+            dc.cutPercentage=num
         }
 
         pub fun createDrop(

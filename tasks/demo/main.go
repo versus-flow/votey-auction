@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/bjartek/go-with-the-flow/gwtf"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/onflow/cadence"
 )
 
@@ -86,6 +85,7 @@ func main() {
 		Argument(cadence.NewUInt64(10)).                                                                //number of editions to use for the editioned auction
 		UFix64Argument("5.0").                                                                          //min bid increment
 		UFix64Argument("10.0").                                                                         //min bid increment unique
+		UFix64Argument("5.0").                                                                          //the length of the drop in seconds
 		RunPrintEventsFull()
 
 	fmt.Println()
@@ -129,5 +129,5 @@ func main() {
 	flow.ScriptFromFile("check_account").AccountArgument("artist").Run()
 	flow.ScriptFromFile("check_account").AccountArgument("marketplace").Run()
 
-	flow.TransactionFromFile("setup/destroy_versus").SignProposeAndPayAs("marketplace").Argument(cadence.NewUInt64(1)).RunPrintEventsFull()
+	flow.TransactionFromFile("setup/destroy_versus").SignProposeAndPayAsService().Argument(cadence.NewUInt64(1)).RunPrintEventsFull()
 }

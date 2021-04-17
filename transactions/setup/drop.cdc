@@ -21,7 +21,8 @@ transaction(
     description: String, 
     editions: UInt64,
     minimumBidIncrement: UFix64, 
-    minimumBidUniqueIncrement:UFix64
+    minimumBidUniqueIncrement:UFix64,
+    dropLength:UFix64
     ) {
 
 
@@ -37,7 +38,9 @@ transaction(
     execute {
 
         let art <-  self.client.mintArt(artist: artist, artistName: artistName, artName: artName, content:content, description: description)
-       
+
+        self.client.setDropLength(dropLength)
+        self.client.setExtentionPeriod(dropLength)
         self.client.createDrop(
            nft:  <- art,
            editions: editions,
@@ -47,6 +50,8 @@ transaction(
            startPrice: startPrice,
            vaultCap: self.artistWallet
        )
+
+
     }
 }
 

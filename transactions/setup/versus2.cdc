@@ -23,6 +23,7 @@ transaction(ownerAddress: Address) {
         let versusAdminCap=account.getCapability<&Versus.DropCollection>(Versus.CollectionPrivatePath)
         client.addCapability(versusAdminCap)
 
+      
 
     }
 }
