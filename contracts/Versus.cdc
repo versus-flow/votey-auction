@@ -62,9 +62,12 @@ pub contract Versus {
         access(contract) var firstBidBlock: UInt64?
         access(contract) var settledAt: UInt64?
 
+        access(contract) var extentionOnLateBid: UFix64
 
         init( uniqueAuction: @Auction.AuctionItem, 
-            editionAuctions: @Auction.AuctionCollection) { 
+            editionAuctions: @Auction.AuctionCollection,
+            extentionOnLateBid: UFix64
+            ) { 
 
             Versus.totalDrops = Versus.totalDrops + (1 as UInt64)
 
@@ -73,6 +76,7 @@ pub contract Versus {
             self.editionAuctions <- editionAuctions
             self.firstBidBlock=nil
             self.settledAt=nil
+            self.extentionOnLateBid=extentionOnLateBid
             self.metadata=self.uniqueAuction.getAuctionStatus().metadata!
         }
             
@@ -174,8 +178,7 @@ pub contract Versus {
             auctionId:UInt64,
             bidTokens: @FungibleToken.Vault, 
             vaultCap: Capability<&{FungibleToken.Receiver}>, 
-            collectionCap: Capability<&{Art.CollectionPublic}>, 
-            minimumTimeRemaining: UFix64) {
+            collectionCap: Capability<&{Art.CollectionPublic}>) {
 
             pre {
                 collectionCap.check() == true : "Collection capability must be linked"
@@ -194,7 +197,7 @@ pub contract Versus {
                 panic("This drop has ended")
             }
            
-            let bidEndTime = time + Fix64(minimumTimeRemaining)
+            let bidEndTime = time + Fix64(self.extentionOnLateBid)
 
             //we save the time of the first bid so that it can be used to fetch events from that given block
             if self.firstBidBlock == nil {
@@ -346,7 +349,9 @@ pub contract Versus {
              minimumBidUniqueIncrement: UFix64,
              startTime: UFix64, 
              startPrice: UFix64,  //TODO: seperate startPrice for unique and edition
-             vaultCap: Capability<&{FungibleToken.Receiver}>) 
+             vaultCap: Capability<&{FungibleToken.Receiver}>,
+             duration: UFix64,
+             extentionOnLateBid: UFix64) 
 
         pub fun settle(_ dropId: UInt64)
     }
@@ -363,24 +368,14 @@ pub contract Versus {
         //NFTs that are not sold are put here when a bid is settled.  
         pub let marketplaceNFTTrash: Capability<&{Art.CollectionPublic}>
 
-        //naming things are hard...
-        pub(set) var minimumTimeRemainingAfterBidOrTie: UFix64
-
-        //make it possible to change the standard drop length from the admin gui
-        pub(set) var dropLength: UFix64
-
         init(
             marketplaceVault: Capability<&{FungibleToken.Receiver}>, 
             marketplaceNFTTrash: Capability<&{Art.CollectionPublic}>,
-            cutPercentage: UFix64,
-            dropLength: UFix64,
-            minimumTimeRemainingAfterBidOrTie:UFix64
+            cutPercentage: UFix64
         ) {
             self.marketplaceNFTTrash=marketplaceNFTTrash
             self.cutPercentage= cutPercentage
             self.marketplaceVault = marketplaceVault
-            self.dropLength=dropLength
-            self.minimumTimeRemainingAfterBidOrTie=minimumTimeRemainingAfterBidOrTie
             self.drops <- {}
         }
 
@@ -393,7 +388,9 @@ pub contract Versus {
              minimumBidUniqueIncrement: UFix64,
              startTime: UFix64, 
              startPrice: UFix64,  //TODO: seperate startPrice for unique and edition
-             vaultCap: Capability<&{FungibleToken.Receiver}> ) {
+             vaultCap: Capability<&{FungibleToken.Receiver}>,
+             duration: UFix64,
+             extentionOnLateBid: UFix64) {
 
             pre {
                 vaultCap.check() == true : "Vault capability should exist"
@@ -412,7 +409,7 @@ pub contract Versus {
                 editionedAuctions.createAuction(
                     token: <- Art.makeEdition(original: &art as &Art.NFT, edition: currentEdition, maxEdition: editions),
                     minimumBidIncrement: minimumBidIncrement, 
-                    auctionLength: self.dropLength,
+                    auctionLength: duration,
                     auctionStartTime:startTime,
                     startPrice: startPrice, 
                     collectionCap: self.marketplaceNFTTrash, 
@@ -424,14 +421,16 @@ pub contract Versus {
             let item <- Auction.createStandaloneAuction(
                 token: <- art,
                 minimumBidIncrement: minimumBidUniqueIncrement,
-                auctionLength: self.dropLength,
+                auctionLength: duration,
                 auctionStartTime: startTime,
                 startPrice: startPrice,
                 collectionCap: self.marketplaceNFTTrash,
                 vaultCap: vaultCap
             )
             
-            let drop  <- create Drop(uniqueAuction: <- item, editionAuctions:  <- editionedAuctions)
+            let drop  <- create Drop(uniqueAuction: <- item, 
+              editionAuctions:  <- editionedAuctions, 
+              extentionOnLateBid: extentionOnLateBid)
             emit DropCreated(name: metadata.name, artist: metadata.artist,  editions: editions, owner: vaultCap.borrow()!.owner!.address, dropId: drop.dropID)
 
             let oldDrop <- self.drops[drop.dropID] <- drop
@@ -487,8 +486,7 @@ pub contract Versus {
                 auctionId: auctionId, 
                 bidTokens: <- bidTokens, 
                 vaultCap: vaultCap, 
-                collectionCap:collectionCap, 
-                minimumTimeRemaining: self.minimumTimeRemainingAfterBidOrTie
+                collectionCap:collectionCap
             )
         }
 
@@ -558,25 +556,7 @@ pub contract Versus {
           }
         }
 
-        pub fun setDropLength(_ num:UFix64) {
-           pre {
-              self.server != nil : "Your client has not been linked to the server"
-          }
-
-            let dc:&Versus.DropCollection=self.server!.borrow()!
-            dc.dropLength=num
-        }
-
-        pub fun setExtentionPeriod(_ num:UFix64) {
-           pre {
-              self.server != nil : "Your client has not been linked to the server"
-          }
-
-            let dc:&Versus.DropCollection=self.server!.borrow()!
-            dc.minimumTimeRemainingAfterBidOrTie=num
-        }
-
-          pub fun setVersusCut(_ num:UFix64) {
+        pub fun setVersusCut(_ num:UFix64) {
            pre {
               self.server != nil : "Your client has not been linked to the server"
            }
@@ -592,7 +572,10 @@ pub contract Versus {
           minimumBidUniqueIncrement: UFix64,
           startTime: UFix64, 
           startPrice: UFix64,  //TODO: seperate startPrice for unique and edition
-          vaultCap: Capability<&{FungibleToken.Receiver}>)  {
+          vaultCap: Capability<&{FungibleToken.Receiver}>
+          duration: UFix64,
+          extentionOnLateBid: UFix64,
+          )  {
  
           pre {
               self.server != nil : "Your client has not been linked to the server"
@@ -604,7 +587,10 @@ pub contract Versus {
             minimumBidUniqueIncrement:minimumBidUniqueIncrement, 
             startTime:startTime, 
             startPrice:startPrice, 
-            vaultCap:vaultCap)
+            vaultCap:vaultCap, 
+            duration: duration, 
+            extentionOnLateBid: extentionOnLateBid
+          )
         }
         /*
           A stored Transaction to mintArt on versus to a given artist 
@@ -677,8 +663,8 @@ pub contract Versus {
         self.CollectionPublicPath= /public/versusCollection
         self.CollectionPrivatePath= /private/versusCollection
         self.CollectionStoragePath= /storage/versusCollection
-        self.VersusAdminClientPublicPath= /public/versusAdminClient
-        self.VersusAdminClientStoragePath=/storage/versusAdminClient
+        self.VersusAdminClientPublicPath= /public/versusAdmin
+        self.VersusAdminClientStoragePath=/storage/versusAdmin
 
 
         self.totalDrops = (0 as UInt64)
@@ -698,9 +684,7 @@ pub contract Versus {
             let collection <- create DropCollection(
                 marketplaceVault: marketplaceReceiver, 
                 marketplaceNFTTrash: marketplaceNFTTrash,
-                cutPercentage: 0.15,
-                dropLength: 86400.0,
-                minimumTimeRemainingAfterBidOrTie: 3000.0
+                cutPercentage: 0.15
             )
             account.save(<-collection, to: Versus.CollectionStoragePath)
             account.link<&{Versus.PublicDrop}>(Versus.CollectionPublicPath, target: Versus.CollectionStoragePath) 

@@ -39,8 +39,6 @@ transaction(
 
         let art <-  self.client.mintArt(artist: artist, artistName: artistName, artName: artName, content:content, description: description)
 
-        self.client.setDropLength(dropLength)
-        self.client.setExtentionPeriod(dropLength)
         self.client.createDrop(
            nft:  <- art,
            editions: editions,
@@ -48,7 +46,9 @@ transaction(
            minimumBidUniqueIncrement: minimumBidUniqueIncrement,
            startTime: startTime,
            startPrice: startPrice,
-           vaultCap: self.artistWallet
+           vaultCap: self.artistWallet,
+           duration: dropLength,
+           extentionOnLateBid: dropLength
        )
 
        let content=self.client.getContent()

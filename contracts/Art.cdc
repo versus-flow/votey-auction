@@ -319,8 +319,8 @@ pub contract Art: NonFungibleToken {
 	init() {
         // Initialize the total supply
         self.totalSupply = 0
-        self.CollectionPublicPath=/public/VersusArtCollection
-        self.CollectionStoragePath=/storage/VersusArtCollection
+        self.CollectionPublicPath=/public/versusArtCollection
+        self.CollectionStoragePath=/storage/versusArtCollection
 
         emit ContractInitialized()
 	}

@@ -88,8 +88,8 @@ pub contract Content {
 	init() {
         // Initialize the total supply
         self.totalSupply = 0
-        self.CollectionPrivatePath=/private/VersusContentCollection
-        self.CollectionStoragePath=/storage/VersusContentCollection
+        self.CollectionPrivatePath=/private/versusContentCollection
+        self.CollectionStoragePath=/storage/versusContentCollection
 
         let account =self.account
         let contentCapability=account.getCapability<&Content.Collection>(Content.CollectionPrivatePath)
