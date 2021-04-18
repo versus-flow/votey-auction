@@ -42,7 +42,7 @@ func main() {
 	flowConfigFile, _ := homedir.Expand("~/.flow-testnet.json")
 	flow := gwtf.NewGoWithTheFlow(flowConfigFile)
 
-	now := time.Now()
+	now := time.Now().Add(time.Hour * 12)
 	t := now.Unix()
 	timeString := strconv.FormatInt(t, 10) + ".0"
 
@@ -51,15 +51,15 @@ func main() {
 	flow.TransactionFromFile("setup/drop_testnet").
 		SignProposeAndPayAs("versus").
 		AccountArgument("artist").             //artist address
-		UFix64Argument("1.00").               //start price
+		UFix64Argument("1.00").                //start price
 		UFix64Argument(timeString).            //start time
 		StringArgument("Kinger9999").          //artist name
 		StringArgument("CryptoBull" + number). //name of art
 		StringArgument(image).                 //imaage
 		StringArgument("An Angry bull").
 		Argument(cadence.NewUInt64(10)). //number of editions to use for the editioned auction
-		UFix64Argument("5.0").           //min bid increment
-		UFix64Argument("10.0").           //min bid increment unique
+		UFix64Argument("2.0").           //min bid increment
+		UFix64Argument("4.0").           //min bid increment unique
 		RunPrintEventsFull()
 
 }
