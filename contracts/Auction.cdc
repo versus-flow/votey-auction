@@ -21,6 +21,7 @@ pub contract Auction {
         pub let endTime : Fix64
         pub let startTime : Fix64
         pub let metadata: Art.Metadata?
+        pub let artId: UInt64?
         pub let owner: Address
         pub let leader: Address?
         pub let minNextBid: UFix64
@@ -33,6 +34,7 @@ pub contract Auction {
             active: Bool, 
             timeRemaining:Fix64, 
             metadata: Art.Metadata?,
+            artId: UInt64?,
             leader:Address?, 
             bidIncrement: UFix64,
             owner: Address, 
@@ -48,6 +50,7 @@ pub contract Auction {
             self.active=active
             self.timeRemaining=timeRemaining
             self.metadata=metadata
+            self.artId=artId
             self.leader= leader
             self.bidIncrement=bidIncrement
             self.owner=owner
@@ -298,6 +301,7 @@ pub contract Auction {
                 active: !self.auctionCompleted  && !self.isAuctionExpired(),
                 timeRemaining: self.timeRemaining(),
                 metadata: self.NFT?.metadata,
+                artId: self.NFT?.id,
                 leader: leader,
                 bidIncrement: self.minimumBidIncrement,
                 owner: self.ownerVaultCap.borrow()!.owner!.address,
