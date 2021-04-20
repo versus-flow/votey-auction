@@ -71,8 +71,6 @@ func main() {
 	flow.TransactionFromFile("setup/versus3").
 		SignProposeAndPayAs("marketplace").
 		UFix64Argument("0.15"). //cut percentage,
-		UFix64Argument("5.0").  //length
-		UFix64Argument("5.0").  // bump on late bid
 		RunPrintEventsFull()
 
 	//fmt.Scanln()
@@ -94,6 +92,7 @@ func main() {
 		Argument(cadence.NewUInt64(10)).                                                                //number of editions to use for the editioned auction
 		UFix64Argument("5.0").                                                                          //min bid increment
 		UFix64Argument("10.0").                                                                         //min bid increment unique
+		UFix64Argument("5.0").  //duration
 		RunPrintEventsFull()
 
 	fmt.Println("Get active auctions")

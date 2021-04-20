@@ -20,7 +20,8 @@ transaction(
     description: String, 
     editions: UInt64,
     minimumBidIncrement: UFix64, 
-    minimumBidUniqueIncrement:UFix64
+    minimumBidUniqueIncrement:UFix64,
+    duration:UFix64
     ) {
 
 
@@ -69,7 +70,9 @@ transaction(
            startTime: startTime,
            startPrice: startPrice,
            vaultCap: self.artistWallet,
-           artAdmin: self.artAdmin
+           artAdmin: self.artAdmin,
+           duration: duration,
+           extentionOnLateBid: duration
        )
     }
 }

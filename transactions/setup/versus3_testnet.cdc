@@ -10,7 +10,7 @@ import Content, Art, Auction, Versus from 0x6bb8a74d4db97b46
 //Each drop settlement will deposit cutPercentage number of tokens into the signers vault
 //Standard dropLength can be set and the number of seconds to postpone the drops on if there is a late bid
 
-transaction(cutPercentage: UFix64, dropLength: UFix64, minimumTimeRemainingAfterBidOrTie: UFix64) {
+transaction(cutPercentage: UFix64) {
 
 
     prepare(account: AuthAccount) {
@@ -22,9 +22,7 @@ transaction(cutPercentage: UFix64, dropLength: UFix64, minimumTimeRemainingAfter
         let versus <- adminClient.createVersusMarketplace(
             marketplaceVault: marketplaceReceiver,
             marketplaceNFTTrash:marketplaceNFTTrash,
-            cutPercentage: cutPercentage,
-            dropLength: dropLength, 
-            minimumTimeRemainingAfterBidOrTie: minimumTimeRemainingAfterBidOrTie
+            cutPercentage: cutPercentage
         )
 
         account.save(<-versus, to: Versus.CollectionStoragePath)
