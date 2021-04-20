@@ -49,7 +49,7 @@ func main() {
 	image := fileAsImageData("bull.png")
 
 	flow.TransactionFromFile("setup/drop_testnet").
-		SignProposeAndPayAs("versus").
+		SignProposeAndPayAs("admin").
 		AccountArgument("artist").             //artist address
 		UFix64Argument("1.00").                //start price
 		UFix64Argument(timeString).            //start time
