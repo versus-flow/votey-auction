@@ -15,13 +15,19 @@ transaction(dropId: UInt64) {
     // will store the bought NFT
 
     let versusRef: &Versus.DropCollection
+    let artRef:&NonFungibleToken.Collection
     prepare(account: AuthAccount) {
 
         self.versusRef = account.borrow<&Versus.DropCollection>(from: Versus.CollectionStoragePath) ?? panic("Could not get versus storage")
+        self.artRef=account.borrow<&NonFungibleToken.Collection>(from: Art.CollectionStoragePath)!   
     }
 
     execute {
         self.versusRef.settle(dropId)
+        for key in self.artRef.ownedNFTs.keys{
+          log("burning art with key=".concat(key.toString()))
+          destroy <- self.artRef.ownedNFTs.remove(key: key)
+        }
           //should maybe consider to delete the trash here
     }
 }
