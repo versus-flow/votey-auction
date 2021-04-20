@@ -496,13 +496,32 @@ pub contract Versus {
     }
 
 
+ /*
+     Get an active drop in the versus marketplace with the given address
+     
+     */
+    pub fun getDrops() : [Versus.DropStatus]{
+        let account = Versus.account
+        let versusCap=account.getCapability<&{Versus.PublicDrop}>(self.CollectionPublicPath)!
+        return versusCap.borrow()!.getAllStatuses().values    
+     }
+
+    pub fun getDrop(_ id: UInt64) : Versus.DropStatus? {
+      let account = Versus.account
+      let versusCap=account.getCapability<&{Versus.PublicDrop}>(Versus.CollectionPublicPath)
+      if let versus = versusCap.borrow() {
+          return versus.getStatus(dropId: id)
+      }
+      return nil
+    }
+
     /*
      Get an active drop in the versus marketplace with the given address
      
      */
-    pub fun getActiveDrop(address:Address) : Versus.DropStatus?{
+    pub fun getActiveDrop() : Versus.DropStatus?{
         // get the accounts' public address objects
-        let account = getAccount(address)
+        let account = Versus.account
 
         let versusCap=account.getCapability<&{Versus.PublicDrop}>(self.CollectionPublicPath)
         if let versus = versusCap.borrow() {
