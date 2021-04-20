@@ -118,6 +118,20 @@ pub contract Versus {
                 winningStatus="UNIQUE"
             }
             
+            let block=getCurrentBlock()
+            let time=Fix64(block.timestamp)
+
+
+            var started = uniqueStatus.startTime < time 
+            var active=true
+            if !started {
+                active=false
+            } else if uniqueStatus.completed {
+                active=false
+            } else if uniqueStatus.expired && winningStatus != "TIE" {
+                active=false
+            }
+           
             return DropStatus(
                 dropId: self.dropID,
                 uniqueStatus: uniqueStatus,
@@ -127,7 +141,8 @@ pub contract Versus {
                 firstBidBlock: self.firstBidBlock,
                 difference: difference,
                 metadata: self.metadata,
-                settledAt: self.settledAt
+                settledAt: self.settledAt,
+                active: active
             )
         }
 
@@ -301,6 +316,7 @@ pub contract Versus {
             difference:UFix64,
             metadata: Art.Metadata,
             settledAt: UInt64?
+            active: Bool
             ) {
                 self.dropId=dropId
                 self.uniqueStatus=DropAuctionStatus(uniqueStatus)
@@ -310,7 +326,7 @@ pub contract Versus {
                 self.endTime=uniqueStatus.endTime
                 self.startTime=uniqueStatus.startTime
                 self.timeRemaining=uniqueStatus.timeRemaining
-                self.active=uniqueStatus.active
+                self.active= active
                 self.winning=status
                 self.firstBidBlock=firstBidBlock
                 self.difference=difference
@@ -318,7 +334,6 @@ pub contract Versus {
                 self.settled=uniqueStatus.completed
                 self.expired=uniqueStatus.expired
                 self.settledAt=settledAt
-
             }
     }
 
@@ -700,6 +715,7 @@ pub contract Versus {
 
         let versusCapability = account.getCapability<&{Versus.PublicDrop}>(Versus.CollectionPublicPath)
         if !versusCapability.check() {
+            log("Setting up versus capability")
             let collection <- create DropCollection(
                 marketplaceVault: marketplaceReceiver, 
                 marketplaceNFTTrash: marketplaceNFTTrash,

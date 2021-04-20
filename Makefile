@@ -36,7 +36,21 @@ settle:
 drop:
 	go run ./tasks/drop/main.go
 
+.PHONY: setup-testnet
+setup-testnet:
+	go run ./tasks/setup_testnet/main.go
+
 #set up the marketplace on testnet
 .PHONY: testnet
-testnet:
+testnet: deploy-testnet
 	go run ./tasks/testnet/main.go
+
+#this goal deployes all the contracts to emulator
+.PHONY: deploy-testnet
+deploy-testnet: setup-testnet
+	flow project deploy  -n testnet -f ~/.flow-dev.json
+
+.PHONY: get-drop
+get-drop:
+	go run ./tasks/get_drop/main.go
+

@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/bjartek/go-with-the-flow/gwtf"
-	"github.com/mitchellh/go-homedir"
 	"github.com/onflow/cadence"
 )
 
@@ -39,11 +38,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	flowConfigFile, _ := homedir.Expand("~/.flow-testnet.json")
-	flow := gwtf.NewGoWithTheFlow(flowConfigFile)
+	flow := gwtf.NewGoWithTheFlowDevNet()
 
-	now := time.Now().Add(time.Hour * 12)
-	t := now.Unix()
+	//	now := time.Now().Add(time.Hour * 12)
+	//	t := now.Unix()
+	t := time.Now().Unix()
 	timeString := strconv.FormatInt(t, 10) + ".0"
 
 	image := fileAsImageData("bull.png")
@@ -60,6 +59,8 @@ func main() {
 		Argument(cadence.NewUInt64(10)). //number of editions to use for the editioned auction
 		UFix64Argument("2.0").           //min bid increment
 		UFix64Argument("4.0").           //min bid increment unique
+		UFix64Argument("86400.0").       //duration
+		UFix64Argument("300.0").        //on late bid
 		RunPrintEventsFull()
 
 }
