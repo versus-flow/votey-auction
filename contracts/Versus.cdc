@@ -113,6 +113,19 @@ pub contract Versus {
                 difference=uniqueStatus.price - editionPrice
                 winningStatus="UNIQUE"
             }
+
+            let block=getCurrentBlock()
+            let time=Fix64(block.timestamp)
+
+            var started = uniqueStatus.startTime < time 
+            var active=true
+            if !started {
+                active=false
+            } else if uniqueStatus.completed {
+                active=false
+            } else if uniqueStatus.expired && winningStatus != "TIE" {
+                active=false
+            }
             
             return DropStatus(
                 dropId: self.dropID,
@@ -123,7 +136,8 @@ pub contract Versus {
                 firstBidBlock: self.firstBidBlock,
                 difference: difference,
                 metadata: self.metadata,
-                settledAt: self.settledAt
+                settledAt: self.settledAt,
+                active: active
             )
         }
 
@@ -297,7 +311,8 @@ pub contract Versus {
             firstBidBlock:UInt64?,
             difference:UFix64,
             metadata: Art.Metadata,
-            settledAt: UInt64?
+            settledAt: UInt64?,
+            active: Bool
             ) {
                 self.dropId=dropId
                 self.uniqueStatus=DropAuctionStatus(uniqueStatus)
@@ -307,7 +322,7 @@ pub contract Versus {
                 self.endTime=uniqueStatus.endTime
                 self.startTime=uniqueStatus.startTime
                 self.timeRemaining=uniqueStatus.timeRemaining
-                self.active=uniqueStatus.active
+                self.active=active
                 self.winning=status
                 self.firstBidBlock=firstBidBlock
                 self.difference=difference
