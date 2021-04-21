@@ -12,14 +12,14 @@ transaction(
     startPrice: UFix64, 
     startTime: UFix64,
     artistName: String, 
-    artName: String, 
+    artName: String,
     content: String, 
     description: String, 
     editions: UInt64,
     minimumBidIncrement: UFix64, 
     minimumBidUniqueIncrement:UFix64,
-    dropLength:UFix64,
-    extentionOnLateBid: UFix64
+    duration:UFix64,
+    extentionOnLateBid:UFix64,
     ) {
 
 
@@ -35,10 +35,10 @@ transaction(
     execute {
 
         let art <-  self.client.mintArt(
-            artist: artist, 
-            artistName: artistName, 
-            artName: artName, 
-            content:content, 
+            artist: artist,
+            artistName: artistName,
+            artName: artName,
+            content:content,
             description: description)
 
         self.client.createDrop(
@@ -49,7 +49,7 @@ transaction(
            startTime: startTime,
            startPrice: startPrice,
            vaultCap: self.artistWallet,
-           duration: dropLength,
+           duration: duration,
            extentionOnLateBid: extentionOnLateBid)
 
        let content=self.client.getContent()

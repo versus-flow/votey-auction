@@ -85,7 +85,7 @@ func main() {
 		Argument(cadence.NewUInt64(10)).                                                                //number of editions to use for the editioned auction
 		UFix64Argument("5.0").                                                                          //min bid increment
 		UFix64Argument("10.0").                                                                         //min bid increment unique
-		UFix64Argument("5.0").                                                                          //the length of the drop in seconds
+		UFix64Argument("5.0").  //duration
 		RunPrintEventsFull()
 
 	fmt.Println()
