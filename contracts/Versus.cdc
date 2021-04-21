@@ -4,6 +4,7 @@ import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import Art from "./Art.cdc"
 import Content from "./Content.cdc"
 import Auction from "./Auction.cdc"
+import Content from "./Content.cdc"
 
 /*
 
@@ -63,11 +64,14 @@ pub contract Versus {
         access(contract) var settledAt: UInt64?
 
         access(contract) var extentionOnLateBid: UFix64
+        access(contract) var contentId: UInt64
+        access(contract) var contentCapability: Capability<&Content.Collection>
 
         init( uniqueAuction: @Auction.AuctionItem, 
             editionAuctions: @Auction.AuctionCollection,
             extentionOnLateBid: UFix64
-            ) {
+            contentId: UInt64,
+            contentCapability: Capability<&Content.Collection>) { 
 
             Versus.totalDrops = Versus.totalDrops + (1 as UInt64)
 
@@ -76,9 +80,10 @@ pub contract Versus {
             self.editionAuctions <- editionAuctions
             self.firstBidBlock=nil
             self.settledAt=nil
-            self.extentionOnLateBid=extentionOnLateBid
             self.metadata=self.uniqueAuction.getAuctionStatus().metadata!
             self.extentionOnLateBid=extentionOnLateBid
+            self.contentId=contentId
+            self.contentCapability=contentCapability
         }
             
         destroy(){
@@ -88,6 +93,11 @@ pub contract Versus {
             emit DropDestroyed(dropId: self.dropID)
         }
 
+        pub fun getContent() : String {
+            let contentCollection= self.contentCapability.borrow()!
+            //not sure banging it here will work but we can try
+            return contentCollection.content(self.contentId)
+        }
 
         //Returns a DropStatus struct that could be used in a script to show information about the drop
         pub fun getDropStatus() : DropStatus {
@@ -417,6 +427,9 @@ pub contract Versus {
 
             let art <- nft as! @Art.NFT
 
+            let contentCapability= art.contentCapability!
+            let contentId= art.contentId!
+
             let metadata= art.metadata
             //Sending in a NFTEditioner capability here and using that instead of this loop would probably make sense. 
             let editionedAuctions <- Auction.createAuctionCollection( 
@@ -447,9 +460,14 @@ pub contract Versus {
                 vaultCap: vaultCap
             )
             
-            let drop  <- create Drop(uniqueAuction: <- item,
-              editionAuctions:  <- editionedAuctions,
-              extentionOnLateBid: extentionOnLateBid)
+
+            let drop  <- create Drop(
+                uniqueAuction: <- item, 
+                editionAuctions:  <- editionedAuctions, 
+                extentionOnLateBid: extentionOnLateBid, 
+                contentId: contentId, 
+                contentCapability: contentCapability)
+
             emit DropCreated(name: metadata.name, artist: metadata.artist,  editions: editions, owner: vaultCap.borrow()!.owner!.address, dropId: drop.dropID)
 
             let oldDrop <- self.drops[drop.dropID] <- drop
@@ -483,9 +501,7 @@ pub contract Versus {
 
         //get the art for this drop
         pub fun getArt(dropId:UInt64) : String {
-            let drop= self.getDrop(dropId)
-            let uniqueRef = &drop.uniqueAuction as &Auction.AuctionItem
-            return uniqueRef.content()!
+            return self.getDrop(dropId).getContent()
         }
 
         //settle a drop
@@ -514,6 +530,13 @@ pub contract Versus {
         }
     }
 
+    pub fun getArtForDrop(dropId: UInt64) : String? {
+        let versusCap=Verus.account.getCapability<&{Versus.PublicDrop}>(self.CollectionPublicPath)
+        if let versus = versusCap.borrow()  {
+            return versus.getArt(dropId: dropId)
+        }
+        return nil
+    }
 
  /*
      Get an active drop in the versus marketplace with the given address
