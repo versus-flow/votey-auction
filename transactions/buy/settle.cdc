@@ -24,6 +24,10 @@ transaction(dropId: UInt64) {
 
     execute {
         self.versusRef.settle(dropId)
+
+
+        let art = self.versusRef.getArt(dropId: dropId)
+        log("Got art content length after settled ".concat(art.length.toString()))
         for key in self.artRef.ownedNFTs.keys{
           log("burning art with key=".concat(key.toString()))
           destroy <- self.artRef.ownedNFTs.remove(key: key)
