@@ -20,7 +20,7 @@ transaction(
     minimumBidIncrement: UFix64, 
     minimumBidUniqueIncrement:UFix64,
     duration:UFix64,
-    extentionOnLateBid:UFix64,
+    extensionOnLateBid:UFix64,
     ) {
 
 
@@ -74,7 +74,7 @@ transaction(
            vaultCap: self.artistWallet,
            artAdmin: self.artAdmin,
            duration: duration,
-           extentionOnLateBid: extentionOnLateBid 
+           extensionOnLateBid: extensionOnLateBid 
        )
     }
 }

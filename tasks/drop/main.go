@@ -59,7 +59,7 @@ func main() {
 		UFix64Argument("2.0").           //min bid increment
 		UFix64Argument("4.0").           //min bid increment unique
 		UFix64Argument("86400.0").       //duration
-		UFix64Argument("300.0").         //extentionOnLateBid
+		UFix64Argument("300.0").         //extensionOnLateBid
 		RunPrintEventsFull()
 
 }

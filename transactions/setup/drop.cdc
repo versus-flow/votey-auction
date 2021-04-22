@@ -72,7 +72,7 @@ transaction(
            vaultCap: self.artistWallet,
            artAdmin: self.artAdmin,
            duration: duration,
-           extentionOnLateBid: duration
+           extensionOnLateBid: duration
        )
     }
 }

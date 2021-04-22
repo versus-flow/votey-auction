@@ -63,7 +63,7 @@ pub contract Versus {
         access(contract) var firstBidBlock: UInt64?
         access(contract) var settledAt: UInt64?
 
-        access(contract) var extentionOnLateBid: UFix64
+        access(contract) var extensionOnLateBid: UFix64
         access(contract) var contentId: UInt64
         access(contract) var contentCapability: Capability<&Content.Collection>
 
@@ -81,7 +81,7 @@ pub contract Versus {
             self.firstBidBlock=nil
             self.settledAt=nil
             self.metadata=self.uniqueAuction.getAuctionStatus().metadata!
-            self.extentionOnLateBid=extentionOnLateBid
+            self.extensionOnLateBid=extensionOnLateBid
             self.contentId=contentId
             self.contentCapability=contentCapability
         }
@@ -223,7 +223,7 @@ pub contract Versus {
                 panic("This drop has ended")
             }
            
-            let bidEndTime = time + Fix64(self.extentionOnLateBid)
+            let bidEndTime = time + Fix64(self.extensionOnLateBid)
 
             //we save the time of the first bid so that it can be used to fetch events from that given block
             if self.firstBidBlock == nil {
@@ -381,7 +381,7 @@ pub contract Versus {
              vaultCap: Capability<&{FungibleToken.Receiver}>, 
              artAdmin: &Art.Administrator,
              duration: UFix64, 
-             extentionOnLateBid:UFix64)
+             extensionOnLateBid:UFix64)
 
         pub fun settle(_ dropId: UInt64)
     }
@@ -422,7 +422,7 @@ pub contract Versus {
              vaultCap: Capability<&{FungibleToken.Receiver}>, 
              artAdmin: &Art.Administrator, 
              duration: UFix64, 
-             extentionOnLateBid:UFix64) {
+             extensionOnLateBid:UFix64) {
 
             pre {
                 vaultCap.check() == true : "Vault capability should exist"
@@ -466,7 +466,7 @@ pub contract Versus {
             let drop  <- create Drop(
                 uniqueAuction: <- item, 
                 editionAuctions:  <- editionedAuctions, 
-                extentionOnLateBid: extentionOnLateBid, 
+                extensionOnLateBid: extensionOnLateBid, 
                 contentId: contentId, 
                 contentCapability: contentCapability)
             emit DropCreated(name: metadata.name, artist: metadata.artist,  editions: editions, owner: vaultCap.borrow()!.owner!.address, dropId: drop.dropID)
