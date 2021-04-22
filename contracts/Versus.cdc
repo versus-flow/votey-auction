@@ -378,7 +378,7 @@ pub contract Versus {
              startPrice: UFix64,  //TODO: seperate startPrice for unique and edition
              vaultCap: Capability<&{FungibleToken.Receiver}>,
              duration: UFix64,
-             extentionOnLateBid: UFix64)
+             extensionOnLateBid:UFix64)
 
         pub fun settle(_ dropId: UInt64)
     }
@@ -417,7 +417,7 @@ pub contract Versus {
              startPrice: UFix64,  //TODO: seperate startPrice for unique and edition
              vaultCap: Capability<&{FungibleToken.Receiver}>,
              duration: UFix64,
-             extentionOnLateBid: UFix64) {
+             extensionOnLateBid: UFix64) {
 
             pre {
                 vaultCap.check() == true : "Vault capability should exist"
@@ -462,7 +462,7 @@ pub contract Versus {
             let drop  <- create Drop(
                 uniqueAuction: <- item, 
                 editionAuctions:  <- editionedAuctions, 
-                extentionOnLateBid: extentionOnLateBid, 
+                extensionOnLateBid: extensionOnLateBid, 
                 contentId: contentId, 
                 contentCapability: contentCapability)
 

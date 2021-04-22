@@ -19,7 +19,7 @@ transaction(
     minimumBidIncrement: UFix64, 
     minimumBidUniqueIncrement:UFix64,
     duration:UFix64,
-    extentionOnLateBid:UFix64,
+    extensionOnLateBid:UFix64,
     ) {
 
 
@@ -50,15 +50,8 @@ transaction(
            startPrice: startPrice,
            vaultCap: self.artistWallet,
            duration: duration,
-           extentionOnLateBid: extentionOnLateBid)
-
-       let content=self.client.getContent()
-       log(content.contents.keys)
-
-       let wallet=self.client.getFlowWallet()
-       log(wallet.balance)
-
-
+           extensionOnLateBid: extensionOnLateBid 
+       )
     }
 }
 

@@ -48,7 +48,7 @@ transaction(
            startPrice: startPrice,
            vaultCap: self.artistWallet,
            duration: duration,
-           extentionOnLateBid: duration
+           extensionOnLateBid: duration
        )
 
        let content=self.client.getContent()
