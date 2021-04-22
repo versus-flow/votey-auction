@@ -69,7 +69,7 @@ pub contract Versus {
 
         init( uniqueAuction: @Auction.AuctionItem, 
             editionAuctions: @Auction.AuctionCollection, 
-            extentionOnLateBid: UFix64,
+            extensionOnLateBid: UFix64,
             contentId: UInt64,
             contentCapability: Capability<&Content.Collection>) { 
 
