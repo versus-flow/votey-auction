@@ -40,8 +40,6 @@ func main() {
 
 	flow := gwtf.NewGoWithTheFlowDevNet()
 
-	//now := time.Now().Add(time.Hour * 12)
-	//t := now.Unix()
 	t := time.Now().Unix()
 	timeString := strconv.FormatInt(t, 10) + ".0"
 
