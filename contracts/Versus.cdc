@@ -49,7 +49,6 @@ pub contract Versus {
     pub resource Drop {
 
 
-        pub let metadata: Art.Metadata
 
         access(contract) let uniqueAuction: @Auction.AuctionItem
         access(contract) let editionAuctions: @Auction.AuctionCollection
@@ -60,6 +59,12 @@ pub contract Versus {
         access(contract) var settledAt: UInt64?
 
         access(contract) var extensionOnLateBid: UFix64
+
+
+        //Store metadata here would allow us to show this after the drop has ended. The NFTS are gone then but the  metadta remains here
+        pub let metadata: Art.Metadata
+
+        //these two together are a pointer to the content in the Drop. Storing them here means we can show the art after the drop has ended
         access(contract) var contentId: UInt64
         access(contract) var contentCapability: Capability<&Content.Collection>
 
