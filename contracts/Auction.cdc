@@ -337,8 +337,6 @@ pub contract Auction {
     // retreiving the auction price list and placing bids
     pub resource interface AuctionPublic {
 
-        pub fun extendAllAuctionsWith(_ amount: UFix64)
-
         //It could be argued that this method should not be here in the public contract. I guss it could be an interface of its own
         //That way when you create an auction you chose if this is a curated auction or an auction where everybody can put their pieces up for sale
          pub fun createAuction(

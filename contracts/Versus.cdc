@@ -28,8 +28,6 @@ pub contract Versus {
     //counter for drops that is incremented every time there is a new versus drop made
     pub var totalDrops: UInt64
 
-    //All the events that start with a T are more technical in nature while the other events are there to be distributed to Discord or similar social media
-
     //emitted when a drop is extended
     pub event DropExtended(name: String, artist: String, dropId: UInt64, extendWith: Fix64, extendTo: Fix64)
 
@@ -717,6 +715,7 @@ pub contract Versus {
 
 
     //initialize all the paths and create and link up the admin proxy
+    //init is only executed on initial deployment
     init() {
 
         self.CollectionPublicPath= /public/versusCollection2
@@ -733,23 +732,18 @@ pub contract Versus {
         let marketplaceReceiver=account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
         let marketplaceNFTTrash: Capability<&{Art.CollectionPublic}> =account.getCapability<&{Art.CollectionPublic}>(Art.CollectionPublicPath)
 
-        if !marketplaceNFTTrash.check() {
-            account.save<@NonFungibleToken.Collection>(<- Art.createEmptyCollection(), to: Art.CollectionStoragePath)
-            account.link<&{Art.CollectionPublic}>(Art.CollectionPublicPath, target: Art.CollectionStoragePath)
-        }
+        account.save<@NonFungibleToken.Collection>(<- Art.createEmptyCollection(), to: Art.CollectionStoragePath)
+        account.link<&{Art.CollectionPublic}>(Art.CollectionPublicPath, target: Art.CollectionStoragePath)
 
-        let versusCapability = account.getCapability<&{Versus.PublicDrop}>(Versus.CollectionPublicPath)
-        if !versusCapability.check() {
-            log("Setting up versus capability")
-            let collection <- create DropCollection(
-                marketplaceVault: marketplaceReceiver,
-                marketplaceNFTTrash: marketplaceNFTTrash,
-                cutPercentage: 0.15
-            )
-            account.save(<-collection, to: Versus.CollectionStoragePath)
-            account.link<&{Versus.PublicDrop}>(Versus.CollectionPublicPath, target: Versus.CollectionStoragePath)
-            account.link<&Versus.DropCollection>(Versus.CollectionPrivatePath, target: Versus.CollectionStoragePath)
-        }
+        log("Setting up versus capability")
+        let collection <- create DropCollection(
+            marketplaceVault: marketplaceReceiver,
+            marketplaceNFTTrash: marketplaceNFTTrash,
+            cutPercentage: 0.15
+        )
+        account.save(<-collection, to: Versus.CollectionStoragePath)
+        account.link<&{Versus.PublicDrop}>(Versus.CollectionPublicPath, target: Versus.CollectionStoragePath)
+        account.link<&Versus.DropCollection>(Versus.CollectionPrivatePath, target: Versus.CollectionStoragePath)
     }
      
 }

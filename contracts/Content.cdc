@@ -92,12 +92,9 @@ pub contract Content {
         self.CollectionStoragePath=/storage/versusContentCollection2
 
         let account =self.account
-        let contentCapability=account.getCapability<&Content.Collection>(Content.CollectionPrivatePath)
+        account.save(<- Content.createEmptyCollection(), to: Content.CollectionStoragePath)
+        account.link<&Content.Collection>(Content.CollectionPrivatePath, target: Content.CollectionStoragePath)
 
-        if !contentCapability.check() {
-            account.save(<- Content.createEmptyCollection(), to: Content.CollectionStoragePath)
-            account.link<&Content.Collection>(Content.CollectionPrivatePath, target: Content.CollectionStoragePath)
-        }
         emit ContractInitialized()
 	}
 }
