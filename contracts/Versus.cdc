@@ -4,7 +4,7 @@ import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import Art from "./Art.cdc"
 import Content from "./Content.cdc"
 import Auction from "./Auction.cdc"
-import Content from "./Content.cdc"
+
 /*
  The main contract in the Versus auction system.
 
@@ -528,6 +528,7 @@ pub contract Versus {
         }
     }
 
+    // Get the art stored on chain for this drop
     pub fun getArtForDrop(dropId: UInt64) : String? {
         let versusCap=Versus.account.getCapability<&{Versus.PublicDrop}>(self.CollectionPublicPath)
         if let versus = versusCap.borrow()  {
