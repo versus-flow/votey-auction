@@ -14,7 +14,7 @@ import NonFungibleToken, Content, Art, Auction, Versus from 0xf8d6e0586b0a20c7
 pub fun main(address:Address) : Bool {
 
     let account=getAccount(address)
-    let adminClient: Capability<&{Versus.VersusAdminClient}> =account.getCapability<&{Versus.VersusAdminClient}>(Versus.VersusAdminClientPublicPath) 
+    let adminClient: Capability<&{Versus.AdminPublic}> =account.getCapability<&{Versus.AdminPublic}>(Versus.VersusAdminPublicPath) 
     return adminClient.check()
 
 }

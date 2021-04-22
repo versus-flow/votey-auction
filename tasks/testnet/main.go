@@ -27,7 +27,7 @@ func main() {
 
 	flow := gwtf.NewGoWithTheFlowDevNet()
 
-	//create the versusAdminClientAndSomeOtherCollections
+	//create the AdminPublicAndSomeOtherCollections
 	flow.TransactionFromFile("setup/versus1_testnet").
 		SignProposeAndPayAs("admin").
 		RunPrintEventsFull()

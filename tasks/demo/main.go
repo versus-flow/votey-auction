@@ -55,7 +55,7 @@ func main() {
 	flow.TransactionFromFile("setup/mint_tokens").SignProposeAndPayAsService().AccountArgument("artist").UFix64Argument("100.0").RunPrintEventsFull()
 	flow.TransactionFromFile("setup/mint_tokens").SignProposeAndPayAsService().AccountArgument("marketplace").UFix64Argument("100.0").RunPrintEventsFull()
 
-	//create the versusAdminClientAndSomeOtherCollections
+	//create the AdminPublicAndSomeOtherCollections
 	flow.TransactionFromFile("setup/versus1").
 		SignProposeAndPayAs("marketplace").
 		RunPrintEventsFull()

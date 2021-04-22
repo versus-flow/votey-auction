@@ -18,8 +18,8 @@ transaction() {
 
         
         //create versus admin client
-        account.save(<- Versus.createAdminClient(), to:Versus.VersusAdminClientStoragePath)
-        account.link<&{Versus.VersusAdminClient}>(Versus.VersusAdminClientPublicPath, target: Versus.VersusAdminClientStoragePath)
+        account.save(<- Versus.createAdminClient(), to:Versus.VersusAdminStoragePath)
+        account.link<&{Versus.AdminPublic}>(Versus.VersusAdminPublicPath, target: Versus.VersusAdminStoragePath)
 
 
     }

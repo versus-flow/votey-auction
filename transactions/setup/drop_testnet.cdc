@@ -23,12 +23,12 @@ transaction(
     ) {
 
 
-    let client: &Versus.VersusAdmin
+    let client: &Versus.Admin
     let artistWallet: Capability<&{FungibleToken.Receiver}>
 
     prepare(account: AuthAccount) {
 
-        self.client = account.borrow<&Versus.VersusAdmin>(from: Versus.VersusAdminClientStoragePath) ?? panic("could not load versus admin")
+        self.client = account.borrow<&Versus.Admin>(from: Versus.VersusAdminStoragePath) ?? panic("could not load versus admin")
         self.artistWallet=  getAccount(artist).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
     }
     

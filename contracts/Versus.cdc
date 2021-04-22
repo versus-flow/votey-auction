@@ -18,8 +18,8 @@ import Auction from "./Auction.cdc"
 pub contract Versus {
 
     //A set of capability and storage paths used in this contract
-    pub let VersusAdminClientPublicPath: PublicPath
-    pub let VersusAdminClientStoragePath: StoragePath
+    pub let VersusAdminPublicPath: PublicPath
+    pub let VersusAdminStoragePath: StoragePath
     pub let CollectionStoragePath: StoragePath
     pub let CollectionPublicPath: PublicPath
     pub let CollectionPrivatePath: PrivatePath
@@ -580,12 +580,12 @@ pub contract Versus {
 
 
     //The interface used to add a Administrator capability to a client
-    pub resource interface VersusAdminClient {
+    pub resource interface AdminPublic {
         pub fun addCapability(_ cap: Capability<&Versus.DropCollection>)
     }
 
-    //The versus admin resource that a client will create and store, then link up a public VersusAdminClient
-    pub resource VersusAdmin: VersusAdminClient {
+    //The versus admin resource that a client will create and store, then link up a public AdminPublic
+    pub resource Admin: AdminPublic {
 
         access(self) var server: Capability<&Versus.DropCollection>?
 
@@ -710,8 +710,8 @@ pub contract Versus {
     }
 
     //make it possible for a user that wants to be a versus admin to create the client
-    pub fun createAdminClient(): @VersusAdmin {
-        return <- create VersusAdmin()
+    pub fun createAdminClient(): @Admin {
+        return <- create Admin()
     }
     
 
@@ -722,8 +722,8 @@ pub contract Versus {
         self.CollectionPublicPath= /public/versusCollection
         self.CollectionPrivatePath= /private/versusCollection
         self.CollectionStoragePath= /storage/versusCollection
-        self.VersusAdminClientPublicPath= /public/versusAdmin
-        self.VersusAdminClientStoragePath=/storage/versusAdmin
+        self.VersusAdminPublicPath= /public/versusAdmin
+        self.VersusAdminStoragePath=/storage/versusAdmin
 
 
         self.totalDrops = (0 as UInt64)

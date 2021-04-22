@@ -17,11 +17,11 @@ transaction(
     description: String) {
 
     let artistCollection: Capability<&{Art.CollectionPublic}>
-    let client: &Versus.VersusAdmin
+    let client: &Versus.Admin
 
     prepare(account: AuthAccount) {
 
-        self.client = account.borrow<&Versus.VersusAdmin>(from: Versus.VersusAdminClientStoragePath) ?? panic("could not load versus admin")
+        self.client = account.borrow<&Versus.Admin>(from: Versus.VersusAdminStoragePath) ?? panic("could not load versus admin")
         self.artistCollection= getAccount(artist).getCapability<&{Art.CollectionPublic}>(Art.CollectionPublicPath)
     }
 

@@ -9,10 +9,10 @@ Transaction to settle/finish off an auction. Has to be signed by the owner of th
  */
 transaction(dropId: UInt64) {
 
-    let client: &Versus.VersusAdmin
+    let client: &Versus.Admin
     prepare(account: AuthAccount) {
 
-        self.client = account.borrow<&Versus.VersusAdmin>(from: Versus.VersusAdminClientStoragePath) ?? panic("could not load versus admin")
+        self.client = account.borrow<&Versus.Admin>(from: Versus.VersusAdminStoragePath) ?? panic("could not load versus admin")
     }
 
     execute {

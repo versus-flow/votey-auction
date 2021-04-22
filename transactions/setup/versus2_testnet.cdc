@@ -15,7 +15,7 @@ transaction(ownerAddress: Address) {
     prepare(account: AuthAccount) {
 
         let owner= getAccount(ownerAddress)
-        let client= owner.getCapability<&{Versus.VersusAdminClient}>(Versus.VersusAdminClientPublicPath)
+        let client= owner.getCapability<&{Versus.AdminPublic}>(Versus.VersusAdminPublicPath)
                 .borrow() ?? panic("Could not borrow admin client")
 
         let versusAdminCap=account.getCapability<&Versus.DropCollection>(Versus.CollectionPrivatePath)
