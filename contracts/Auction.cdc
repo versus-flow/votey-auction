@@ -167,7 +167,9 @@ pub contract Auction {
             // borrow a reference to the owner's NFT receiver
             if let vaultRef = capability.borrow() {
                 let bidVaultRef = &self.bidVault as &FungibleToken.Vault
-                vaultRef.deposit(from: <-bidVaultRef.withdraw(amount: bidVaultRef.balance))
+                if(bidVaultRef.balance > 0.0) {
+                    vaultRef.deposit(from: <-bidVaultRef.withdraw(amount: bidVaultRef.balance))
+                }
                 return
             }
             panic("Could not send tokens to non existant receiver")
