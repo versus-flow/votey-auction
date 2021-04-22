@@ -1,5 +1,3 @@
-// This script checks that the accounts are set up correctly for the marketplace tutorial.
-//
 
 //emulator
 import Versus from 0xbc08417e9d472f2e
