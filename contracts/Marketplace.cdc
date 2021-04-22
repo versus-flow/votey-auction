@@ -8,8 +8,8 @@ import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 pub contract Marketplace {
 
     pub init() {
-        self.CollectionPublicPath= /public/versusArtMarketplace
-        self.CollectionStoragePath= /storage/versusArtMarketplace
+        self.CollectionPublicPath= /public/versusArtMarketplace2
+        self.CollectionStoragePath= /storage/versusArtMarketplace2
     }
 
     pub let CollectionStoragePath: StoragePath

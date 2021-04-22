@@ -719,11 +719,11 @@ pub contract Versus {
     //initialize all the paths and create and link up the admin proxy
     init() {
 
-        self.CollectionPublicPath= /public/versusCollection
-        self.CollectionPrivatePath= /private/versusCollection
-        self.CollectionStoragePath= /storage/versusCollection
-        self.VersusAdminPublicPath= /public/versusAdmin
-        self.VersusAdminStoragePath=/storage/versusAdmin
+        self.CollectionPublicPath= /public/versusCollection2
+        self.CollectionPrivatePath= /private/versusCollection2
+        self.CollectionStoragePath= /storage/versusCollection2
+        self.VersusAdminPublicPath= /public/versusAdmin2
+        self.VersusAdminStoragePath=/storage/versusAdmin2
 
 
         self.totalDrops = (0 as UInt64)

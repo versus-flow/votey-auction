@@ -312,15 +312,12 @@ pub contract Art: NonFungibleToken {
         return <- newNFT
     }
  
-         
-
-    
 
 	init() {
         // Initialize the total supply
         self.totalSupply = 0
-        self.CollectionPublicPath=/public/versusArtCollection
-        self.CollectionStoragePath=/storage/versusArtCollection
+        self.CollectionPublicPath=/public/versusArtCollection2
+        self.CollectionStoragePath=/storage/versusArtCollection2
 
         emit ContractInitialized()
 	}

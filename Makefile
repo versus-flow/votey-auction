@@ -42,7 +42,7 @@ setup-testnet:
 
 #set up the marketplace on testnet
 .PHONY: testnet
-testnet: deploy-testnet
+testnet: 
 	go run ./tasks/testnet/main.go
 
 #this goal deployes all the contracts to emulator
@@ -54,3 +54,6 @@ deploy-testnet: setup-testnet
 get-drop:
 	go run ./tasks/get_drop/main.go
 
+.PHONY: art
+art:
+	go run ./tasks/mint_art/main.go
