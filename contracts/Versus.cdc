@@ -5,9 +5,7 @@ import Art from "./Art.cdc"
 import Content from "./Content.cdc"
 import Auction from "./Auction.cdc"
 import Content from "./Content.cdc"
-
 /*
-
  The main contract in the Versus auction system.
 
  A versions auction contains a single auction and a group of auctions and either of them will be fulfilled while the other will be cancelled
@@ -531,7 +529,7 @@ pub contract Versus {
     }
 
     pub fun getArtForDrop(dropId: UInt64) : String? {
-        let versusCap=Verus.account.getCapability<&{Versus.PublicDrop}>(self.CollectionPublicPath)
+        let versusCap=Versus.account.getCapability<&{Versus.PublicDrop}>(self.CollectionPublicPath)
         if let versus = versusCap.borrow()  {
             return versus.getArt(dropId: dropId)
         }

@@ -9,7 +9,7 @@ import FungibleToken from 0xee82856bf20e2aa6
 import NonFungibleToken, Content, Art, Auction, Versus from 0xf8d6e0586b0a20c7
 
 /*
-  This script will check an address and print out its FT, NFT and Versus resources
+  This script will check an address and print out its an admin
  */
 pub fun main(address:Address) : Bool {
 

@@ -97,8 +97,7 @@ func main() {
 
 	flow.TransactionFromFile("buy/bid").
 		SignProposeAndPayAs("buyer1").
-		RawAccountArgument("0xf8d6e0586b0a20c7").
-		//		AccountArgument("emulator-account").
+		AccountArgument("emulator-account").
 		Argument(cadence.UInt64(1)).  //id of drop
 		Argument(cadence.UInt64(11)). //id of unique auction auction to bid on
 		UFix64Argument("10.00").      //amount to bid
