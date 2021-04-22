@@ -333,6 +333,8 @@ pub contract Art: NonFungibleToken {
         self.CollectionPublicPath=/public/versusArtCollection2
         self.CollectionStoragePath=/storage/versusArtCollection2
 
+        self.account.save<@NonFungibleToken.Collection>(<- Art.createEmptyCollection(), to: Art.CollectionStoragePath)
+        self.account.link<&{Art.CollectionPublic}>(Art.CollectionPublicPath, target: Art.CollectionStoragePath)
         emit ContractInitialized()
 	}
 }

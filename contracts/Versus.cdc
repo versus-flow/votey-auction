@@ -413,7 +413,7 @@ pub contract Versus {
              minimumBidIncrement: UFix64, 
              minimumBidUniqueIncrement: UFix64,
              startTime: UFix64, 
-             startPrice: UFix64,  //TODO: seperate startPrice for unique and edition
+             startPrice: UFix64,  
              vaultCap: Capability<&{FungibleToken.Receiver}>,
              duration: UFix64,
              extensionOnLateBid: UFix64) {
@@ -537,7 +537,7 @@ pub contract Versus {
     }
 
  /*
-     Get an active drop in the versus marketplace with the given address
+     Get an active drop in the versus marketplace 
      
      */
     pub fun getDrops() : [Versus.DropStatus]{
@@ -556,8 +556,7 @@ pub contract Versus {
     }
 
     /*
-     Get an active drop in the versus marketplace with the given address
-
+     Get the first active drop in the versus marketplace
      */
     pub fun getActiveDrop() : Versus.DropStatus?{
         // get the accounts' public address objects
@@ -578,7 +577,7 @@ pub contract Versus {
 
 
 
-    //The interface used to add a Administrator capability to a client
+    //The interface used to add a Versus Drop Collection capability to a AdminPublic
     pub resource interface AdminPublic {
         pub fun addCapability(_ cap: Capability<&Versus.DropCollection>)
     }
@@ -725,16 +724,12 @@ pub contract Versus {
         self.VersusAdminPublicPath= /public/versusAdmin2
         self.VersusAdminStoragePath=/storage/versusAdmin2
 
-
         self.totalDrops = (0 as UInt64)
 
         let account=self.account
 
         let marketplaceReceiver=account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
         let marketplaceNFTTrash: Capability<&{Art.CollectionPublic}> =account.getCapability<&{Art.CollectionPublic}>(Art.CollectionPublicPath)
-
-        account.save<@NonFungibleToken.Collection>(<- Art.createEmptyCollection(), to: Art.CollectionStoragePath)
-        account.link<&{Art.CollectionPublic}>(Art.CollectionPublicPath, target: Art.CollectionStoragePath)
 
         log("Setting up versus capability")
         let collection <- create DropCollection(
