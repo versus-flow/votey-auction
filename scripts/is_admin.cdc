@@ -1,5 +1,3 @@
-// This script checks that the accounts are set up correctly for the marketplace tutorial.
-//
 
 //testnet
 //import FungibleToken from 0x9a0766d93b6608b7
