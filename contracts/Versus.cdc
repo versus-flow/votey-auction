@@ -61,13 +61,13 @@ pub contract Versus {
         access(contract) var firstBidBlock: UInt64?
         access(contract) var settledAt: UInt64?
 
-        access(contract) var extentionOnLateBid: UFix64
+        access(contract) var extensionOnLateBid: UFix64
         access(contract) var contentId: UInt64
         access(contract) var contentCapability: Capability<&Content.Collection>
 
         init( uniqueAuction: @Auction.AuctionItem, 
-            editionAuctions: @Auction.AuctionCollection,
-            extentionOnLateBid: UFix64
+            editionAuctions: @Auction.AuctionCollection, 
+            extensionOnLateBid: UFix64,
             contentId: UInt64,
             contentCapability: Capability<&Content.Collection>) { 
 
@@ -79,7 +79,7 @@ pub contract Versus {
             self.firstBidBlock=nil
             self.settledAt=nil
             self.metadata=self.uniqueAuction.getAuctionStatus().metadata!
-            self.extentionOnLateBid=extentionOnLateBid
+            self.extensionOnLateBid=extensionOnLateBid
             self.contentId=contentId
             self.contentCapability=contentCapability
         }
@@ -221,7 +221,7 @@ pub contract Versus {
                 panic("This drop has ended")
             }
            
-            let bidEndTime = time + Fix64(self.extentionOnLateBid)
+            let bidEndTime = time + Fix64(self.extensionOnLateBid)
 
             //we save the time of the first bid so that it can be used to fetch events from that given block
             if self.firstBidBlock == nil {
