@@ -634,8 +634,7 @@ pub contract Versus {
           startPrice: UFix64,  //TODO: seperate startPrice for unique and edition
           vaultCap: Capability<&{FungibleToken.Receiver}>
           duration: UFix64,
-          extentionOnLateBid: UFix64,
-          )  {
+          extensionOnLateBid: UFix64)  {
 
           pre {
               self.server != nil : "Your client has not been linked to the server"
@@ -649,7 +648,7 @@ pub contract Versus {
             startPrice:startPrice,
             vaultCap:vaultCap,
             duration: duration,
-            extentionOnLateBid: extentionOnLateBid
+            extensionOnLateBid: extensionOnLateBid
           )
         }
         /*
