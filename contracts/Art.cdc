@@ -21,7 +21,15 @@ pub contract Art: NonFungibleToken {
     pub resource interface Public {
         pub let id: UInt64
         pub let metadata: Metadata
+
+        //these three are added because I think they will be in the standard. Atleast dieter thinks it will be needed
+        pub let name: String
+        pub let description: String
+        pub let schema: String? 
+
         pub fun content() : String?
+
+        pub let royalty: {String: Royalty}
     }
 
     pub struct Metadata {
@@ -64,7 +72,10 @@ pub contract Art: NonFungibleToken {
 
     pub resource NFT: NonFungibleToken.INFT, Public {
         pub let id: UInt64
+        pub let name: String
+        pub let description: String
 
+        pub let schema: String?
         //content can either be embedded in the NFT as and URL or a pointer to a Content collection to be stored onChain
         //a pointer will be used for all editions of the same Art when it is editioned 
         pub let contentCapability:Capability<&Content.Collection>?
@@ -87,6 +98,9 @@ pub contract Art: NonFungibleToken {
             self.contentId=contentId
             self.url=url
             self.royalty=royalty
+            self.schema=nil
+            self.name = metadata.name
+            self.description=metadata.description
         }
 
         //return the content for this NFT
