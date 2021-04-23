@@ -373,7 +373,7 @@ pub contract Versus {
     //An resource interface that everybody can access through a public capability.
     pub resource interface PublicDrop {
 
-        pub fun currentBidForUser( dropId: UInt64, auctionId: UInt64, address:Address) : UFix64
+        pub fun currentBidForUser(dropId: UInt64, auctionId: UInt64, address:Address) : UFix64
         pub fun getAllStatuses(): {UInt64: DropStatus}
         pub fun getStatus(dropId: UInt64): DropStatus
 
