@@ -4,6 +4,7 @@ import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import Art from "./Art.cdc"
 import Content from "./Content.cdc"
 import Auction from "./Auction.cdc"
+import Content from "./Content.cdc"
 
 /*
  The main contract in the Versus auction system.
@@ -142,7 +143,6 @@ pub contract Versus {
             } else if uniqueStatus.expired && winningStatus != "TIE" {
                 active=false
             }
-
             return DropStatus(
                 dropId: self.dropID,
                 uniqueStatus: uniqueStatus,
@@ -459,14 +459,12 @@ pub contract Versus {
                 vaultCap: vaultCap
             )
             
-
             let drop  <- create Drop(
                 uniqueAuction: <- item, 
                 editionAuctions:  <- editionedAuctions, 
                 extensionOnLateBid: extensionOnLateBid, 
                 contentId: contentId, 
                 contentCapability: contentCapability)
-
             emit DropCreated(name: metadata.name, artist: metadata.artist,  editions: editions, owner: vaultCap.borrow()!.owner!.address, dropId: drop.dropID)
 
             let oldDrop <- self.drops[drop.dropID] <- drop
