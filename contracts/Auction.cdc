@@ -266,7 +266,7 @@ pub contract Auction {
                 return self.bidVault.balance
             }
             return 0.0
-        }n
+        }
 
         // This method should probably use preconditions more
         pub fun placeBid(bidTokens: @FungibleToken.Vault, vaultCap: Capability<&{FungibleToken.Receiver}>, collectionCap: Capability<&{Art.CollectionPublic}>) {
