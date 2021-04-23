@@ -95,6 +95,7 @@ func main() {
 
 	flow.TransactionFromFile("setup/mint_tokens").SignProposeAndPayAsService().AccountArgument("buyer1").UFix64Argument("1000.0").RunPrintEventsFull()
 
+	fmt.Scanln()
 	flow.TransactionFromFile("buy/bid").
 		SignProposeAndPayAs("buyer1").
 		RawAccountArgument("0xf8d6e0586b0a20c7"). //we use raw argument here because of a limitation on how go-with-the-flow is built
@@ -102,6 +103,15 @@ func main() {
 		Argument(cadence.UInt64(11)).             //id of unique auction auction to bid on
 		UFix64Argument("10.00").                  //amount to bid
 		RunPrintEventsFull()
+
+	flow.TransactionFromFile("buy/bid").
+		SignProposeAndPayAs("buyer1").
+		RawAccountArgument("0xf8d6e0586b0a20c7"). //we use raw argument here because of a limitation on how go-with-the-flow is built
+		Argument(cadence.UInt64(1)).              //id of drop
+		Argument(cadence.UInt64(11)).             //id of unique auction auction to bid on
+		UFix64Argument("12.00").                  //amount to bid
+		RunPrintEventsFull()
+	fmt.Scanln()
 
 	fmt.Println()
 	fmt.Println()
