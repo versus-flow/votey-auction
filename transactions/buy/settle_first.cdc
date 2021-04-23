@@ -18,7 +18,7 @@ transaction() {
 
       let versusStatuses =Versus.getDrops()
       for status in versusStatuses {
-        if status.active == false && status.expired==true && status.settledAt != nil {
+        if status.active == false && status.expired==true && status.settledAt == nil {
           self.client.settle(status.dropId)
         }
       } 
