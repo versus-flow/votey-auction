@@ -29,7 +29,7 @@ transfer:
 #this goal settles and drop on testnet requires a drop(int) argument
 .PHONY: settle
 settle:
-	go run ./tasks/settle/main.go
+	go run ./tasks/settle_first/main.go
 
 #this goal creates and example drop on testnet, requires drop(string) env that will be used as NFT name suffix
 .PHONY: drop

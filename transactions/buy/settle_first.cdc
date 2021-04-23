@@ -16,11 +16,10 @@ transaction() {
 
     execute {
 
-      let versusStatuses=self.client.getAllStatuses()
-      for dropId in versusStatuses.keys {
-        let status = versusStatuses[dropId]!
-        if status.active == false && status.expired==true && status.settled == false {
-          self.client.settle(dropId)
+      let versusStatuses =Versus.getDrops()
+      for status in versusStatuses {
+        if status.active == false && status.expired==true && status.settledAt != nil {
+          self.client.settle(status.dropId)
         }
       } 
     } 

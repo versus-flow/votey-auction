@@ -160,7 +160,7 @@ pub contract Versus {
         pub fun settle(cutPercentage:UFix64, vault: Capability<&{FungibleToken.Receiver}> ) {
             let status=self.getDropStatus()
 
-            if status.settled {
+            if status.settledAt != nil {
                 panic("Drop has already been settled")
             }
 
@@ -313,7 +313,6 @@ pub contract Versus {
         pub let timeRemaining: Fix64
         pub let firstBidBlock:UInt64?
         pub let metadata: Art.Metadata
-        pub let settled: Bool
         pub let expired: Bool
         pub let settledAt: UInt64?
 
@@ -342,7 +341,6 @@ pub contract Versus {
                 self.firstBidBlock=firstBidBlock
                 self.difference=difference
                 self.metadata=metadata
-                self.settled=uniqueStatus.completed
                 self.expired=uniqueStatus.expired
                 self.settledAt=settledAt
             }

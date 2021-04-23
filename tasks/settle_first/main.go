@@ -1,12 +1,7 @@
 package main
 
 import (
-	"fmt"
-	"os"
-	"strconv"
-
 	"github.com/bjartek/go-with-the-flow/gwtf"
-	"github.com/onflow/cadence"
 )
 
 func main() {
