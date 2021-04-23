@@ -17,6 +17,7 @@ transaction(marketplace: Address, dropId: UInt64, auctionId: UInt64, bidAmount: 
 
     let vaultCap: Capability<&{FungibleToken.Receiver}>
     let collectionCap: Capability<&{Art.CollectionPublic}> 
+    let versusRef:&{Versus.PublicDrop}
     // Vault that will hold the tokens that will be used
     // to buy the NFT
     let temporaryVault: @FungibleToken.Vault
@@ -42,20 +43,18 @@ transaction(marketplace: Address, dropId: UInt64, auctionId: UInt64, bidAmount: 
         let vaultRef = account.borrow<&FungibleToken.Vault>(from: /storage/flowTokenVault)
             ?? panic("Could not borrow owner's Vault reference")
 
+        let seller = getAccount(marketplace)
+        self.versusRef = seller.getCapability(Versus.CollectionPublicPath).borrow<&{Versus.PublicDrop}>() ?? panic("Could not borrow seller's sale reference")
+
+        let currentBid=self.versusRef.currentBidForUser(dropId: dropId, auctionId: auctionId, address: account.address)
+        //if your capability is the leader you only have to send in the difference
+
         // withdraw tokens from the buyer's Vault
-        self.temporaryVault <- vaultRef.withdraw(amount: bidAmount)
+        self.temporaryVault <- vaultRef.withdraw(amount: bidAmount - currentBid)
     }
 
     execute {
-        // get the read-only account storage of the seller
-        let seller = getAccount(marketplace)
-
-        // get the reference to the seller's sale
-        let versusRef = seller.getCapability(Versus.CollectionPublicPath)
-                         .borrow<&{Versus.PublicDrop}>()
-                         ?? panic("Could not borrow seller's sale reference")
-
-        versusRef.placeBid(dropId: dropId, auctionId: auctionId, bidTokens: <- self.temporaryVault, vaultCap: self.vaultCap, collectionCap: self.collectionCap)
+        self.versusRef.placeBid(dropId: dropId, auctionId: auctionId, bidTokens: <- self.temporaryVault, vaultCap: self.vaultCap, collectionCap: self.collectionCap)
     }
 }
  
