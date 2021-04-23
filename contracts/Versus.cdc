@@ -4,7 +4,6 @@ import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import Art from "./Art.cdc"
 import Content from "./Content.cdc"
 import Auction from "./Auction.cdc"
-import Content from "./Content.cdc"
 
 /*
  The main contract in the Versus auction system.
