@@ -128,5 +128,6 @@ func main() {
 	flow.ScriptFromFile("check_account").AccountArgument("artist").Run()
 	flow.ScriptFromFile("check_account").AccountArgument("marketplace").Run()
 
+	flow.ScriptFromFile("drop_status_emulator").UInt64Argument(1).Run()
 	flow.TransactionFromFile("setup/destroy_versus").SignProposeAndPayAsService().Argument(cadence.NewUInt64(1)).RunPrintEventsFull()
 }

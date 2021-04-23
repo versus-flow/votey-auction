@@ -40,10 +40,12 @@ func main() {
 
 	flow := gwtf.NewGoWithTheFlowDevNet()
 
-	t := time.Now().Unix()
+	now := time.Now() //.Add(time.Hour * 12)
+	t := now.Unix()
+	//t := time.Now().Unix()
 	timeString := strconv.FormatInt(t, 10) + ".0"
 
-	image := fileAsImageData("bull.png")
+	image := fileAsImageData("versus.png")
 
 	flow.TransactionFromFile("setup/drop_testnet").
 		SignProposeAndPayAs("admin").
@@ -51,13 +53,13 @@ func main() {
 		UFix64Argument("1.00").                //start price
 		UFix64Argument(timeString).            //start time
 		StringArgument("Kinger9999").          //artist name
-		StringArgument("CryptoBull" + number). //name of art
+		StringArgument("Versus" + number). //name of art
 		StringArgument(image).                 //imaage
-		StringArgument("An Angry bull").
+		StringArgument("Versus").
 		Argument(cadence.NewUInt64(10)). //number of editions to use for the editioned auction
 		UFix64Argument("2.0").           //min bid increment
 		UFix64Argument("4.0").           //min bid increment unique
-		UFix64Argument("86400.0").       //duration
+		UFix64Argument("21600.0").       //duration
 		UFix64Argument("600.0").         //extensionOnLateBid
 		RunPrintEventsFull()
 

@@ -153,7 +153,8 @@ pub contract Versus {
                 difference: difference,
                 metadata: self.metadata,
                 settledAt: self.settledAt,
-                active: active
+                active: active,
+                startPrice: uniqueRef.startPrice
             )
         }
 
@@ -315,6 +316,7 @@ pub contract Versus {
         pub let metadata: Art.Metadata
         pub let expired: Bool
         pub let settledAt: UInt64?
+        pub let startPrice: UFix64
 
         init(
             dropId: UInt64,
@@ -327,6 +329,7 @@ pub contract Versus {
             metadata: Art.Metadata,
             settledAt: UInt64?
             active: Bool
+            startPrice: UFix64
             ) {
                 self.dropId=dropId
                 self.uniqueStatus=DropAuctionStatus(uniqueStatus)
@@ -343,6 +346,7 @@ pub contract Versus {
                 self.metadata=metadata
                 self.expired=uniqueStatus.expired
                 self.settledAt=settledAt
+                self.startPrice =startPrice
             }
     }
 

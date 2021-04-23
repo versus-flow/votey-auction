@@ -105,7 +105,7 @@ pub contract Auction {
         priv var auctionCompleted: Bool
 
         // Auction State
-        priv var startPrice: UFix64
+        access(account) var startPrice: UFix64
         priv var currentPrice: UFix64
 
         //the capability that points to the resource where you want the NFT transfered to if you win this bid. 
