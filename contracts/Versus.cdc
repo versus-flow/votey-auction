@@ -530,7 +530,7 @@ pub contract Versus {
     }
 
     // Get the art stored on chain for this drop
-    pub fun getArtForDrop(dropId: UInt64) : String? {
+    pub fun getArtForDrop(_ dropId: UInt64) : String? {
         let versusCap=Versus.account.getCapability<&{Versus.PublicDrop}>(self.CollectionPublicPath)
         if let versus = versusCap.borrow()  {
             return versus.getArt(dropId: dropId)
