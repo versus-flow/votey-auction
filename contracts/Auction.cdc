@@ -266,7 +266,7 @@ pub contract Auction {
                 return self.bidVault.balance
             }
             return 0.0
-        }
+        }n
 
         // This method should probably use preconditions more
         pub fun placeBid(bidTokens: @FungibleToken.Vault, vaultCap: Capability<&{FungibleToken.Receiver}>, collectionCap: Capability<&{Art.CollectionPublic}>) {
@@ -278,15 +278,19 @@ pub contract Auction {
 
             let bidderAddress=vaultCap.borrow()!.owner!.address
 
-            if bidTokens.balance < self.minNextBid() + self.currentBidForUser(address:bidderAddress) {
-                panic("bid amount must be larger or equal to the current price + minimum bid increment - your current bid (if any)")
+            let amountYouAreBidding= bidTokens.balance + self.currentBidForUser(address: bidderAddress)
+            let minNextBid=self.minNextBid()
+            if amountYouAreBidding < minNextBid {
+                panic("bid amount + (your current bid) must be larger or equal to the current price + minimum bid increment ".concat(amountYouAreBidding.toString()).concat(" < ").concat(minNextBid.toString()))
              }
 
             if self.bidder() != bidderAddress {
-              if let vaultCap = self.recipientVaultCap {
-                  self.sendBidTokens(self.recipientVaultCap!)
-              } else {
-                  panic("unable to get recipient Vault capability")
+              if self.bidVault.balance != 0.0 {
+                if let vaultCap = self.recipientVaultCap {
+                    self.sendBidTokens(self.recipientVaultCap!)
+                } else {
+                    panic("unable to get recipient Vault capability")
+                }
               }
             }
 
