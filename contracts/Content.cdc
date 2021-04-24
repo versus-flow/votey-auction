@@ -88,8 +88,8 @@ pub contract Content {
 	init() {
         // Initialize the total supply
         self.totalSupply = 0
-        self.CollectionPrivatePath=/private/versusContentCollection2
-        self.CollectionStoragePath=/storage/versusContentCollection2
+        self.CollectionPrivatePath=/private/versusContentCollection
+        self.CollectionStoragePath=/storage/versusContentCollection
 
         let account =self.account
         account.save(<- Content.createEmptyCollection(), to: Content.CollectionStoragePath)
