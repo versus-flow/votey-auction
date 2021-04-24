@@ -257,12 +257,12 @@ pub contract Versus {
                 self.extendDropWith(UFix64(extendWith))
             }
 
-            let bidPrice = bidTokens.balance
             let bidder=vaultCap.borrow()!.owner!.address
+            let currentBidForUser= self.currentBidForUser(auctionId: auctionId, address: bidder)
+            let bidPrice = bidTokens.balance + currentBidForUser
 
             var edition:String="1 of 1"
 
-            var price:UFix64=0.0
             //the bid is on a unique auction so we place the bid there
             if self.uniqueAuction.auctionID == auctionId {
                 let auctionRef = &self.uniqueAuction as &Auction.AuctionItem
