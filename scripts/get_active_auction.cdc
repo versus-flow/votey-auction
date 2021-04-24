@@ -2,7 +2,7 @@
 //
 
 //emulator
-import Versus from 0xe193e719ae2b5853
+import Versus from 0xd5ee212b0fa4a319
 
 //testnet
 //import Versus from 0x6bb8a74d4db97b46

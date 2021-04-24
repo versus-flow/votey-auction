@@ -12,11 +12,9 @@ func main() {
 	//fetch the current block height
 	eb := g.SendEventsTo("beta").
 		TrackProgressIn(".flow-dev.events").
-		Event("A.e193e719ae2b5853.Versus.Bid").
-		Event("A.e193e719ae2b5853.Versus.LeaderChanged").
-		Event("A.e193e719ae2b5853.Versus.Settle").
-		Event("A.e193e719ae2b5853.Versus.DropExtended").
-		Event("A.e193e719ae2b5853.Versus.DropCreated")
+		EventIgnoringFields("A.d5ee212b0fa4a319.Versus.Bid", []string{"auctionId", "dropId"}).
+		EventIgnoringFields("A.d5ee212b0fa4a319.Versus.LeaderChanged", []string{"dropId"}).
+		Event("A.d5ee212b0fa4a319.Versus.Settle")
 
 	_, err := eb.Run()
 	if err != nil {

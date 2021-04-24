@@ -10,13 +10,8 @@ keys=$(flow keys generate -o json)
 publicKey=$(echo $keys | jq ".private" -r)
 privateKey=$(echo $keys | jq ".public" -r)
 
-
-echo "Public $publicKey"
-echo "Private $privateKey"
-
 account=$(flow accounts create --host access.devnet.nodes.onflow.org:9000 --config-path ~/.flow-dev.json --key $publicKey -o json)
 
-echo $account
 
 address=$(echo $account | jq ".address" -r)
 
