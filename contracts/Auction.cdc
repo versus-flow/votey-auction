@@ -159,7 +159,11 @@ pub contract Auction {
                 collectionRef.deposit(token: <-NFT!)
                 return
             } 
-            panic("Could not send NFT to non existing capability")
+            if let ownerCollection=self.ownerCollectionCap.borrow() {
+                let NFT <- self.NFT <- nil
+                ownerCollection.deposit(token: <-NFT!)
+                return 
+            } 
         }
 
         // sendBidTokens sends the bid tokens to the Vault Receiver belonging to the provided Capability
@@ -172,7 +176,14 @@ pub contract Auction {
                 }
                 return
             }
-            panic("Could not send tokens to non existant receiver")
+
+            if let ownerRef= self.ownerVaultCap.borrow() {
+                let bidVaultRef = &self.bidVault as &FungibleToken.Vault
+                if(bidVaultRef.balance > 0.0) {
+                    ownerRef.deposit(from: <-bidVaultRef.withdraw(amount: bidVaultRef.balance))
+                }
+                return
+            }
         }
 
         pub fun releasePreviousBid() {
@@ -184,7 +195,6 @@ pub contract Auction {
 
         //This method should probably use preconditions more 
         pub fun settleAuction(cutPercentage: UFix64, cutVault:Capability<&{FungibleToken.Receiver}> )  {
-
 
             pre {
                 !self.auctionCompleted : "The auction is already settled"
@@ -286,11 +296,7 @@ pub contract Auction {
 
             if self.bidder() != bidderAddress {
               if self.bidVault.balance != 0.0 {
-                if let vaultCap = self.recipientVaultCap {
-                    self.sendBidTokens(self.recipientVaultCap!)
-                } else {
-                    panic("unable to get recipient Vault capability")
-                }
+                self.sendBidTokens(self.recipientVaultCap!)
               }
             }
 
